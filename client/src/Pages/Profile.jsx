@@ -125,7 +125,7 @@ export default function Profile({ setIsAuthenticated }) {
         }
 
         // Merge with local storage created listings
-        const localListings = JSON.parse(localStorage.getItem("studx_user_listings") || "[]");
+        const localListings = JSON.parse(localStorage.getItem("buykaro_user_listings") || localStorage.getItem("studx_user_listings") || "[]");
         const merged = [...(Array.isArray(serverListings) ? serverListings : [])];
 
         // Add local listings if not already in server array
@@ -137,7 +137,7 @@ export default function Profile({ setIsAuthenticated }) {
 
         setMyListings(merged);
       } catch {
-        const localListings = JSON.parse(localStorage.getItem("studx_user_listings") || "[]");
+        const localListings = JSON.parse(localStorage.getItem("buykaro_user_listings") || localStorage.getItem("studx_user_listings") || "[]");
         setMyListings(localListings);
       } finally {
         setListingsLoading(false);
@@ -183,11 +183,11 @@ export default function Profile({ setIsAuthenticated }) {
       );
 
       // Update local storage
-      const localListings = JSON.parse(localStorage.getItem("studx_user_listings") || "[]");
+      const localListings = JSON.parse(localStorage.getItem("buykaro_user_listings") || localStorage.getItem("studx_user_listings") || "[]");
       const updated = localListings.map((item) =>
         item._id === productId ? { ...item, status: newStatus } : item
       );
-      localStorage.setItem("studx_user_listings", JSON.stringify(updated));
+      localStorage.setItem("buykaro_user_listings", JSON.stringify(updated));
 
       toast.success(`Listing status updated to ${newStatus}`);
     } catch {
@@ -212,9 +212,9 @@ export default function Profile({ setIsAuthenticated }) {
       setMyListings((prev) => prev.filter((item) => item._id !== deletingProductId));
 
       // Remove from local storage
-      const localListings = JSON.parse(localStorage.getItem("studx_user_listings") || "[]");
+      const localListings = JSON.parse(localStorage.getItem("buykaro_user_listings") || localStorage.getItem("studx_user_listings") || "[]");
       const filtered = localListings.filter((item) => item._id !== deletingProductId);
-      localStorage.setItem("studx_user_listings", JSON.stringify(filtered));
+      localStorage.setItem("buykaro_user_listings", JSON.stringify(filtered));
 
       toast.success("Listing deleted successfully.");
     } catch {
@@ -257,11 +257,11 @@ export default function Profile({ setIsAuthenticated }) {
       );
 
       // Update in local storage
-      const localListings = JSON.parse(localStorage.getItem("studx_user_listings") || "[]");
+      const localListings = JSON.parse(localStorage.getItem("buykaro_user_listings") || localStorage.getItem("studx_user_listings") || "[]");
       const updated = localListings.map((item) =>
         item._id === editingProduct._id ? editingProduct : item
       );
-      localStorage.setItem("studx_user_listings", JSON.stringify(updated));
+      localStorage.setItem("buykaro_user_listings", JSON.stringify(updated));
 
       toast.success("Listing updated successfully!");
       setEditingProduct(null);

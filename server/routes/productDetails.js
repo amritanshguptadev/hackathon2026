@@ -13,7 +13,7 @@ async function getAuthUser(req) {
     const authHeader = req.header('authorization') || req.header('Authorization');
     if (!authHeader) return null;
     const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : authHeader;
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'studx-dev-jwt-secret');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'buykaro-dev-jwt-secret');
     if (decoded && decoded._id) {
       return await User.findById(decoded._id).select('-password');
     }

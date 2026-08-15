@@ -56,21 +56,21 @@ const SOCIAL = [
 
 export default function Footer() {
   return (
-    <footer className="border-t border-[var(--cm-border)] bg-[#0f172a] text-slate-300">
+    <footer className="border-t border-indigo-950 bg-[#0b132b] text-slate-300">
       {/* Top CTA strip */}
-      <div className="bg-[var(--cm-blue)] py-5 px-4">
+      <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 py-5 px-4 shadow-inner">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 sm:flex-row">
           <div className="flex items-center gap-3">
             <ShoppingBag size={22} className="text-white" />
-            <p className="text-sm font-semibold text-white sm:text-base">
-              Have something to sell? List it for free in under 2 minutes!
+            <p className="text-sm font-bold text-white sm:text-base">
+              Have textbooks, gadgets, or room essentials to sell? List for free!
             </p>
           </div>
           <Link
-            to="/product-listing"
-            className="flex items-center gap-2 rounded-full bg-white px-5 py-2 text-sm font-bold text-[var(--cm-blue)] transition hover:bg-slate-100"
+            to="/sell"
+            className="flex items-center gap-2 rounded-full bg-white px-6 py-2.5 text-sm font-extrabold text-indigo-700 shadow-md transition hover:bg-slate-50 hover:scale-105 active:scale-95"
           >
-            Start Selling <ArrowRight size={15} />
+            Start Selling Free <ArrowRight size={15} />
           </Link>
         </div>
       </div>
@@ -81,10 +81,10 @@ export default function Footer() {
 
           {/* Brand column */}
           <div className="lg:col-span-2">
-            <Link to="/" className="inline-block">
-              <span className="text-2xl font-extrabold tracking-tight text-white" style={{ fontFamily: "var(--font-display)" }}>
-                Buykro
-              </span>
+            <Link to="/" className="inline-flex items-center gap-2">
+              <div className="rounded-xl bg-white px-3.5 py-1.5 shadow-sm transition hover:opacity-95">
+                <img src="/images/logo.png" alt="BuyKaro" className="h-8 sm:h-9 w-auto object-contain" />
+              </div>
             </Link>
             <p className="mt-3 text-sm leading-relaxed text-slate-400">
               India's #1 student marketplace. Buy, sell, and exchange items
@@ -95,7 +95,7 @@ export default function Footer() {
             <div className="mt-6 space-y-2 text-sm text-slate-400">
               <div className="flex items-center gap-2">
                 <Mail size={14} className="shrink-0 text-[var(--cm-blue)]" />
-                <span>support@buykro.in</span>
+                <span>support@buykaro.in</span>
               </div>
               <div className="flex items-center gap-2">
                 <Phone size={14} className="shrink-0 text-[var(--cm-blue)]" />
@@ -200,7 +200,7 @@ export default function Footer() {
       <div className="border-t border-slate-700 px-4 py-5 sm:px-6 lg:px-8">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 sm:flex-row">
           <p className="text-xs text-slate-500">
-            © {new Date().getFullYear()} Buykro Technologies Pvt. Ltd. All rights reserved. Built for students, by students. 🎓
+            © {new Date().getFullYear()} BuyKaro Technologies Pvt. Ltd. All rights reserved. Built for students, by students. 🎓
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             {LEGAL_LINKS.map((l) => (

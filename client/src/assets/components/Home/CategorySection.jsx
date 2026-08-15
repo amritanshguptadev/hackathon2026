@@ -50,21 +50,21 @@ export default function CategorySection() {
           </div>
 
           {/* Amazon-style compact grid */}
-          <div className="rounded-2xl bg-white ring-1 ring-[var(--cm-border)] overflow-hidden">
-            <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 divide-x divide-y divide-[var(--cm-border)]">
+          <div className="rounded-2xl bg-white ring-1 ring-[var(--cm-border-indigo)] overflow-hidden shadow-sm">
+            <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 divide-x divide-y divide-indigo-50">
               {CATEGORIES.map((cat) => (
                 <Link
                   key={cat.name}
                   to="/all-products"
-                  className="group flex flex-col items-center gap-1.5 px-2 py-3 transition hover:bg-[var(--cm-blue-soft)]"
+                  className="group flex flex-col items-center gap-1.5 px-2 py-3.5 transition hover:bg-gradient-to-b hover:from-indigo-50/50 hover:to-purple-50/40"
                 >
                   <span
-                    className="flex h-10 w-10 items-center justify-center rounded-xl text-xl shadow-sm transition group-hover:scale-110"
+                    className="flex h-10 w-10 items-center justify-center rounded-xl text-xl shadow-xs transition group-hover:scale-110"
                     style={{ backgroundColor: cat.color }}
                   >
                     {cat.emoji}
                   </span>
-                  <span className="text-center text-[10px] font-medium leading-tight text-[var(--cm-ink)] group-hover:text-[var(--cm-blue)]">
+                  <span className="text-center text-[11px] font-semibold leading-tight text-slate-700 group-hover:text-indigo-600 transition-colors">
                     {cat.name}
                   </span>
                 </Link>
@@ -74,7 +74,7 @@ export default function CategorySection() {
         </div>
 
         {/* ── RIGHT: Post a Request ── */}
-        <div className="w-full lg:w-[260px] shrink-0">
+        <div className="w-full lg:w-[270px] shrink-0">
           <div className="mb-3">
             <h2
               className="text-lg font-bold text-[var(--cm-ink)] sm:text-xl"
@@ -84,20 +84,20 @@ export default function CategorySection() {
             </h2>
           </div>
 
-          <div className="rounded-2xl bg-[var(--cm-blue-soft)] p-4 ring-1 ring-[var(--cm-border)]">
+          <div className="rounded-2xl bg-gradient-to-br from-indigo-50/90 via-purple-50/60 to-blue-50/80 p-4 ring-1 ring-indigo-200/70 shadow-sm">
             <ul className="space-y-2.5 mb-4">
               {WANTED.map((text) => (
                 <li key={text} className="flex items-start gap-2">
-                  <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white text-[var(--cm-blue)] shadow-sm">
+                  <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white text-indigo-600 shadow-xs border border-indigo-100">
                     <Search size={12} />
                   </span>
-                  <p className="text-xs leading-snug text-[var(--cm-ink)]">{text}</p>
+                  <p className="text-xs leading-snug font-medium text-slate-800">{text}</p>
                 </li>
               ))}
             </ul>
             <Link
               to="/sell"
-              className="flex w-full items-center justify-center rounded-full bg-[var(--cm-blue)] py-2.5 text-xs font-bold text-white shadow transition hover:bg-blue-700"
+              className="flex w-full items-center justify-center rounded-full cm-gradient-btn py-2.5 text-xs font-bold text-white shadow-md transition"
             >
               + Post a Request
             </Link>

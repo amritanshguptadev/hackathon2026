@@ -1,68 +1,62 @@
 import {
-    Package,
-    CreditCard,
-    Headset,
-    BadgePercent
-} from 'lucide-react'
+  Package,
+  ShieldCheck,
+  Headset,
+  BadgePercent,
+  Sparkles
+} from 'lucide-react';
+
 export default function SiteHighlights() {
-    return (
-        <>
-        
-             <div className="raleway hidden md:flex justify-center items-center px-4 ">
-            <div className="flex flex-col md:flex-row border border-gray-300 rounded-md w-full md:w-18/20 justify-center bg-white ">
-                <div className="flex w-full md:w-1/3 md:p-4 items-center md:justify-center">
-                    <div className="m-3">
-                        <Package size={35} className="text-black-300" />
-                    </div>
-                    <div className="m-3">
-                        <p className="text-black font-semibold">GENUINE PRODUCTS</p>
-                        <p className="text-sm text-gray-500">Customers are verified</p>
-                    </div>
-                </div>
-                <div className="hidden md:flex items-center mx-2">
-                    <div className="border-l h-12 border-gray-300" />
-                </div>
-                
-                <div className="flex w-full md:w-1/3 md:p-4 items-center md:justify-center">
-                    <div className="m-3">
-                        <CreditCard size={35} className="text-black" />
-                    </div>
-                    <div className="m-3">
-                        <p className="text-black font-semibold">SECURE PAYMENT</p>
-                        <p className="text-sm text-gray-500">Safe & encrypted</p>
-                    </div>
-                </div>
+  const highlights = [
+    {
+      icon: Package,
+      title: "100% Peer Verified",
+      desc: "Student ID authenticated listings",
+    },
+    {
+      icon: ShieldCheck,
+      title: "Direct Campus Hand-Off",
+      desc: "Meet on campus safely with zero delivery wait",
+    },
+    {
+      icon: BadgePercent,
+      title: "0% Commission",
+      desc: "Free student-to-student exchange",
+    },
+    {
+      icon: Headset,
+      title: "Instant In-App Chat",
+      desc: "Direct messaging with student sellers",
+    },
+  ];
 
-                <div className="hidden md:flex items-center mx-2">
-                    <div className="border-l h-12 border-gray-300" />
+  return (
+    <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className="rounded-3xl bg-white border border-indigo-100 p-6 sm:p-8 shadow-xs">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 divide-y lg:divide-y-0 lg:divide-x divide-indigo-50">
+          {highlights.map((item, idx) => {
+            const Icon = item.icon;
+            return (
+              <div
+                key={item.title}
+                className={`flex items-center gap-4 ${
+                  idx > 0 ? "pt-4 lg:pt-0 lg:pl-6" : ""
+                }`}
+              >
+                <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-100/80 text-indigo-600 flex items-center justify-center shrink-0 shadow-2xs">
+                  <Icon size={22} />
                 </div>
-
-                <div className="flex w-full md:w-1/3 md:p-4 items-center md:justify-center">
-                    <div className="m-3">
-                        <Headset size={35} className="text-black" />
-                    </div>
-                    <div className="m-3">
-                        <p className="text-black font-semibold">24/7 SUPPORT</p>
-                        <p className="text-sm text-gray-500">Always here for you</p>
-                    </div>
+                <div>
+                  <h3 className="text-sm font-extrabold text-slate-900">
+                    {item.title}
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-0.5">{item.desc}</p>
                 </div>
-
-                <div className="hidden md:flex items-center mx-2">
-                    <div className="border-l h-12 border-gray-300" />
-                </div>
-
-                <div className="flex w-full md:w-1/3 md:p-4 items-center md:justify-center">
-                    <div className="m-3">
-                        <BadgePercent size={35} className="text-black" />
-                    </div>
-                    <div className="m-3">
-                        <p className="text-black font-semibold">BEST PRICE</p>
-                        <p className="text-sm text-gray-500">Low prices guaranteed</p>
-                    </div>
-                </div>
-            </div>
+              </div>
+            );
+          })}
         </div>
-
-        </>
-    );
+      </div>
+    </section>
+  );
 }

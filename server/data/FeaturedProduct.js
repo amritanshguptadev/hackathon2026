@@ -39,7 +39,7 @@ const featuredProduct = [
     dimensions: "45 x 47 x 50 cm",
     seller: {
       name: "Ananya Verma",
-      email: "ananya.coolgadgets@studx.com",
+      email: "ananya.coolgadgets@buykaro.com",
       joinedAt: "2024-02-14T15:00:00Z",
       city: "Delhi",
       college: "Lady Shri Ram College",
@@ -62,7 +62,7 @@ const featuredProduct = [
     dimensions: "20 x 12 x 35 cm",
     seller: {
       name: "Nikhil Rao",
-      email: "nikhil.electro@studx.com",
+      email: "nikhil.electro@buykaro.com",
       joinedAt: "2022-11-10T08:30:00Z",
       city: "Mumbai",
       college: "IIT Bombay",
@@ -85,7 +85,7 @@ const featuredProduct = [
     dimensions: "28 x 22 x 6 cm (folded)",
     seller: {
       name: "Priya Sharma",
-      email: "priya.gearhub@studx.com",
+      email: "priya.gearhub@buykaro.com",
       joinedAt: "2024-06-01T09:15:00Z",
       city: "Pune",
       college: "MIT WPU",
@@ -108,7 +108,7 @@ const featuredProduct = [
     dimensions: "70 x 55 x 145 cm",
     seller: {
       name: "Amit Jha",
-      email: "amit.homeneeds@studx.com",
+      email: "amit.homeneeds@buykaro.com",
       joinedAt: "2023-12-18T18:45:00Z",
       city: "Bangalore",
       college: "Christ University",
@@ -131,7 +131,7 @@ const featuredProduct = [
     dimensions: "30 x 25 x 45 cm",
     seller: {
       name: "Sonal Mehta",
-      email: "sonal.coolcorner@studx.com",
+      email: "sonal.coolcorner@buykaro.com",
       joinedAt: "2025-01-05T12:00:00Z",
       city: "Hyderabad",
       college: "Osmania University",
@@ -154,7 +154,7 @@ const featuredProduct = [
     dimensions: "25 x 25 x 18 cm",
     seller: {
       name: "Rakesh Bhatt",
-      email: "rakesh.kitchenware@studx.com",
+      email: "rakesh.kitchenware@buykaro.com",
       joinedAt: "2023-04-22T14:10:00Z",
       city: "Ahmedabad",
       college: "Nirma University",
@@ -177,7 +177,7 @@ const featuredProduct = [
     dimensions: "30 x 30 x 4 cm",
     seller: {
       name: "Shruti Patel",
-      email: "shruti.homevibe@studx.com",
+      email: "shruti.homevibe@buykaro.com",
       joinedAt: "2022-10-03T07:25:00Z",
       city: "Indore",
       college: "DAVV",
@@ -200,7 +200,7 @@ const featuredProduct = [
     dimensions: "44 x 35 x 61 cm",
     seller: {
       name: "Karan Desai",
-      email: "karan.organizeit@studx.com",
+      email: "karan.organizeit@buykaro.com",
       joinedAt: "2023-09-10T16:45:00Z",
       city: "Surat",
       college: "SVNIT",

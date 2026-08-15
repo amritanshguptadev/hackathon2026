@@ -70,7 +70,7 @@ const getOrCreateConversation = async (req, res) => {
 
     // Fallback registration if legacy product lacks registered user entry
     if (!sellerUser && product.seller) {
-      const fallbackEmail = product.seller.email || `seller_${product._id}@studx.campus`;
+      const fallbackEmail = product.seller.email || `seller_${product._id}@buykaro.campus`;
       sellerUser = await UserModel.findOne({ email: fallbackEmail.toLowerCase() }).select('-password');
       if (!sellerUser) {
         sellerUser = await UserModel.create({

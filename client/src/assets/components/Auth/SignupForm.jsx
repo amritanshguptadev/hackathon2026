@@ -486,7 +486,7 @@ export default function SignupForm() {
                   Your Hyperlocal Student Marketplace
                 </h2>
                 <p className="mt-3 text-slate-300 text-sm leading-relaxed">
-                  STUDx connects university students on the same campus to buy, sell, and pass down textbooks, tech, bikes, and dorm essentials with zero shipping hassle.
+                  BuyKaro connects university students on the same campus to buy, sell, and pass down textbooks, tech, bikes, and dorm essentials with zero shipping hassle.
                 </p>
 
                 {/* Benefits List */}

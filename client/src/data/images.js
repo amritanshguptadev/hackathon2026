@@ -1,8 +1,10 @@
 /**
- * Central paths for Buykro marketplace images.
+ * Central paths for BuyKaro marketplace images.
  * Files live in: client/public/images/
  */
 export const IMAGES = {
+  logo: "/images/logo.png",
+
   products: {
     macbook: "/images/products/macbook.png",
     textbook: "/images/products/textbook.png",

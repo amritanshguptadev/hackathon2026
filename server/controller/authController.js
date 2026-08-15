@@ -220,7 +220,7 @@ export const login = async (req, res) => {
         studentId: user.studentId,
         role: user.role,
       },
-      process.env.JWT_SECRET || 'studx-dev-jwt-secret',
+      process.env.JWT_SECRET || 'buykaro-dev-jwt-secret',
       { expiresIn: '48h' }
     );
 

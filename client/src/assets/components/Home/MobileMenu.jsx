@@ -63,22 +63,22 @@ export default function MobileMenu() {
 
       <Link
         to="/sell"
-        className="flex w-full items-center justify-center rounded-full bg-[var(--cm-blue)] py-3 text-sm font-semibold text-white"
+        className="flex w-full items-center justify-center rounded-full cm-gradient-btn py-3 text-sm font-bold text-white shadow-md transition"
       >
-        Sell Item
+        + Sell Item
       </Link>
 
       {!isAuthenticated && (
         <div className="flex gap-2">
           <Link
             to="/login"
-            className="flex-1 rounded-full border border-[var(--cm-border)] py-2.5 text-center text-sm font-semibold text-[var(--cm-ink)]"
+            className="flex-1 rounded-full border border-indigo-200 py-2.5 text-center text-sm font-bold text-slate-800 hover:bg-slate-50 transition"
           >
             Log In
           </Link>
           <Link
             to="/signup"
-            className="flex-1 rounded-full bg-[var(--cm-blue-soft)] py-2.5 text-center text-sm font-semibold text-[var(--cm-blue)]"
+            className="flex-1 rounded-full bg-indigo-50 border border-indigo-200 py-2.5 text-center text-sm font-bold text-indigo-700 hover:bg-indigo-100 transition"
           >
             Sign Up
           </Link>

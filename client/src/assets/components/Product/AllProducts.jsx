@@ -134,7 +134,11 @@ export default function AllProducts() {
 
   // Fetch live products & custom user listings
   useEffect(() => {
-    const customListings = JSON.parse(localStorage.getItem("studx_user_listings") || "[]");
+    const customListings = JSON.parse(
+      localStorage.getItem("buykaro_user_listings") ||
+      localStorage.getItem("studx_user_listings") ||
+      "[]"
+    );
 
     Promise.all([
       fetch(`${API_URL}/api/featured-products`).then((r) => r.json()).catch(() => []),

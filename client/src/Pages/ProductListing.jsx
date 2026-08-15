@@ -259,9 +259,9 @@ export default function ProductListing() {
       }
 
       // Persist to local listings storage so it appears in My Listings & Marketplace
-      const existingCustom = JSON.parse(localStorage.getItem("studx_user_listings") || "[]");
+      const existingCustom = JSON.parse(localStorage.getItem("buykaro_user_listings") || localStorage.getItem("studx_user_listings") || "[]");
       existingCustom.unshift(savedProduct);
-      localStorage.setItem("studx_user_listings", JSON.stringify(existingCustom));
+      localStorage.setItem("buykaro_user_listings", JSON.stringify(existingCustom));
 
       toast.success("🎉 Your item has been listed successfully!");
       setShowPreviewModal(false);

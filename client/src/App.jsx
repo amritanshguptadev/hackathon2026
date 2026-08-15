@@ -12,7 +12,9 @@ import { useState } from 'react';
 import Profile from './Pages/Profile';
 import ProductListing from './Pages/ProductListing';
 import Messages from './Pages/Messages';
+import Cart from './Pages/Cart';
 import { SocketProvider } from './context/SocketContext';
+import { CartProvider } from './context/CartContext';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('token'));
@@ -25,21 +27,24 @@ function App() {
 
   return (
     <SocketProvider>
-      <RefreshHandler setIsAuthenticated={setIsAuthenticated} />
-      <Routes>
-        <Route path="/login" element={<LoginForm />} />
-        <Route path="/signup" element={<SignupForm />} />
-        <Route path="/verify-email" element={<EmailVerification />} />
-        <Route path="/" element={<Home/>} />
-        <Route path="/api/product/:id" element={<ProductDetails />} />
-        <Route path="/all-products" element={<AllProducts />} />
-        <Route path="/upcoming" element={<Upcoming />} />
-        <Route path="/profile" element={<Profile setIsAuthenticated={setIsAuthenticated}/>}/>
-        <Route path="/product-listing" element={<ProductListing/>}/>
-        <Route path="/sell" element={<ProductListing/>}/>
-        <Route path="/messages" element={<PrivateRoute element={<Messages />} />} />
-        <Route path="/messages/:conversationId" element={<PrivateRoute element={<Messages />} />} />
-      </Routes>
+      <CartProvider>
+        <RefreshHandler setIsAuthenticated={setIsAuthenticated} />
+        <Routes>
+          <Route path="/login" element={<LoginForm />} />
+          <Route path="/signup" element={<SignupForm />} />
+          <Route path="/verify-email" element={<EmailVerification />} />
+          <Route path="/" element={<Home/>} />
+          <Route path="/api/product/:id" element={<ProductDetails />} />
+          <Route path="/all-products" element={<AllProducts />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/upcoming" element={<Upcoming />} />
+          <Route path="/profile" element={<Profile setIsAuthenticated={setIsAuthenticated}/>}/>
+          <Route path="/product-listing" element={<ProductListing/>}/>
+          <Route path="/sell" element={<ProductListing/>}/>
+          <Route path="/messages" element={<PrivateRoute element={<Messages />} />} />
+          <Route path="/messages/:conversationId" element={<PrivateRoute element={<Messages />} />} />
+        </Routes>
+      </CartProvider>
     </SocketProvider>
   );
 }

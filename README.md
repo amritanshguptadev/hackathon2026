@@ -1,14 +1,11 @@
-# 🎓 STUDx – Campus Exchange Hub
+# 🎓 BuyKaro – Campus Exchange Hub
 
-STUDx is a full-stack marketplace platform built with the MERN stack, designed specifically for **college students** to buy and sell second-hand academic and living essentials like books, furniture, electronics, and more within their **local campus community**.
-
+BuyKaro is a full-stack marketplace platform built with the MERN stack, designed specifically for **college students** to buy and sell second-hand academic and living essentials like books, furniture, electronics, and more within their **local campus community**.
 
 ---
 
-
-### 🌐 STUDx - Campus Exchange Hub
-[![Screenshot](STUDx.png)](https://github.com/shahnawaz-hussaink/studx)
-
+### 🌐 BuyKaro - Campus Exchange Hub
+[![Logo](images/logo.png)](https://github.com/shahnawaz-hussaink/studx)
 
 ---
 ## 📌 Features
@@ -35,10 +32,12 @@ STUDx is a full-stack marketplace platform built with the MERN stack, designed s
 
 ## 🗂️ Project Structure
 
-studx/
+```
+buykaro/
 ├── client/ # React frontend
-└── server/ # Node.js backend
-
+├── server/ # Node.js backend
+└── images/ # Marketplace branding & assets
+```
 
 ---
 
@@ -51,12 +50,13 @@ studx/
 
 ```bash 
 # Clone the repo
-git clone https://github.com/your-username/studx.git
-cd studx
+git clone https://github.com/your-username/buykaro.git
+cd buykaro
 
 # Install frontend dependencies
 cd client
 npm install
+
 
 # Install backend dependencies
 cd ../server

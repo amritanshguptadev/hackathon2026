@@ -1,19 +1,37 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import Header from "../Home/Header";
-import { Loader, ArrowLeft, MessageCircle } from "lucide-react";
 import Footer from "../Home/Footer";
+import { useCart } from "../../../context/CartContext";
 import { ToastContainer } from "react-toastify";
 import { handleError } from "../../../utils";
 import { API_URL, resolveMediaUrl } from "../../../config/api";
+import {
+  Loader,
+  ArrowLeft,
+  MessageCircle,
+  ShoppingCart,
+  Zap,
+  ShieldCheck,
+  MapPin,
+  School,
+  Calendar,
+  Mail,
+  Sparkles,
+  Tag,
+  CheckCircle2
+} from "lucide-react";
 
 export default function ProductDetails() {
   const { id } = useParams();
   const [product, setProduct] = useState({});
+  const [loading, setLoading] = useState(true);
   const [contacting, setContacting] = useState(false);
   const navigate = useNavigate();
+  const { addToCart } = useCart();
 
   useEffect(() => {
+    setLoading(true);
     fetch(`${API_URL}/api/product/${id}`)
       .then((res) => res.json())
       .then((data) => {
@@ -21,8 +39,22 @@ export default function ProductDetails() {
       })
       .catch((err) => {
         console.error("Error fetching product:", err);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   }, [id]);
+
+  const handleAddToCart = () => {
+    if (!product || !product._id) return;
+    addToCart(product, 1);
+  };
+
+  const handleBuyNow = () => {
+    if (!product || !product._id) return;
+    addToCart(product, 1);
+    navigate('/cart');
+  };
 
   const handleContactSeller = async () => {
     const token = localStorage.getItem("token");
@@ -56,135 +88,196 @@ export default function ProductDetails() {
     }
   };
 
-  if (!product.title) {
+  if (loading || !product.title) {
     return (
-      <div className="text-center p-4">
-        <Loader size={50} color="black" />
+      <div className="min-h-screen bg-[var(--cm-bg)] flex flex-col justify-between">
+        <Header showSearchBar={false} />
+        <div className="flex-1 flex flex-col items-center justify-center p-8">
+          <div className="h-12 w-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mb-4" />
+          <p className="text-sm font-semibold text-slate-600">Loading campus listing...</p>
+        </div>
+        <Footer />
       </div>
     );
   }
 
   return (
-    <>
+    <div className="min-h-screen bg-[var(--cm-bg)] flex flex-col justify-between">
       <Header showSearchBar={false} />
-      <ToastContainer />
-      <div>
-        <div className="px-4 py-1 md:hidden">
-        <button
-          onClick={() => navigate(-1)}
-          className="flex items-center text-blue-600 font-semibold hover:underline "
-        >
-          <ArrowLeft className="mr-2" size={20} />
-          Back
-        </button>
-      </div>
-        <div className="bg-black w-full h-[1px]" />
-        <div className="flex flex-col md:flex-row justify-center w-19/20">
-          <div className="bg-white h-full md:sticky top-0 w-full md:w-1/3 flex justify-center">
-            <div>
+      <ToastContainer position="top-right" autoClose={3000} />
+
+      <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6">
+        {/* Navigation bar */}
+        <div className="mb-6">
+          <button
+            onClick={() => navigate(-1)}
+            className="inline-flex items-center gap-2 text-sm font-semibold text-indigo-600 hover:text-indigo-800 transition cursor-pointer"
+          >
+            <ArrowLeft size={16} /> Back to Marketplace
+          </button>
+        </div>
+
+        {/* Product Details Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          
+          {/* Left Column: Image Card */}
+          <div className="lg:col-span-5">
+            <div className="rounded-3xl bg-white border border-indigo-100 p-6 sm:p-8 shadow-sm flex items-center justify-center sticky top-24">
               <img
                 src={resolveMediaUrl(product.image)}
-                className=" h-64 md:h-130 p-6 md:p-10 object-contain my-4 md:my-10 "
+                alt={product.title}
+                className="max-h-96 w-full object-contain transition-transform duration-300 hover:scale-105"
               />
             </div>
           </div>
 
-          <div className="m-4 md:m-10 w-full md:w-2/3">
-            <div className="md:w-2/4">
-              <p className="raleway text-xl md:text-2xl font-black pb-1">
+          {/* Right Column: Information & Actions */}
+          <div className="lg:col-span-7 space-y-6">
+            
+            {/* Title & Price Card */}
+            <div className="rounded-3xl bg-white border border-indigo-100 p-6 sm:p-8 shadow-sm">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100">
+                  <Sparkles size={12} />
+                  {product.category || "Campus Listing"}
+                </span>
+                <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100">
+                  {product.condition || "Verified Quality"}
+                </span>
+              </div>
+
+              <h1
+                className="text-2xl sm:text-3xl font-extrabold text-slate-900 leading-snug tracking-tight"
+                style={{ fontFamily: "var(--font-display)" }}
+              >
+                {product.title}
+              </h1>
+
+              <p className="mt-2 text-sm text-slate-600 leading-relaxed">
                 {product.description}
               </p>
-              <p className="raleway text-sm font-black text-gray-500 pb-5">
-                Sell by{" "}
-                <Link className="text-black cursor-pointer">
-                  {product.seller?.name}
-                </Link>
-              </p>
-              <p className="text-xl md:text-2xl pb-5">₹ {product.price}.00</p>
+
+              {/* Price Banner */}
+              <div className="mt-5 p-4 rounded-2xl bg-gradient-to-r from-blue-50/80 via-indigo-50/80 to-purple-50/80 border border-indigo-100 flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Student Price</p>
+                  <p className="text-3xl font-extrabold text-indigo-700">
+                    ₹{product.price}
+                  </p>
+                </div>
+                <div className="text-right text-xs font-semibold text-emerald-700 bg-emerald-100/80 px-3 py-1.5 rounded-xl">
+                  ✓ Free Campus Hand-off
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <button
+                  onClick={handleAddToCart}
+                  className="w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-2xl border-2 border-indigo-600 text-indigo-700 bg-indigo-50/40 hover:bg-indigo-50 font-bold text-sm transition active:scale-[0.99] cursor-pointer"
+                >
+                  <ShoppingCart size={18} />
+                  Add to Cart
+                </button>
+
+                <button
+                  onClick={handleBuyNow}
+                  className="w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-2xl cm-gradient-btn font-extrabold text-sm shadow-md transition active:scale-[0.99] cursor-pointer"
+                >
+                  <Zap size={18} />
+                  Buy Now
+                </button>
+
+                <button
+                  onClick={handleContactSeller}
+                  disabled={contacting}
+                  className="w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm shadow-md transition active:scale-[0.99] cursor-pointer disabled:opacity-60"
+                >
+                  <MessageCircle size={18} />
+                  {contacting ? "Opening..." : "Chat Seller"}
+                </button>
+              </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 mt-6 w-full sm:w-auto">
-              <button
-                onClick={handleContactSeller}
-                disabled={contacting}
-                className="flex items-center justify-center gap-2 px-8 py-3 bg-[var(--cm-blue)] text-white rounded-xl shadow-md hover:bg-[var(--cm-blue-dark)] transition text-center font-bold text-base cursor-pointer disabled:opacity-60 active:scale-98"
-              >
-                <MessageCircle size={20} />
-                {contacting ? "Opening Chat..." : "Contact Seller"}
-              </button>
-              <button className="px-8 py-3 bg-orange-500 text-white rounded-xl shadow hover:bg-orange-600 transition font-bold text-base cursor-pointer">
-                <Link to="/upcoming" className="block w-full h-full">Buy Now</Link>
-              </button>
-            </div>
-            <div className="w-full md:w-3/4 py-10">
-              <div className="bg-gray-300 w-full h-[1px]" />
-            </div>
+            {/* Highlights / Details */}
+            {product.details && product.details.length > 0 && (
+              <div className="rounded-3xl bg-white border border-indigo-100 p-6 shadow-sm">
+                <h2 className="text-base font-bold text-slate-900 mb-3 flex items-center gap-2">
+                  <Tag size={16} className="text-indigo-600" />
+                  Product Features &amp; Notes
+                </h2>
+                <ul className="space-y-2">
+                  {product.details.map((detail, index) => (
+                    <li key={index} className="flex items-start gap-2 text-sm text-slate-600">
+                      <CheckCircle2 size={16} className="text-indigo-500 shrink-0 mt-0.5" />
+                      <span>{detail}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
-            <div className="w-full  md:w-3/4">
-              <h2 className="raleway text-xl md:text-2xl font-black mb-2">
-                About this Product
-              </h2>
-              <ul className="raleway text-md list-disc list-inside space-y-1">
-                {product.details.map((detail, index) => (
-                  <li key={index}>{detail}</li>
-                ))}
-              </ul>
-            </div>
+            {/* Seller Profile Card */}
+            {product.seller && (
+              <div className="rounded-3xl bg-white border border-indigo-100 p-6 shadow-sm">
+                <h2 className="text-base font-bold text-slate-900 mb-4 flex items-center gap-2">
+                  <ShieldCheck size={18} className="text-indigo-600" />
+                  Seller Information
+                </h2>
 
-            <div className="w-full md:w-3/4 py-10">
-              <div className="bg-gray-300 w-full h-[1px]" />
-            </div>
-            <div className="w-full md:w-3/4">
-              <h2 className="raleway text-xl md:text-2xl font-black mb-2">
-                About the Seller
-              </h2>
-              <ul className="raleway text-md list-disc list-inside space-y-1">
-                <li>
-                  <span className="font-medium">Sold by:</span>{" "}
-                  {product.seller.name}
-                </li>
-                <li>
-                  <span className="font-medium">College:</span>{" "}
-                  {product.seller.college}
-                </li>
-                <li>
-                  <span className="font-medium">City:</span>{" "}
-                  {product.seller.city}
-                </li>
-                <li>
-                  <span className="font-medium">Email:</span>{" "}
-                  <Link
-                    to={`mailto:${product.seller.email}`}
-                    className="text-blue-600 hover:underline underline-offset-4 hover:text-orange-500"
-                  >
-                    {product.seller.email}
-                  </Link>
-                </li>
-                <li>
-                  <span className="font-medium">Joined in:</span>{" "}
-                  {new Date(product.seller?.joinedAt).toLocaleDateString(
-                    "en-IN",
-                    {
-                      year: "numeric",
-                      month: "long",
-                    }
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs sm:text-sm">
+                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-full bg-indigo-100 text-indigo-700 font-extrabold flex items-center justify-center text-sm shrink-0">
+                      {product.seller.name ? product.seller.name.charAt(0) : "S"}
+                    </div>
+                    <div>
+                      <p className="font-bold text-slate-900">{product.seller.name}</p>
+                      <p className="text-slate-500 text-xs">Verified Student Seller</p>
+                    </div>
+                  </div>
+
+                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center gap-3">
+                    <School size={20} className="text-indigo-500 shrink-0" />
+                    <div>
+                      <p className="font-bold text-slate-900">{product.seller.college || "Campus Community"}</p>
+                      <p className="text-slate-500 text-xs">College / Department</p>
+                    </div>
+                  </div>
+
+                  {product.seller.city && (
+                    <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center gap-3">
+                      <MapPin size={20} className="text-indigo-500 shrink-0" />
+                      <div>
+                        <p className="font-bold text-slate-900">{product.seller.city}</p>
+                        <p className="text-slate-500 text-xs">City / Campus</p>
+                      </div>
+                    </div>
                   )}
-                </li>
-              </ul>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-4 mt-6 p-5 md:w-3/4 justify-items-start">
-              <button className="cursor-pointer w-full px-4 py-2 font-black text-black bg-yellow-400 rounded-md opacity-80 hover:opacity-100">
-                <Link to="/upcoming">Buy Now</Link>
-              </button>
-              <button className="cursor-pointer w-full px-4 py-2 font-black text-black bg-orange-400 rounded-md opacity-90 hover:opacity-100">
-                <Link to="/upcoming">Add to Cart</Link>
-              </button>
-            </div>
+
+                  {product.seller.joinedAt && (
+                    <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center gap-3">
+                      <Calendar size={20} className="text-indigo-500 shrink-0" />
+                      <div>
+                        <p className="font-bold text-slate-900">
+                          {new Date(product.seller.joinedAt).toLocaleDateString("en-IN", {
+                            year: "numeric",
+                            month: "short",
+                          })}
+                        </p>
+                        <p className="text-slate-500 text-xs">Member Since</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
           </div>
+
         </div>
-      </div>
+      </main>
 
       <Footer />
-    </>
+    </div>
   );
 }

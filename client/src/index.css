@@ -1,21 +1,45 @@
 @import "tailwindcss";
 
 :root {
+  /* BuyKaro Brand Theme Tokens (Electric Blue -> Royal Indigo / Purple) */
   --cm-blue: #2563eb;
   --cm-blue-dark: #1d4ed8;
+  --cm-indigo: #4f46e5;
+  --cm-indigo-dark: #4338ca;
+  --cm-purple: #7c3aed;
+  --cm-purple-dark: #6d28d9;
+  --cm-cyan: #06b6d4;
+
+  /* Brand Gradients */
+  --cm-gradient-brand: linear-gradient(135deg, #1d4ed8 0%, #4f46e5 50%, #7c3aed 100%);
+  --cm-gradient-brand-hover: linear-gradient(135deg, #1e40af 0%, #4338ca 50%, #6d28d9 100%);
+  --cm-gradient-subtle: linear-gradient(90deg, #2563eb 0%, #6366f1 50%, #8b5cf6 100%);
+  --cm-gradient-light: linear-gradient(135deg, #eff6ff 0%, #eef2ff 50%, #f5f3ff 100%);
+  --cm-gradient-hero: linear-gradient(135deg, #e8f1ff 0%, #f1f5fe 50%, #f3eeff 100%);
+  --cm-gradient-dark: linear-gradient(135deg, #0b132b 0%, #0f172a 50%, #1e1b4b 100%);
+
+  /* Neutrals & Surfaces */
   --cm-blue-soft: #eff6ff;
-  --cm-blue-mist: #e8f1ff;
+  --cm-indigo-soft: #eef2ff;
+  --cm-purple-soft: #f5f3ff;
+  --cm-blue-mist: #f8faff;
   --cm-ink: #0f172a;
   --cm-slate: #64748b;
-  --cm-bg: #f4f7fb;
+  --cm-bg: #f8faff;
   --cm-surface: #ffffff;
   --cm-border: #e2e8f0;
+  --cm-border-indigo: #e0e7ff;
+  --cm-border-focus: #818cf8;
+
+  /* Status Colors */
   --cm-available: #16a34a;
   --cm-reserved: #ea580c;
   --cm-sold: #94a3b8;
   --cm-safety: #fef9c3;
   --cm-safety-border: #fde68a;
-  --font-sans: "Plus Jakarta Sans", system-ui, sans-serif;
+
+  /* Typography */
+  --font-sans: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
   --font-display: "Sora", "Plus Jakarta Sans", system-ui, sans-serif;
 }
 
@@ -32,6 +56,7 @@ body,
   -webkit-font-smoothing: antialiased;
 }
 
+/* Animations */
 @keyframes cm-rise {
   from {
     opacity: 0;
@@ -52,6 +77,17 @@ body,
   }
 }
 
+@keyframes cm-pulse-subtle {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.92;
+    transform: scale(1.02);
+  }
+}
+
 .cm-rise {
   animation: cm-rise 0.7s ease-out both;
 }
@@ -68,11 +104,54 @@ body,
   animation: cm-fade 0.6s ease-out both;
 }
 
+/* Card & Interaction Utilities */
 .cm-card-hover {
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
 .cm-card-hover:hover {
   transform: translateY(-3px);
-  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 14px 30px -10px rgba(79, 70, 229, 0.12), 0 4px 12px rgba(15, 23, 42, 0.04);
+  border-color: #c7d2fe;
+}
+
+/* Theme Utilities */
+.cm-gradient-text {
+  background: var(--cm-gradient-brand);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.cm-gradient-btn {
+  background: var(--cm-gradient-brand);
+  color: white;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 14px 0 rgba(79, 70, 229, 0.35);
+}
+
+.cm-gradient-btn:hover {
+  background: var(--cm-gradient-brand-hover);
+  box-shadow: 0 6px 20px rgba(79, 70, 229, 0.45);
+  transform: translateY(-1px);
+}
+
+.cm-gradient-btn:active {
+  transform: translateY(0);
+}
+
+.cm-brand-badge {
+  background: var(--cm-indigo-soft);
+  color: var(--cm-indigo);
+  border: 1px solid #c7d2fe;
+}
+
+.cm-glass {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.cm-border-glow:focus-within {
+  border-color: var(--cm-indigo);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
 }

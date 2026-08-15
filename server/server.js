@@ -80,7 +80,7 @@ app.get('/api/health', (req, res) => {
 
 // Root route
 app.get('/', (req, res) => {
-  res.send(`Buykro / Studx backend is running on port ${PORT}`);
+  res.send(`BuyKaro backend is running on port ${PORT}`);
 });
 
 // Middleware & APIs

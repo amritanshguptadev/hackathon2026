@@ -1,4 +1,4 @@
-// Centralized API and Socket.IO configuration for Buykro
+// Centralized API and Socket.IO configuration for BuyKaro
 export const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3000').replace(/\/$/, '');
 export const API_BASE_URL = API_URL;
 export const SOCKET_URL = (import.meta.env.VITE_SOCKET_URL || import.meta.env.VITE_API_URL || 'http://localhost:3000').replace(/\/$/, '');

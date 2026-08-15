@@ -19,65 +19,52 @@ export default function BestDeals() {
   }, []);
 
   return (
-    <div>
-      <div className="flex justify-between m-5  md:m-10">
+    <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className="flex justify-between items-center mb-6">
         <div>
-          <h2 className="raleway md:pt-5 text-xl font-bold md:text-4xl text-black  font-semi-bold ">
-            BEST DEALS
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 text-xs font-bold uppercase tracking-wider mb-1">
+            Top Savings
+          </div>
+          <h2 className="text-xl md:text-3xl font-extrabold text-slate-900" style={{ fontFamily: "var(--font-display)" }}>
+            Best Campus Deals
           </h2>
         </div>
-        <div className="raleway flex justify-content md:pt-10 text-blue-500 hover:text-blue-600">
-          <div>
-            <Link to="/all-products" className="flex items-center text-center gap-1 md:text-xl text-blue-600 hover:underline underline-offset-8">
-                                            Browse all products <ArrowRight size={16} />
-             </Link> 
-          </div>
-        </div>
+        <Link to="/all-products" className="flex items-center gap-1 text-sm md:text-base font-semibold text-indigo-600 hover:text-indigo-700 transition">
+          Browse all deals <ArrowRight size={16} />
+        </Link>
       </div>
-      <div className="hidden  md:block m-10 border-1 border-gray-400 rounded-xl p-5">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {deals.map((deal, index) => (
+
+      <div className="rounded-3xl bg-white border border-indigo-100 p-5 sm:p-6 shadow-sm">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">
+          {deals.map((deal) => (
             <Link
               to={`/api/product/${deal._id}`}
               key={deal._id}
-              className="block"
+              className="group block"
             >
-              <div className="h-full p-4 rounded-md shadow-lg border border-gray-500 hover:shadow-xl transition flex flex-col justify-between">
-                <img
-                  src={resolveImageUrl(deal.image)}
-                  alt={deal.title}
-                  className="w-full h-40 object-contain mb-2"
-                />
-                <h2 className="raleway text-lg font-bold">{deal.title}</h2>
-                <p className=" raleway text-sm text-gray-600 flex-grow">
+              <div className="h-full p-4 rounded-2xl bg-[var(--cm-bg)] border border-slate-100 group-hover:border-indigo-200 group-hover:shadow-md transition-all duration-300 flex flex-col justify-between">
+                <div className="w-full h-40 bg-white rounded-xl overflow-hidden p-2 flex items-center justify-center mb-3">
+                  <img
+                    src={resolveImageUrl(deal.image)}
+                    alt={deal.title}
+                    className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
+                  />
+                </div>
+                <h3 className="text-base font-bold text-slate-900 line-clamp-1">{deal.title}</h3>
+                <p className="text-xs text-slate-500 line-clamp-2 mt-1 flex-grow">
                   {deal.description}
                 </p>
-                <p className="text-xl text-green-600 font-semibold pt-2">₹ {deal.price}.00</p>
+                <div className="flex items-center justify-between mt-3 pt-2 border-t border-slate-200/60">
+                  <p className="text-lg text-emerald-600 font-extrabold">₹{deal.price}</p>
+                  <span className="text-[11px] font-semibold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">
+                    Deal
+                  </span>
+                </div>
               </div>
             </Link>
           ))}
         </div>
       </div>
-
-      <div className="block sm:hidden p-2">
-        <div className="grid grid-cols-2 gap-4 ">
-          {deals.slice(0,6).map((deal, index) => (
-            <Link
-              to={`/api/product/${deal._id}`}
-              key={deal._id}
-            >
-            <div key={index} className="shadow-lg rounded-md">
-              <img
-                src={resolveImageUrl(deal.image)}
-                alt={deal.title}
-                className="w-full h-40 object-cover"
-              />
-              <p className="text-green-600 font-semibold text-center py-2">₹ {deal.price}.00</p>
-            </div>
-            </Link> 
-          ))}
-        </div>
-      </div>
-    </div>
+    </section>
   );
 }

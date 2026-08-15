@@ -37,19 +37,18 @@ export default function FeatureProducts() {
                     </Link>
                 </div>
             </div>
-            <div className="w-full  flex flex-col p-2">
+            <div className="w-full flex flex-col p-2">
                 <div className="flex flex-col gap-4 mb-6">
                     <div className="flex justify-between items-center">
-                        <h2 className="raleway text-xl md:text-4xl font-semibold">
-                            Feature Products
+                        <h2 className="text-xl md:text-3xl font-extrabold text-slate-900" style={{ fontFamily: "var(--font-display)" }}>
+                            Featured Products
                         </h2>
-                        <nav className="raleway flex flex-wrap gap-2 md:gap-5  text-sm md:text-base items-center px-2">
-                            <Link to="" className='hidden md:flex hover:text-orange-400 hover:underline underline-offset-8'>All Products</Link>
-                            <Link to="" className='hidden md:flex hover:text-orange-400 hover:underline underline-offset-8'>Laptop</Link>
-                            <Link to="" className='hidden md:flex hover:text-orange-400 hover:underline underline-offset-8'>Books</Link>
-                            <Link to="" className='hidden md:flex hover:text-orange-400 hover:underline underline-offset-8'>Furniture</Link>
-                            <Link to="" className='hidden md:flex hover:text-orange-400 hover:underline underline-offset-8'>Utensils</Link>
-                            <Link to="/all-products" className="flex items-center text-center gap-1 text-orange-400 hover:underline underline-offset-8 hover:text-orange-500">
+                        <nav className="flex flex-wrap gap-2 md:gap-4 text-sm md:text-base items-center px-2">
+                            <Link to="/all-products" className='hidden md:flex text-slate-600 hover:text-indigo-600 font-medium transition'>All Products</Link>
+                            <Link to="/all-products" className='hidden md:flex text-slate-600 hover:text-indigo-600 font-medium transition'>Laptops</Link>
+                            <Link to="/all-products" className='hidden md:flex text-slate-600 hover:text-indigo-600 font-medium transition'>Books</Link>
+                            <Link to="/all-products" className='hidden md:flex text-slate-600 hover:text-indigo-600 font-medium transition'>Furniture</Link>
+                            <Link to="/all-products" className="flex items-center gap-1 font-semibold text-indigo-600 hover:text-indigo-700 transition">
                                 Browse all products <ArrowRight size={16} />
                             </Link>
                         </nav>
@@ -59,18 +58,18 @@ export default function FeatureProducts() {
                     {FeatureProduct.slice(0, 9).map((product) => (
                         <Link key={product._id}
                         to={`/api/product/${product._id}`}
+                        className="group"
                         >
                             <div
-                            key={product.id}
-                            className="p-4 rounded-md shadow-md border border-gray-200 hover:shadow-lg transition mb-10 h-80"
+                            className="p-4 rounded-2xl bg-white shadow-xs border border-indigo-50 hover:border-indigo-200 hover:shadow-lg transition-all duration-300 mb-6 flex flex-col justify-between h-80"
                         >
                                 <img
                                 src={resolveImageUrl(product.image)}
                                 alt={product.title}
-                                className="w-full h-30 md:h-40 object-contain mb-2"
+                                className="w-full h-32 md:h-40 object-contain mb-2 transition-transform duration-300 group-hover:scale-105"
                             />
-                            <p className=" raleway line-clamp-5  text-md text-gray-700 ">{product.description}</p>
-                            <p className="text-xl text-green-600 font-semibold mt-5 md:mt-2">₹ {product.price}.00</p>
+                            <p className="line-clamp-3 text-sm font-medium text-slate-700">{product.title || product.description}</p>
+                            <p className="text-lg text-emerald-600 font-bold mt-2">₹{product.price}</p>
                         </div>
                         </Link>
                     ))}
