@@ -1,4 +1,4 @@
-import { Heart, Bell, User, Menu, X, Search, ShoppingCart } from "lucide-react";
+import { Heart, MessageCircle, User, Menu, X, Search, ShoppingCart } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import MobileMenu from "./MobileMenu.jsx";
@@ -55,9 +55,9 @@ export default function HeaderMain({ showSearchBar = true }) {
           <Link
             to="/upcoming"
             className="hidden rounded-full p-2.5 text-[var(--cm-slate)] transition hover:bg-[var(--cm-blue-soft)] hover:text-[var(--cm-blue)] sm:inline-flex"
-            aria-label="Notifications"
+            aria-label="Messages"
           >
-            <Bell size={20} />
+            <MessageCircle size={20} />
           </Link>
           <Link
             to="/cart"
