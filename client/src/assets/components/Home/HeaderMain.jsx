@@ -1,4 +1,4 @@
-import { Heart, Bell, User, Menu, X, Search } from "lucide-react";
+import { Heart, Bell, User, Menu, X, Search, ShoppingCart } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import MobileMenu from "./MobileMenu.jsx";
@@ -6,6 +6,7 @@ import MobileMenu from "./MobileMenu.jsx";
 export default function HeaderMain({ showSearchBar = true }) {
   const [searchText, setSearchText] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [cartCount] = useState(0);
   const isAuthenticated = !!localStorage.getItem("token");
 
   const handleSearch = (e) => {
@@ -57,6 +58,18 @@ export default function HeaderMain({ showSearchBar = true }) {
             aria-label="Notifications"
           >
             <Bell size={20} />
+          </Link>
+          <Link
+            to="/cart"
+            className="relative rounded-full p-2.5 text-[var(--cm-slate)] transition hover:bg-[var(--cm-blue-soft)] hover:text-[var(--cm-blue)]"
+            aria-label="Cart"
+          >
+            <ShoppingCart size={20} />
+            {cartCount > 0 && (
+              <span className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-[var(--cm-blue)] text-[10px] font-bold text-white">
+                {cartCount}
+              </span>
+            )}
           </Link>
           <Link
             to={isAuthenticated ? "/profile" : "/login"}

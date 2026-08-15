@@ -87,10 +87,16 @@ export const DEMO_LISTINGS = [
 ];
 
 export const CATEGORY_IMAGES = [
-  { name: "Cycles", image: IMAGES.categories.cycles },
-  { name: "Books", image: IMAGES.categories.books },
-  { name: "Electronics", image: IMAGES.categories.electronics },
-  { name: "Furniture", image: IMAGES.categories.furniture },
-  { name: "Appliances", image: IMAGES.categories.appliances },
-  { name: "Hostel Essentials", image: IMAGES.categories.hostel },
+  { name: "Electronics", image: IMAGES.categories.electronics, emoji: "💻" },
+  { name: "Books & Notes", image: IMAGES.categories.books, emoji: "📚" },
+  { name: "Furniture", image: IMAGES.categories.furniture, emoji: "🪑" },
+  { name: "Cycles & Bikes", image: IMAGES.categories.cycles, emoji: "🚲" },
+  { name: "Hostel Essentials", image: IMAGES.categories.hostel, emoji: "🏠" },
+  { name: "Appliances", image: IMAGES.categories.appliances, emoji: "🔌" },
+  { name: "Clothing & Fashion", image: IMAGES.categories.electronics, emoji: "👕" },
+  { name: "Sports & Fitness", image: IMAGES.categories.cycles, emoji: "⚽" },
+  { name: "Stationery", image: IMAGES.categories.books, emoji: "✏️" },
+  { name: "Musical Instruments", image: IMAGES.categories.furniture, emoji: "🎸" },
+  { name: "Lab Equipment", image: IMAGES.categories.electronics, emoji: "🔬" },
+  { name: "Food & Kitchen", image: IMAGES.categories.appliances, emoji: "🍳" },
 ];
