@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
 const messageSchema = new Schema(
@@ -72,6 +72,6 @@ messageSchema.index({ conversation: 1, receiver: 1, read: 1 });
 // Query index for counting total unread messages for a user across all conversations
 messageSchema.index({ receiver: 1, read: 1 });
 
-const Message = mongoose.model('Message', messageSchema);
+const Message = mongoose.models.Message || mongoose.model('Message', messageSchema);
 
-module.exports = Message;
+export default Message;

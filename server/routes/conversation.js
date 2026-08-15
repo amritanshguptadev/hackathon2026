@@ -1,7 +1,6 @@
-const express = require('express');
-const router = express.Router();
-const profileMiddleware = require('../middleware/userProfile');
-const {
+import express from 'express';
+import profileMiddleware from '../middleware/userProfile.js';
+import {
   getOrCreateConversation,
   getUserConversations,
   getConversationById,
@@ -9,7 +8,9 @@ const {
   sendMessageREST,
   markConversationAsRead,
   getTotalUnreadCount,
-} = require('../controller/conversationController');
+} from '../controller/conversationController.js';
+
+const router = express.Router();
 
 // All conversation routes require authentication
 router.use(profileMiddleware);
@@ -22,4 +23,4 @@ router.get('/:id/messages', getConversationMessages);
 router.post('/:id/messages', sendMessageREST);
 router.patch('/:id/read', markConversationAsRead);
 
-module.exports = router;
+export default router;

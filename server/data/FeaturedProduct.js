@@ -482,4 +482,4 @@ const featuredProduct = [
 }
 ];
 
-module.exports = featuredProduct;
+export default featuredProduct;

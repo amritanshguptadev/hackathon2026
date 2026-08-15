@@ -1,9 +1,9 @@
-const mongoose = require('mongoose');
-const Conversation = require('../models/conversation');
-const Message = require('../models/message');
-const UserModel = require('../models/user');
-const FeaturedProduct = require('../models/featuredProduct');
-const Deal = require('../models/deals');
+import mongoose from 'mongoose';
+import Conversation from '../models/conversation.js';
+import Message from '../models/message.js';
+import UserModel from '../models/user.js';
+import FeaturedProduct from '../models/featuredProduct.js';
+import Deal from '../models/deals.js';
 
 const MAX_MESSAGE_LENGTH = 2000;
 
@@ -366,7 +366,7 @@ const getTotalUnreadCount = async (req, res) => {
   }
 };
 
-module.exports = {
+export {
   getOrCreateConversation,
   getUserConversations,
   getConversationById,
