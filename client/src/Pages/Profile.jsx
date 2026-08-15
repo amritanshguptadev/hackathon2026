@@ -24,12 +24,15 @@ import {
   X,
   Loader2,
   Heart,
+  Save,
+  Settings,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { formatINR } from "../components/PriceRangeFilter";
 import { useAuth } from "../context/AuthContext";
 import { productService } from "../services/productService";
 import { favoriteService } from "../services/favoriteService";
+import { categoryService, FALLBACK_CATEGORIES } from "../services/categoryService";
 
 const STATUS_BADGES = {
   Available: "bg-emerald-50 text-emerald-700 border-emerald-200",
@@ -38,18 +41,46 @@ const STATUS_BADGES = {
 };
 
 export default function Profile() {
-  const { user, profile, logout, updateProfile, isAuthenticated } = useAuth();
+  const { user, profile, logout, updateProfile, refreshProfile, isAuthenticated, loading: authLoading } = useAuth();
   const [myListings, setMyListings] = useState([]);
   const [favorites, setFavorites] = useState([]);
+  const [categoriesList, setCategoriesList] = useState(FALLBACK_CATEGORIES);
   const [listingsLoading, setListingsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("listings"); // "listings" | "saved" | "details"
 
-  // Modal states for Edit and Delete
+  // Modal states for Edit Product & Edit Profile
   const [editingProduct, setEditingProduct] = useState(null);
   const [deletingProductId, setDeletingProductId] = useState(null);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [showEditProfileModal, setShowEditProfileModal] = useState(false);
+  const [profileForm, setProfileForm] = useState({
+    name: "",
+    college: "",
+    campusLocation: "",
+    studentId: "",
+  });
+  const [savingProfile, setSavingProfile] = useState(false);
 
   const navigate = useNavigate();
+
+  // Load Categories
+  useEffect(() => {
+    categoryService.getActiveCategories().then((cats) => {
+      if (cats && cats.length > 0) setCategoriesList(cats);
+    });
+  }, []);
+
+  // Initialize Profile Edit Form when profile loads
+  useEffect(() => {
+    if (profile) {
+      setProfileForm({
+        name: profile.name || "",
+        college: profile.college || profile.university || "",
+        campusLocation: profile.campus_location || "Campus Main",
+        studentId: profile.student_id || profile.studentId || "",
+      });
+    }
+  }, [profile]);
 
   // Load User Listings and Favorites from Supabase
   useEffect(() => {
@@ -61,7 +92,7 @@ export default function Profile() {
         setMyListings(data || []);
       })
       .catch((err) => {
-        console.error("Error loading user listings:", err);
+        console.error("Error loading user listings from Supabase:", err);
       })
       .finally(() => setListingsLoading(false));
 
@@ -116,7 +147,7 @@ export default function Profile() {
     }
   };
 
-  // Save Edited Listing
+  // Save Edited Listing to Supabase
   const handleSaveEdit = async (e) => {
     e.preventDefault();
     if (!editingProduct) return;
@@ -126,6 +157,7 @@ export default function Profile() {
       const prodId = editingProduct.id || editingProduct._id;
       const updated = await productService.updateProduct(prodId, {
         title: editingProduct.title,
+        categoryId: editingProduct.categoryId || editingProduct.category_id,
         price: editingProduct.isFree ? 0 : Number(editingProduct.price),
         isFree: editingProduct.isFree,
         description: editingProduct.description,
@@ -138,7 +170,7 @@ export default function Profile() {
         prev.map((item) => ((item.id === prodId || item._id === prodId) ? (updated || editingProduct) : item))
       );
 
-      toast.success("Listing updated successfully!");
+      toast.success("Listing updated successfully in Supabase!");
       setEditingProduct(null);
     } catch (err) {
       toast.error(err.message || "Failed to save changes.");
@@ -147,7 +179,28 @@ export default function Profile() {
     }
   };
 
-  if (!profile && !loading) {
+  // Save Profile Edit Form to Supabase
+  const handleSaveProfile = async (e) => {
+    e.preventDefault();
+    setSavingProfile(true);
+    try {
+      await updateProfile({
+        name: profileForm.name.trim(),
+        college: profileForm.college.trim(),
+        campus_location: profileForm.campusLocation.trim(),
+        student_id: profileForm.studentId.trim(),
+      });
+      await refreshProfile();
+      toast.success("Profile updated successfully!");
+      setShowEditProfileModal(false);
+    } catch (err) {
+      toast.error(err.message || "Failed to update profile.");
+    } finally {
+      setSavingProfile(false);
+    }
+  };
+
+  if (!user && !authLoading) {
     return (
       <div className="min-h-screen bg-[var(--cm-bg)] text-[var(--cm-ink)] flex flex-col justify-between">
         <HeaderMain />
@@ -163,7 +216,7 @@ export default function Profile() {
               Sign In to View Profile
             </h1>
             <p className="text-sm text-slate-600 mb-6 leading-relaxed">
-              Log in or create a student account to view your campus profile, manage listings, and chat with buyers.
+              Log in or create a student account to view your campus profile, manage listings, and chat with peers.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link
@@ -206,46 +259,53 @@ export default function Profile() {
                 <ShieldCheck size={14} />
                 Verified Student
               </span>
+              <button
+                onClick={() => setShowEditProfileModal(true)}
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md hover:bg-white/25 text-white border border-white/20 text-xs font-semibold transition cursor-pointer"
+              >
+                <Settings size={13} />
+                Edit Profile
+              </button>
             </div>
           </div>
 
-          <div className="px-6 sm:px-10 pb-10">
-            {/* Avatar & User summary */}
-            <div className="relative -mt-16 mb-6 flex flex-col sm:flex-row items-center sm:items-end justify-between gap-4 text-center sm:text-left">
-              <div className="flex flex-col sm:flex-row items-center gap-4">
-                <div className="w-28 h-28 rounded-2xl bg-white p-1.5 shadow-xl ring-4 ring-blue-50">
-                  <div className="w-full h-full rounded-xl bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center text-white">
-                    <UserRound size={48} />
-                  </div>
+          <div className="px-6 sm:px-8 pb-8">
+            {/* Avatar & Main User Info */}
+            <div className="relative flex flex-col sm:flex-row items-center sm:items-end justify-between -mt-16 mb-6 gap-4 border-b border-slate-100 pb-6">
+              <div className="flex flex-col sm:flex-row items-center sm:items-end gap-4 text-center sm:text-left">
+                <div className="h-24 w-24 rounded-full border-4 border-white bg-blue-600 shadow-md flex items-center justify-center text-white text-3xl font-extrabold overflow-hidden">
+                  {profile?.name ? (
+                    profile.name.charAt(0).toUpperCase()
+                  ) : (
+                    <UserRound size={40} />
+                  )}
                 </div>
-                <div>
-                  <h1
-                    className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center justify-center sm:justify-start gap-2"
-                    style={{ fontFamily: "var(--font-display)" }}
-                  >
-                    {profile?.name || "Campus Student"}
+
+                <div className="mb-1">
+                  <h1 className="text-2xl font-black text-slate-900 flex items-center gap-2 justify-center sm:justify-start">
+                    {profile?.name || user?.user_metadata?.name || "Student User"}
+                    <BadgeCheck className="h-5 w-5 text-[var(--cm-blue)]" />
                   </h1>
-                  <p className="text-sm font-medium text-slate-500 flex items-center justify-center sm:justify-start gap-1.5 mt-0.5">
-                    <GraduationCap size={16} className="text-[var(--cm-blue)]" />
-                    {profile?.college || profile?.university || "University Member"}
+                  <p className="text-xs font-semibold text-slate-500 flex items-center gap-1.5 justify-center sm:justify-start mt-0.5">
+                    <GraduationCap size={15} className="text-slate-400" />
+                    {profile?.college || profile?.university || user?.user_metadata?.college || "University Campus"}
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
                 <Link
                   to="/sell"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[var(--cm-blue)] hover:bg-[var(--cm-blue-dark)] text-white text-sm font-bold shadow-sm transition-all"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-[var(--cm-blue)] px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-[var(--cm-blue-dark)] transition"
                 >
-                  <PlusCircle size={16} />
-                  Sell an Item
+                  <PlusCircle size={14} /> Sell an Item
                 </Link>
                 <button
+                  type="button"
                   onClick={handleLogout}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full border border-red-200 bg-red-50 hover:bg-red-100 text-red-700 text-sm font-semibold transition-all cursor-pointer"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50 hover:border-rose-200 transition cursor-pointer"
                 >
-                  <LogOut size={16} />
-                  Logout
+                  <LogOut size={14} /> Log Out
                 </button>
               </div>
             </div>
@@ -263,6 +323,19 @@ export default function Profile() {
               >
                 <ShoppingBag size={14} />
                 My Listings ({myListings.length})
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveTab("saved")}
+                className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition cursor-pointer ${
+                  activeTab === "saved"
+                    ? "bg-[var(--cm-blue)] text-white shadow-xs"
+                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                }`}
+              >
+                <Heart size={14} />
+                Saved Items ({favorites.length})
               </button>
 
               <button
@@ -285,7 +358,7 @@ export default function Profile() {
                 {listingsLoading ? (
                   <div className="text-center py-12">
                     <Loader2 size={32} className="animate-spin text-[var(--cm-blue)] mx-auto mb-2" />
-                    <p className="text-xs text-slate-500 font-semibold">Loading your campus listings...</p>
+                    <p className="text-xs text-slate-500 font-semibold">Loading your campus listings from Supabase...</p>
                   </div>
                 ) : myListings.length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -295,7 +368,7 @@ export default function Profile() {
 
                       return (
                         <div
-                          key={item._id}
+                          key={item.id || item._id}
                           className="rounded-2xl border border-slate-200 bg-white p-4 shadow-2xs hover:shadow-xs transition flex flex-col justify-between"
                         >
                           <div className="flex gap-3.5">
@@ -345,8 +418,8 @@ export default function Profile() {
                               {status !== "Available" && (
                                 <button
                                   type="button"
-                                  onClick={() => handleStatusChange(item._id, "Available")}
-                                  className="rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 px-2.5 py-1 text-[11px] font-bold transition"
+                                  onClick={() => handleStatusChange(item.id || item._id, "Available")}
+                                  className="rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 px-2.5 py-1 text-[11px] font-bold transition cursor-pointer"
                                 >
                                   Make Available
                                 </button>
@@ -354,8 +427,8 @@ export default function Profile() {
                               {status !== "Reserved" && status !== "Sold" && (
                                 <button
                                   type="button"
-                                  onClick={() => handleStatusChange(item._id, "Reserved")}
-                                  className="rounded-lg bg-orange-50 hover:bg-orange-100 text-orange-700 px-2.5 py-1 text-[11px] font-bold transition"
+                                  onClick={() => handleStatusChange(item.id || item._id, "Reserved")}
+                                  className="rounded-lg bg-orange-50 hover:bg-orange-100 text-orange-700 px-2.5 py-1 text-[11px] font-bold transition cursor-pointer"
                                 >
                                   Reserve
                                 </button>
@@ -363,8 +436,8 @@ export default function Profile() {
                               {status !== "Sold" && (
                                 <button
                                   type="button"
-                                  onClick={() => handleStatusChange(item._id, "Sold")}
-                                  className="rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1 text-[11px] font-bold transition"
+                                  onClick={() => handleStatusChange(item.id || item._id, "Sold")}
+                                  className="rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1 text-[11px] font-bold transition cursor-pointer"
                                 >
                                   Mark Sold
                                 </button>
@@ -375,15 +448,15 @@ export default function Profile() {
                               <button
                                 type="button"
                                 onClick={() => setEditingProduct({ ...item })}
-                                className="rounded-lg p-1.5 text-slate-500 hover:bg-slate-100 hover:text-[var(--cm-blue)] transition"
+                                className="rounded-lg p-1.5 text-slate-500 hover:bg-slate-100 hover:text-[var(--cm-blue)] transition cursor-pointer"
                                 title="Edit Listing"
                               >
                                 <Edit size={14} />
                               </button>
                               <button
                                 type="button"
-                                onClick={() => setDeletingProductId(item._id)}
-                                className="rounded-lg p-1.5 text-slate-500 hover:bg-rose-50 hover:text-rose-600 transition"
+                                onClick={() => setDeletingProductId(item.id || item._id)}
+                                className="rounded-lg p-1.5 text-slate-500 hover:bg-rose-50 hover:text-rose-600 transition cursor-pointer"
                                 title="Delete Listing"
                               >
                                 <Trash2 size={14} />
@@ -403,7 +476,7 @@ export default function Profile() {
                     </p>
                     <Link
                       to="/sell"
-                      className="inline-flex items-center gap-2 rounded-full bg-[var(--cm-blue)] hover:bg-[var(--cm-blue-dark)] text-white px-6 py-2.5 text-xs font-bold shadow-sm transition"
+                      className="inline-flex items-center gap-2 rounded-full bg-[var(--cm-blue)] hover:bg-[var(--cm-blue-dark)] text-white px-6 py-2.5 text-xs font-bold shadow-xs transition"
                     >
                       <PlusCircle size={14} /> List Your First Item
                     </Link>
@@ -412,30 +485,92 @@ export default function Profile() {
               </div>
             )}
 
-            {/* ── TAB 2: ACCOUNT INFO ── */}
+            {/* ── TAB 2: SAVED ITEMS (FAVORITES) ── */}
+            {activeTab === "saved" && (
+              <div className="space-y-4">
+                {favorites.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {favorites.map((fav) => (
+                      <Link
+                        key={fav.id || fav._id}
+                        to={`/product/${fav.id || fav._id}`}
+                        className="rounded-2xl border border-slate-200 bg-white p-4 shadow-2xs hover:shadow-xs transition flex gap-3.5 group"
+                      >
+                        <div className="h-20 w-20 shrink-0 rounded-xl overflow-hidden bg-slate-100 border border-slate-200">
+                          <img
+                            src={fav.image || "/images/products/desk-lamp.png"}
+                            alt={fav.title}
+                            className="h-full w-full object-cover group-hover:scale-105 transition"
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-sm font-bold text-[var(--cm-ink)] group-hover:text-[var(--cm-blue)] transition truncate">
+                            {fav.title}
+                          </h3>
+                          <p className="text-xs font-extrabold text-[var(--cm-blue)] mt-0.5">
+                            {fav.isFree ? "FREE" : typeof fav.price === "number" ? formatINR(fav.price) : fav.price}
+                          </p>
+                          <p className="text-[11px] text-slate-500 mt-1">
+                            {fav.campusLocation || "Campus"} • {fav.condition || "Good"}
+                          </p>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50/50 p-10 text-center">
+                    <Heart className="mx-auto h-12 w-12 text-slate-300 mb-3" />
+                    <h3 className="text-base font-bold text-slate-800">No Saved Items</h3>
+                    <p className="text-xs text-slate-500 max-w-sm mx-auto mt-1 mb-5">
+                      Save items you want to keep an eye on by clicking the heart button on product listings.
+                    </p>
+                    <Link
+                      to="/all-products"
+                      className="inline-flex items-center gap-2 rounded-full bg-[var(--cm-blue)] hover:bg-[var(--cm-blue-dark)] text-white px-6 py-2.5 text-xs font-bold shadow-xs transition"
+                    >
+                      Browse Marketplace
+                    </Link>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* ── TAB 3: ACCOUNT INFO ── */}
             {activeTab === "details" && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
-                  <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Full Name</p>
-                  <p className="text-base font-semibold text-slate-900">{profile?.name || "N/A"}</p>
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                    <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Full Name</p>
+                    <p className="text-base font-semibold text-slate-900">{profile?.name || user?.user_metadata?.name || "N/A"}</p>
+                  </div>
+                  <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                    <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1 flex items-center gap-1">
+                      <Mail size={13} className="text-slate-400" /> Email Address
+                    </p>
+                    <p className="text-base font-semibold text-slate-900 break-all">{user?.email || "N/A"}</p>
+                  </div>
+                  <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                    <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1 flex items-center gap-1">
+                      <GraduationCap size={13} className="text-[var(--cm-blue)]" /> College / University
+                    </p>
+                    <p className="text-base font-semibold text-slate-900">{profile?.college || profile?.university || user?.user_metadata?.college || "N/A"}</p>
+                  </div>
+                  <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                    <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1 flex items-center gap-1">
+                      <BadgeCheck size={13} className="text-emerald-600" /> Student ID / Roll No
+                    </p>
+                    <p className="text-base font-semibold text-slate-900">{profile?.student_id || profile?.studentId || user?.user_metadata?.student_id || "N/A"}</p>
+                  </div>
                 </div>
-                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
-                  <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1 flex items-center gap-1">
-                    <Mail size={13} className="text-slate-400" /> Email Address
-                  </p>
-                  <p className="text-base font-semibold text-slate-900 break-all">{profile?.email || "N/A"}</p>
-                </div>
-                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
-                  <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1 flex items-center gap-1">
-                    <GraduationCap size={13} className="text-[var(--cm-blue)]" /> College / University
-                  </p>
-                  <p className="text-base font-semibold text-slate-900">{profile?.college || profile?.university || "N/A"}</p>
-                </div>
-                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
-                  <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1 flex items-center gap-1">
-                    <BadgeCheck size={13} className="text-emerald-600" /> Student ID / Roll No
-                  </p>
-                  <p className="text-base font-semibold text-slate-900">{profile?.studentId || "N/A"}</p>
+
+                <div className="pt-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowEditProfileModal(true)}
+                    className="inline-flex items-center gap-1.5 rounded-full bg-[var(--cm-blue)] px-5 py-2.5 text-xs font-bold text-white hover:bg-[var(--cm-blue-dark)] transition cursor-pointer"
+                  >
+                    <Edit size={13} /> Edit Account Details
+                  </button>
                 </div>
               </div>
             )}
@@ -463,7 +598,7 @@ export default function Profile() {
               <button
                 type="button"
                 onClick={() => setEditingProduct(null)}
-                className="rounded-full p-1.5 text-slate-400 hover:bg-slate-100"
+                className="rounded-full p-1.5 text-slate-400 hover:bg-slate-100 cursor-pointer"
               >
                 <X size={18} />
               </button>
@@ -481,6 +616,23 @@ export default function Profile() {
                   className="w-full rounded-xl border border-slate-300 p-2.5 text-sm outline-none focus:border-[var(--cm-blue)]"
                   required
                 />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Category</label>
+                <select
+                  value={editingProduct.categoryId || editingProduct.category_id || ""}
+                  onChange={(e) =>
+                    setEditingProduct({ ...editingProduct, categoryId: e.target.value })
+                  }
+                  className="w-full rounded-xl border border-slate-300 p-2.5 text-xs outline-none focus:border-[var(--cm-blue)] cursor-pointer"
+                >
+                  {categoriesList.map((c) => (
+                    <option key={c.id || c.name} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div>
@@ -534,7 +686,7 @@ export default function Profile() {
                     onChange={(e) =>
                       setEditingProduct({ ...editingProduct, condition: e.target.value })
                     }
-                    className="w-full rounded-xl border border-slate-300 p-2.5 text-xs outline-none focus:border-[var(--cm-blue)]"
+                    className="w-full rounded-xl border border-slate-300 p-2.5 text-xs outline-none focus:border-[var(--cm-blue)] cursor-pointer"
                   >
                     <option value="Like New">Like New</option>
                     <option value="Good">Good</option>
@@ -543,7 +695,7 @@ export default function Profile() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Pickup Location</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Campus Location</label>
                   <input
                     type="text"
                     value={editingProduct.campusLocation || editingProduct.location || "Boys Hostel"}
@@ -563,16 +715,95 @@ export default function Profile() {
                 <button
                   type="button"
                   onClick={() => setEditingProduct(null)}
-                  className="rounded-full border border-slate-300 px-5 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100"
+                  className="rounded-full border border-slate-300 px-5 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isUpdating}
-                  className="rounded-full bg-[var(--cm-blue)] px-6 py-2 text-xs font-bold text-white hover:bg-[var(--cm-blue-dark)]"
+                  className="rounded-full bg-[var(--cm-blue)] px-6 py-2 text-xs font-bold text-white hover:bg-[var(--cm-blue-dark)] cursor-pointer"
                 >
                   {isUpdating ? "Saving..." : "Save Changes"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── EDIT PROFILE MODAL ── */}
+      {showEditProfileModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+          <div className="relative w-full max-w-md rounded-3xl bg-white shadow-2xl border border-[var(--cm-border)]">
+            <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
+              <h3 className="text-base font-bold text-[var(--cm-ink)]">Edit Account Profile</h3>
+              <button
+                type="button"
+                onClick={() => setShowEditProfileModal(false)}
+                className="rounded-full p-1.5 text-slate-400 hover:bg-slate-100 cursor-pointer"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveProfile} className="p-6 space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Full Name</label>
+                <input
+                  type="text"
+                  value={profileForm.name}
+                  onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })}
+                  className="w-full rounded-xl border border-slate-300 p-2.5 text-sm outline-none focus:border-[var(--cm-blue)]"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">College / University</label>
+                <input
+                  type="text"
+                  value={profileForm.college}
+                  onChange={(e) => setProfileForm({ ...profileForm, college: e.target.value })}
+                  className="w-full rounded-xl border border-slate-300 p-2.5 text-sm outline-none focus:border-[var(--cm-blue)]"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Campus Location</label>
+                <input
+                  type="text"
+                  value={profileForm.campusLocation}
+                  onChange={(e) => setProfileForm({ ...profileForm, campusLocation: e.target.value })}
+                  className="w-full rounded-xl border border-slate-300 p-2.5 text-sm outline-none focus:border-[var(--cm-blue)]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Student ID / Roll No</label>
+                <input
+                  type="text"
+                  value={profileForm.studentId}
+                  onChange={(e) => setProfileForm({ ...profileForm, studentId: e.target.value })}
+                  className="w-full rounded-xl border border-slate-300 p-2.5 text-sm outline-none focus:border-[var(--cm-blue)]"
+                />
+              </div>
+
+              <div className="pt-4 flex justify-end gap-2 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setShowEditProfileModal(false)}
+                  className="rounded-full border border-slate-300 px-5 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingProfile}
+                  className="rounded-full bg-[var(--cm-blue)] px-6 py-2 text-xs font-bold text-white hover:bg-[var(--cm-blue-dark)] cursor-pointer"
+                >
+                  {savingProfile ? "Saving..." : "Update Profile"}
                 </button>
               </div>
             </form>
@@ -589,20 +820,20 @@ export default function Profile() {
             </div>
             <h3 className="text-base font-bold text-slate-900 mb-1">Delete Listing</h3>
             <p className="text-xs text-slate-500 mb-6 leading-relaxed">
-              Are you sure you want to delete this listing? This action cannot be undone.
+              Are you sure you want to delete this listing from Supabase? This action cannot be undone.
             </p>
             <div className="flex items-center justify-center gap-3">
               <button
                 type="button"
                 onClick={() => setDeletingProductId(null)}
-                className="flex-1 rounded-full border border-slate-300 bg-white py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50"
+                className="flex-1 rounded-full border border-slate-300 bg-white py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={confirmDelete}
-                className="flex-1 rounded-full bg-rose-600 py-2.5 text-xs font-bold text-white hover:bg-rose-700"
+                className="flex-1 rounded-full bg-rose-600 py-2.5 text-xs font-bold text-white hover:bg-rose-700 cursor-pointer"
               >
                 Delete
               </button>
