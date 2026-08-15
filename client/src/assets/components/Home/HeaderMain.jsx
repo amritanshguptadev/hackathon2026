@@ -2,12 +2,14 @@ import { Heart, MessageCircle, User, Menu, X, Search, ShoppingCart } from "lucid
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import MobileMenu from "./MobileMenu.jsx";
+import { useSocket } from "../../../context/SocketContext";
 
 export default function HeaderMain({ showSearchBar = true }) {
   const [searchText, setSearchText] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const [cartCount] = useState(0);
   const isAuthenticated = !!localStorage.getItem("token");
+  const { totalUnreadCount } = useSocket() || { totalUnreadCount: 0 };
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -53,11 +55,16 @@ export default function HeaderMain({ showSearchBar = true }) {
             <Heart size={20} />
           </Link>
           <Link
-            to="/upcoming"
-            className="hidden rounded-full p-2.5 text-[var(--cm-slate)] transition hover:bg-[var(--cm-blue-soft)] hover:text-[var(--cm-blue)] sm:inline-flex"
-            aria-label="Messages"
+            to={isAuthenticated ? "/messages" : "/login"}
+            className="relative hidden rounded-full p-2.5 text-[var(--cm-slate)] transition hover:bg-[var(--cm-blue-soft)] hover:text-[var(--cm-blue)] sm:inline-flex"
+            aria-label={totalUnreadCount > 0 ? `Messages (${totalUnreadCount} unread)` : "Messages"}
           >
             <MessageCircle size={20} />
+            {isAuthenticated && totalUnreadCount > 0 && (
+              <span className="absolute right-0.5 top-0.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[var(--cm-blue)] px-1 text-[10px] font-bold text-white shadow-xs animate-scale-in">
+                {totalUnreadCount > 99 ? '99+' : totalUnreadCount}
+              </span>
+            )}
           </Link>
           <Link
             to="/cart"

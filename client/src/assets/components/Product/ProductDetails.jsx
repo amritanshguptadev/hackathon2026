@@ -1,16 +1,20 @@
 import { useEffect, useState } from "react";
-import { useParams , useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import Header from "../Home/Header";
-import { Loader,ArrowLeft } from "lucide-react";
+import { Loader, ArrowLeft, MessageCircle } from "lucide-react";
 import Footer from "../Home/Footer";
+import { ToastContainer } from "react-toastify";
+import { handleError } from "../../../utils";
+import { API_URL, resolveMediaUrl } from "../../../config/api";
 
 export default function ProductDetails() {
   const { id } = useParams();
   const [product, setProduct] = useState({});
+  const [contacting, setContacting] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch(`http://localhost:3000/api/product/${id}`)
+    fetch(`${API_URL}/api/product/${id}`)
       .then((res) => res.json())
       .then((data) => {
         setProduct(data);
@@ -19,6 +23,38 @@ export default function ProductDetails() {
         console.error("Error fetching product:", err);
       });
   }, [id]);
+
+  const handleContactSeller = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
+    try {
+      setContacting(true);
+      const res = await fetch(`${API_URL}/api/conversations`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
+        body: JSON.stringify({ productId: id }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success && data.conversation) {
+        navigate(`/messages/${data.conversation._id}`);
+      } else {
+        handleError(data.message || "Failed to start conversation");
+      }
+    } catch (err) {
+      console.error("Error contacting seller:", err);
+      handleError("Could not start conversation. Please try again.");
+    } finally {
+      setContacting(false);
+    }
+  };
 
   if (!product.title) {
     return (
@@ -31,6 +67,7 @@ export default function ProductDetails() {
   return (
     <>
       <Header showSearchBar={false} />
+      <ToastContainer />
       <div>
         <div className="px-4 py-1 md:hidden">
         <button
@@ -46,7 +83,7 @@ export default function ProductDetails() {
           <div className="bg-white h-full md:sticky top-0 w-full md:w-1/3 flex justify-center">
             <div>
               <img
-                src={product.image}
+                src={resolveMediaUrl(product.image)}
                 className=" h-64 md:h-130 p-6 md:p-10 object-contain my-4 md:my-10 "
               />
             </div>
@@ -66,16 +103,18 @@ export default function ProductDetails() {
               <p className="text-xl md:text-2xl pb-5">₹ {product.price}.00</p>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 mt-4 w-18/20 m-auto">
-              <button className="px-6 py-2 bg-orange-500 text-white rounded-xl shadow hover:bg-orange-600 transition ">
-                <Link to="/upcoming">Buy now</Link>
-              </button>
-              <Link
-                to={`mailto:${product.seller.email}`}
-                className="px-6 py-2 border-2 border-orange-500 text-orange-500 rounded-xl hover:bg-orange-50 transition text-center"
+            <div className="flex flex-col sm:flex-row gap-4 mt-6 w-full sm:w-auto">
+              <button
+                onClick={handleContactSeller}
+                disabled={contacting}
+                className="flex items-center justify-center gap-2 px-8 py-3 bg-[var(--cm-blue)] text-white rounded-xl shadow-md hover:bg-[var(--cm-blue-dark)] transition text-center font-bold text-base cursor-pointer disabled:opacity-60 active:scale-98"
               >
-                Contact Seller
-              </Link>
+                <MessageCircle size={20} />
+                {contacting ? "Opening Chat..." : "Contact Seller"}
+              </button>
+              <button className="px-8 py-3 bg-orange-500 text-white rounded-xl shadow hover:bg-orange-600 transition font-bold text-base cursor-pointer">
+                <Link to="/upcoming" className="block w-full h-full">Buy Now</Link>
+              </button>
             </div>
             <div className="w-full md:w-3/4 py-10">
               <div className="bg-gray-300 w-full h-[1px]" />

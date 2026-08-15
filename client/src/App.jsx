@@ -10,6 +10,8 @@ import RefreshHandler from './refreshHandler';
 import { useState } from 'react';
 import Profile from './Pages/Profile';
 import ProductListing from './Pages/ProductListing';
+import Messages from './Pages/Messages';
+import { SocketProvider } from './context/SocketContext';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('token'));
@@ -21,7 +23,7 @@ function App() {
   };
 
   return (
-    <>
+    <SocketProvider>
       <RefreshHandler setIsAuthenticated={setIsAuthenticated} />
       <Routes>
         <Route path="/login" element={<LoginForm />} />
@@ -30,10 +32,12 @@ function App() {
         <Route path="/api/product/:id" element={<ProductDetails />} />
         <Route path="/all-products" element={<AllProducts />} />
         <Route path="/upcoming" element={<Upcoming />} />
-        <Route path='/profile' element={<Profile setIsAuthenticated={setIsAuthenticated}/>}/>
-        <Route path='/product-listing' element={<ProductListing/>}/>
+        <Route path="/profile" element={<Profile setIsAuthenticated={setIsAuthenticated}/>}/>
+        <Route path="/product-listing" element={<ProductListing/>}/>
+        <Route path="/messages" element={<PrivateRoute element={<Messages />} />} />
+        <Route path="/messages/:conversationId" element={<PrivateRoute element={<Messages />} />} />
       </Routes>
-    </>
+    </SocketProvider>
   );
 }
 

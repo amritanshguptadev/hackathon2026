@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate, Link } from 'react-router-dom';
 import { Search } from 'lucide-react';
+import { API_URL } from "../../../config/api";
 
 export default function SearchBar({ searchText, onChange,}) {
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -8,7 +9,7 @@ export default function SearchBar({ searchText, onChange,}) {
   const [categories, setCategories] = useState([]);
   
     useEffect(() => {
-      fetch("http://localhost:3000/api/category")
+      fetch(`${API_URL}/api/category`)
         .then((res) => res.json())
         .then((data) => {
           setCategories(data);

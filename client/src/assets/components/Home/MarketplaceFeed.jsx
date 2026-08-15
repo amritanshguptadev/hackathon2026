@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Search, ShieldCheck } from "lucide-react";
 import ProductCard from "./ProductCard";
 import { DEMO_LISTINGS, IMAGES } from "../../../data/images";
+import { API_URL } from "../../../config/api";
 
 const WANTED = [
   "Looking for a second-hand cycle",
@@ -31,8 +32,8 @@ export default function MarketplaceFeed() {
 
   useEffect(() => {
     Promise.all([
-      fetch("http://localhost:3000/api/featured-products").then((r) => r.json()),
-      fetch("http://localhost:3000/api/deals").then((r) => r.json()),
+      fetch(`${API_URL}/api/featured-products`).then((r) => r.json()),
+      fetch(`${API_URL}/api/deals`).then((r) => r.json()),
     ])
       .then(([featured, deals]) => {
         const merged = [

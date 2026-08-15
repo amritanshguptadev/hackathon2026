@@ -5,6 +5,7 @@ import { handleError, handleSuccess } from '../../../utils'
 import Footer from '../Home/Footer'
 import HeaderMain from '../Home/HeaderMain'
 import { IMAGES } from '../../../data/images'
+import { API_URL } from '../../../config/api'
 
 export default function LoginForm() {
   const [loginInfo, setLoginInfo] = useState({
@@ -29,7 +30,7 @@ export default function LoginForm() {
 
     try {
       setSubmitting(true)
-      const response = await fetch('http://localhost:3000/api/auth/login', {
+      const response = await fetch(`${API_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

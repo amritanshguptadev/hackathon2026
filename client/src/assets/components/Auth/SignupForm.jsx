@@ -5,6 +5,7 @@ import { handleError, handleSuccess } from '../../../utils'
 import Footer from '../Home/Footer'
 import HeaderMain from '../Home/HeaderMain'
 import { IMAGES } from '../../../data/images'
+import { API_URL } from '../../../config/api'
 
 export default function SignupForm() {
   const [signupInfo, setSignupInfo] = useState({
@@ -82,7 +83,7 @@ export default function SignupForm() {
       formData.append('studentDeclared', 'true')
       formData.append('idCard', idCard)
 
-      const response = await fetch('http://localhost:3000/api/auth/signup', {
+      const response = await fetch(`${API_URL}/api/auth/signup`, {
         method: 'POST',
         body: formData,
       })

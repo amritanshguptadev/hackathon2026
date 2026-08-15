@@ -5,6 +5,7 @@ import Header from "../Home/Header";
 import Footer from "../Home/Footer";
 import ProductCard from "../Home/ProductCard";
 import { DEMO_LISTINGS, IMAGES } from "../../../data/images";
+import { API_URL } from "../../../config/api";
 
 function normalizeProduct(p, index) {
   const statuses = ["Available", "Available", "Reserved", "Sold"];
@@ -28,8 +29,8 @@ export default function AllProducts() {
 
   useEffect(() => {
     Promise.all([
-      fetch("http://localhost:3000/api/featured-products").then((r) => r.json()),
-      fetch("http://localhost:3000/api/deals").then((r) => r.json()),
+      fetch(`${API_URL}/api/featured-products`).then((r) => r.json()),
+      fetch(`${API_URL}/api/deals`).then((r) => r.json()),
     ])
       .then(([featured, deals]) => {
         const merged = [

@@ -1,13 +1,14 @@
 import { MapPin, Info, Headphones, Mail } from "lucide-react";
 import SearchBar from "./SearchBar";
 import React, { useEffect, useState, useRef } from "react";
-import {Link} from 'react-router-dom'
+import { Link } from 'react-router-dom';
+import { API_URL } from "../../../config/api";
 
 export default function HeaderLow({showSearchBar=true}) {
   
   const [categories, setCategories] = useState([]);
     useEffect(() => {
-      fetch("http://localhost:3000/api/category")
+      fetch(`${API_URL}/api/category`)
         .then((res) => res.json())
         .then((data) => {
           setCategories(data);

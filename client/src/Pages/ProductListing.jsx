@@ -2,6 +2,7 @@ import { useState } from "react";
 import Header from "../assets/components/Home/Header";
 import Footer from "../assets/components/Home/Footer";
 import { Upload, X } from "lucide-react";
+import { API_URL } from "../config/api";
 
 export default function ProductListing() {
   const [product, setProduct] = useState({
@@ -72,7 +73,7 @@ export default function ProductListing() {
     formData.append("seller", JSON.stringify(product.seller));
     formData.append("productImage", imageFile);
 
-    const response = await fetch("http://localhost:3000/api/products", {
+    const response = await fetch(`${API_URL}/api/products`, {
       method: "POST",
       body: formData,
     });

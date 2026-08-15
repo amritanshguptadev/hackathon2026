@@ -44,9 +44,9 @@ router.post("/api/products", uploadProductImage, async (req, res) => {
       productData.price = Number(productData.price);
     }
 
-    // Set image URL
+    // Set image URL (store path so frontend resolveImageUrl can prepend current API_URL)
     if (req.file) {
-      productData.image = `http://localhost:3000/uploads/products/${req.file.filename}`;
+      productData.image = `/uploads/products/${req.file.filename}`;
     }
 
     const newProduct = new Featured_Product(productData);  

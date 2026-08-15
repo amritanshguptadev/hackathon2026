@@ -7,6 +7,7 @@ import { UserRound, AlertCircle } from "lucide-react";
 import HeaderMain from "../assets/components/Home/HeaderMain";
 import HeaderLow from "../assets/components/Home/HeaderLow";
 import { Link, useNavigate } from "react-router-dom";
+import { API_URL } from "../config/api";
 
 export default function Profile({setIsAuthenticated}) {
   const [profile, setProfile] = useState(null);
@@ -25,7 +26,7 @@ export default function Profile({setIsAuthenticated}) {
           return;
         }
 
-        const res = await fetch("http://localhost:3000/api/profile", {
+        const res = await fetch(`${API_URL}/api/profile`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",

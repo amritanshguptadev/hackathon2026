@@ -1,11 +1,13 @@
 import { React, useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { API_URL, resolveImageUrl } from "../../../config/api";
+
 export default function BestDeals() {
   const [deals, setDeals] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/deals")
+    fetch(`${API_URL}/api/deals`)
       .then((res) => res.json())
       .then((data) => {
         setDeals(data);
@@ -42,7 +44,7 @@ export default function BestDeals() {
             >
               <div className="h-full p-4 rounded-md shadow-lg border border-gray-500 hover:shadow-xl transition flex flex-col justify-between">
                 <img
-                  src={deal.image}
+                  src={resolveImageUrl(deal.image)}
                   alt={deal.title}
                   className="w-full h-40 object-contain mb-2"
                 />
@@ -66,7 +68,7 @@ export default function BestDeals() {
             >
             <div key={index} className="shadow-lg rounded-md">
               <img
-                src={deal.image}
+                src={resolveImageUrl(deal.image)}
                 alt={deal.title}
                 className="w-full h-40 object-cover"
               />

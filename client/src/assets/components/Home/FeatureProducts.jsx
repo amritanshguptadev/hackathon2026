@@ -1,13 +1,14 @@
 import { ArrowRight } from 'lucide-react';
 import React, { useEffect, useState } from "react";
 import {Link} from 'react-router-dom'
+import { API_URL, resolveImageUrl } from "../../../config/api";
 
 
 export default function FeatureProducts() {
     const [FeatureProduct, setFeatureProduct] = useState([]);
 
     useEffect(() => {
-        fetch("http://localhost:3000/api/featured-products")
+        fetch(`${API_URL}/api/featured-products`)
             .then((res) => res.json())
             .then((data) => {
                 setFeatureProduct(data);
@@ -64,7 +65,7 @@ export default function FeatureProducts() {
                             className="p-4 rounded-md shadow-md border border-gray-200 hover:shadow-lg transition mb-10 h-80"
                         >
                                 <img
-                                src={product.image}
+                                src={resolveImageUrl(product.image)}
                                 alt={product.title}
                                 className="w-full h-30 md:h-40 object-contain mb-2"
                             />

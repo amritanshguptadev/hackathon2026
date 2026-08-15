@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { API_URL } from "../../../config/api";
 
 export default function MacbookSale() {
   const [macbookId, setMacbookId] = useState(null);
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/featured-products")
+    fetch(`${API_URL}/api/featured-products`)
       .then((res) => res.json())
       .then((data) => {
         const macbookProduct = data.find((item) =>

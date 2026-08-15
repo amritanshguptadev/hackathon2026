@@ -1,9 +1,11 @@
-import { Heart, User, Package } from "lucide-react";
+import { Heart, User, Package, MessageCircle } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useSocket } from "../../../context/SocketContext";
 
 export default function MobileMenu() {
   const isAuthenticated = !!localStorage.getItem("token");
   const userName = localStorage.getItem("loggedInUser") || "Guest";
+  const { totalUnreadCount } = useSocket() || { totalUnreadCount: 0 };
 
   return (
     <div className="space-y-4 py-2">
@@ -23,13 +25,25 @@ export default function MobileMenu() {
         </Link>
       )}
 
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-4 gap-2">
         <Link
           to="/all-products"
           className="flex flex-col items-center gap-1 rounded-xl bg-[var(--cm-bg)] py-3 text-xs font-medium text-[var(--cm-slate)]"
         >
           <Package size={20} />
           Browse
+        </Link>
+        <Link
+          to={isAuthenticated ? "/messages" : "/login"}
+          className="relative flex flex-col items-center gap-1 rounded-xl bg-[var(--cm-bg)] py-3 text-xs font-medium text-[var(--cm-slate)]"
+        >
+          <MessageCircle size={20} />
+          Messages
+          {isAuthenticated && totalUnreadCount > 0 && (
+            <span className="absolute right-2 top-2 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[var(--cm-blue)] px-1 text-[10px] font-bold text-white shadow-xs">
+              {totalUnreadCount > 99 ? '99+' : totalUnreadCount}
+            </span>
+          )}
         </Link>
         <Link
           to="/upcoming"

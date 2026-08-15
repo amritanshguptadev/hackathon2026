@@ -1,5 +1,6 @@
 import { Heart } from "lucide-react";
 import { Link } from "react-router-dom";
+import { resolveImageUrl } from "../../../config/api";
 
 const STATUS_STYLES = {
   Available: "bg-emerald-50 text-emerald-700",
@@ -19,7 +20,7 @@ export default function ProductCard({ product }) {
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-[var(--cm-bg)]">
         <img
-          src={product.image}
+          src={resolveImageUrl(product.image)}
           alt={product.title}
           className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
         />

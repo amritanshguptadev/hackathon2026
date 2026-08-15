@@ -45,6 +45,15 @@ const UserSchema = new Schema({
         enum: ['pending', 'verified', 'rejected'],
         default: 'pending',
     },
+    isSuspended: {
+        type: Boolean,
+        default: false,
+    },
+    status: {
+        type: String,
+        enum: ['active', 'suspended', 'banned'],
+        default: 'active',
+    },
     createdAt: {
         type: Date,
         default: Date.now,
