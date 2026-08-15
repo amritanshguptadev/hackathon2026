@@ -1,15 +1,16 @@
-const express = require('express');
-const router = express.Router();
-const Featured_Product = require("../models/featuredProduct");
+import express from 'express';
+import FeaturedProduct from '../models/featuredProduct.js';
 
+const router = express.Router();
 
 router.get('/', async (req, res) => {
-  try{
-    const featuredproduct = await Featured_Product.find();
-    res.json(featuredproduct);
-  }catch(error){ 
-    res.status(500).json({ message: "Error fetching deals", error }) 
-  };
-
+  try {
+    const featuredProduct = await FeaturedProduct.find();
+    res.json(featuredProduct);
+  } catch (error) {
+    console.error('Error fetching featured products:', error.message);
+    res.status(500).json({ message: 'Error fetching deals', error });
+  }
 });
-module.exports = router;
+
+export default router;

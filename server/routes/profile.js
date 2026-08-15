@@ -1,6 +1,9 @@
-const route = require('express').Router();
-const User = require("../middleware/userProfile")
-const userValidator = require('../controller/profileValidator')
-route.get("/profile",User,userValidator);
+import express from 'express';
+import userProfileMiddleware from '../middleware/userProfile.js';
+import userValidator from '../controller/profileValidator.js';
 
-module.exports = route;
+const router = express.Router();
+
+router.get('/profile', userProfileMiddleware, userValidator);
+
+export default router;

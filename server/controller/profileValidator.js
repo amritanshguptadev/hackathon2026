@@ -1,5 +1,5 @@
-const userValidator = (req, res) => {
-    res.json(req.user); 
+export const userValidator = (req, res) => {
+  res.json(req.user);
 };
 
-module.exports = userValidator ;
+export default userValidator;

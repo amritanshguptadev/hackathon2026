@@ -1,5 +1,6 @@
 // Centralized API and Socket.IO configuration for Buykro
 export const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3000').replace(/\/$/, '');
+export const API_BASE_URL = API_URL;
 export const SOCKET_URL = (import.meta.env.VITE_SOCKET_URL || import.meta.env.VITE_API_URL || 'http://localhost:3000').replace(/\/$/, '');
 
 // Helper to resolve media and uploaded image paths

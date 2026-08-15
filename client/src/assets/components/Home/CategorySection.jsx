@@ -96,7 +96,7 @@ export default function CategorySection() {
               ))}
             </ul>
             <Link
-              to="/product-listing"
+              to="/sell"
               className="flex w-full items-center justify-center rounded-full bg-[var(--cm-blue)] py-2.5 text-xs font-bold text-white shadow transition hover:bg-blue-700"
             >
               + Post a Request

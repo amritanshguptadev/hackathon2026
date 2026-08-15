@@ -36,7 +36,7 @@ export default function HeaderLow({showSearchBar=true}) {
           <Link to="/upcoming" className="flex items-center gap-1">
             <MapPin size={18} /> Track Order
           </Link>
-          <Link to="/product-listing">Sell</Link>
+          <Link to="/sell">Sell</Link>
           <Link to="/upcoming">Buy</Link>
           <Link to="mailto:shahnawaz.hussain96508@gmail.com" className="flex items-center gap-1">
             <Info size={18} /> Need Help

@@ -1,29 +1,45 @@
-const { signup, login } = require('../controller/authController');
-const {
+import express from 'express';
+import {
+  signup,
+  login,
+  resendVerification,
+  verifyEmail,
+} from '../controller/authController.js';
+import {
   signupValidation,
   loginValidation,
-} = require('../middleware/authValidation');
-const uploadIdCard = require('../middleware/uploadIdCard');
+} from '../middleware/authValidation.js';
+import uploadIdCard from '../middleware/uploadIdCard.js';
 
-const router = require('express').Router();
+const router = express.Router();
 
 router.post('/login', loginValidation, login);
 
+router.post('/resend-verification', resendVerification);
+router.get('/verify-email', verifyEmail);
+router.post('/verify-email', verifyEmail);
+
+// Supports both standard JSON payloads and multipart/form-data
 router.post(
   '/signup',
   (req, res, next) => {
-    uploadIdCard(req, res, (err) => {
-      if (err) {
-        return res.status(400).json({
-          message: err.message || 'ID card upload failed',
-          success: false,
-        });
-      }
+    const contentType = req.headers['content-type'] || '';
+    if (contentType.includes('multipart/form-data')) {
+      uploadIdCard(req, res, (err) => {
+        if (err) {
+          return res.status(400).json({
+            message: err.message || 'File upload failed',
+            success: false,
+          });
+        }
+        next();
+      });
+    } else {
       next();
-    });
+    }
   },
   signupValidation,
   signup
 );
 
-module.exports = router;
+export default router;

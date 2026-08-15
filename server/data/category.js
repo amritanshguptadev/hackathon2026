@@ -11,4 +11,4 @@ const  category = [
         { name: "Fitness", image: "/CategoryImages/Fitness.png" },
         { name: "Chargers", image: "/CategoryImages/Chargers.png" },
     ];
-module.exports = category;
+export default category;

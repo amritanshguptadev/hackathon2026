@@ -1,6 +1,10 @@
-const path = require('path');
-const fs = require('fs');
-const multer = require('multer');
+import path from 'path';
+import fs from 'fs';
+import multer from 'multer';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const uploadDir = path.join(__dirname, '../uploads/id-cards');
 
@@ -33,4 +37,4 @@ const uploadIdCard = multer({
   limits: { fileSize: 5 * 1024 * 1024 },
 }).single('idCard');
 
-module.exports = uploadIdCard;
+export default uploadIdCard;

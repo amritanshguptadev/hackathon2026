@@ -6,6 +6,7 @@ import ProductDetails from './assets/components/Product/ProductDetails';
 import AllProducts from './assets/components/Product/AllProducts';
 import Upcoming from './Pages/Upcoming'
 import LoginForm from './assets/components/Auth/LoginForm';
+import EmailVerification from './assets/components/Auth/EmailVerification';
 import RefreshHandler from './refreshHandler';
 import { useState } from 'react';
 import Profile from './Pages/Profile';
@@ -28,12 +29,14 @@ function App() {
       <Routes>
         <Route path="/login" element={<LoginForm />} />
         <Route path="/signup" element={<SignupForm />} />
+        <Route path="/verify-email" element={<EmailVerification />} />
         <Route path="/" element={<Home/>} />
         <Route path="/api/product/:id" element={<ProductDetails />} />
         <Route path="/all-products" element={<AllProducts />} />
         <Route path="/upcoming" element={<Upcoming />} />
         <Route path="/profile" element={<Profile setIsAuthenticated={setIsAuthenticated}/>}/>
         <Route path="/product-listing" element={<ProductListing/>}/>
+        <Route path="/sell" element={<ProductListing/>}/>
         <Route path="/messages" element={<PrivateRoute element={<Messages />} />} />
         <Route path="/messages/:conversationId" element={<PrivateRoute element={<Messages />} />} />
       </Routes>

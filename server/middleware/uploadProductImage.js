@@ -1,6 +1,10 @@
-const path = require('path');
-const fs = require('fs');
-const multer = require('multer');
+import path from 'path';
+import fs from 'fs';
+import multer from 'multer';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const uploadDir = path.join(__dirname, '../uploads/products');
 
@@ -23,14 +27,22 @@ const fileFilter = (_req, file, cb) => {
   if (allowed.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error('Only JPG, PNG, or WEBP product photos are allowed'));
+    cb(new Error('Only JPG, JPEG, PNG, or WEBP product photos are allowed'));
   }
 };
 
-const uploadProductImage = multer({
+const upload = multer({
   storage,
   fileFilter,
-  limits: { fileSize: 5 * 1024 * 1024 },
-}).single('productImage');
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+});
 
-module.exports = uploadProductImage;
+// Support both multiple images (productImages) and single image (productImage)
+const uploadProductImage = upload.fields([
+  { name: 'productImages', maxCount: 5 },
+  { name: 'productImage', maxCount: 1 },
+  { name: 'images', maxCount: 5 },
+  { name: 'image', maxCount: 1 },
+]);
+
+export default uploadProductImage;

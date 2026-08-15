@@ -1,5 +1,5 @@
-const jwt = require('jsonwebtoken');
-const User = require('../models/user');
+import jwt from 'jsonwebtoken';
+import User from '../models/user.js';
 
 const profileMiddleware = async (req, res, next) => {
     try {
@@ -31,4 +31,4 @@ const profileMiddleware = async (req, res, next) => {
     }
 };
 
-module.exports = profileMiddleware;
+export default profileMiddleware;

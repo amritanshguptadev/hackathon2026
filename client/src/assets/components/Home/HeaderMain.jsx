@@ -87,7 +87,7 @@ export default function HeaderMain({ showSearchBar = true }) {
           </Link>
 
           <Link
-            to="/product-listing"
+            to="/sell"
             className="ml-1 hidden rounded-full bg-[var(--cm-blue)] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[var(--cm-blue-dark)] sm:inline-flex"
           >
             Sell Item

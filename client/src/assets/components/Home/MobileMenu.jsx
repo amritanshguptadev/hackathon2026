@@ -62,7 +62,7 @@ export default function MobileMenu() {
       </div>
 
       <Link
-        to="/product-listing"
+        to="/sell"
         className="flex w-full items-center justify-center rounded-full bg-[var(--cm-blue)] py-3 text-sm font-semibold text-white"
       >
         Sell Item
