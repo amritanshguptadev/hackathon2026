@@ -13,10 +13,6 @@ export const IMAGES = {
     keyboard: "/images/products/keyboard.png",
     sofa: "/images/products/sofa.png",
   },
-  giveaways: {
-    notebooks: "/images/giveaways/notebooks.png",
-    storageBin: "/images/giveaways/storage-bin.png",
-  },
   categories: {
     cycles: "/images/categories/cycles.png",
     books: "/images/categories/books.png",
@@ -88,11 +84,6 @@ export const DEMO_LISTINGS = [
     status: "Available",
     timeAgo: "6h ago",
   },
-];
-
-export const DEMO_GIVEAWAYS = [
-  { title: "Old Notebooks", image: IMAGES.giveaways.notebooks },
-  { title: "Plastic Storage Bin", image: IMAGES.giveaways.storageBin },
 ];
 
 export const CATEGORY_IMAGES = [

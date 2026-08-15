@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Search, ShieldCheck } from "lucide-react";
 import ProductCard from "./ProductCard";
-import { DEMO_LISTINGS, DEMO_GIVEAWAYS, IMAGES } from "../../../data/images";
+import { DEMO_LISTINGS, IMAGES } from "../../../data/images";
 
 const WANTED = [
   "Looking for a second-hand cycle",
@@ -72,31 +72,6 @@ export default function MarketplaceFeed() {
         </div>
 
         <aside className="space-y-4">
-          <div className="rounded-2xl bg-white p-5 ring-1 ring-[var(--cm-border)]">
-            <h3 className="mb-4 text-base font-bold text-[var(--cm-ink)]">
-              Giveaways
-            </h3>
-            <ul className="space-y-3">
-              {DEMO_GIVEAWAYS.map((item) => (
-                <li key={item.title} className="flex items-center gap-3">
-                  <img
-                    src={item.image}
-                    alt=""
-                    className="h-12 w-12 rounded-xl object-cover"
-                  />
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold text-[var(--cm-ink)]">
-                      {item.title}
-                    </p>
-                  </div>
-                  <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-bold text-emerald-700">
-                    FREE
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
           <div className="rounded-2xl bg-[var(--cm-blue-soft)] p-5">
             <h3 className="mb-4 text-base font-bold text-[var(--cm-ink)]">
               Wanted by Students

@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Featured_Product = require("../models/featuredProduct");
 const Deals = require("../models/deals");
+const uploadProductImage = require("../middleware/uploadProductImage");
 
 router.get("/api/product/:id", async (req, res) => {
   try {
@@ -20,9 +21,35 @@ router.get("/api/product/:id", async (req, res) => {
     res.status(500).json({ error: "Server error." });
   }
 });
-router.post("/api/products", async (req, res) => {
+router.post("/api/products", uploadProductImage, async (req, res) => {
   try {
-    const newProduct = new Featured_Product(req.body);  
+    const productData = { ...req.body };
+    
+    // Parse seller if it's a string
+    if (typeof productData.seller === 'string') {
+      try {
+        productData.seller = JSON.parse(productData.seller);
+      } catch (e) {
+        console.error("Error parsing seller:", e);
+      }
+    }
+    
+    // Parse details if it's a string
+    if (typeof productData.details === 'string') {
+      productData.details = productData.details.split(',').map(d => d.trim()).filter(d => d);
+    }
+    
+    // Parse price
+    if (productData.price) {
+      productData.price = Number(productData.price);
+    }
+
+    // Set image URL
+    if (req.file) {
+      productData.image = `http://localhost:3000/uploads/products/${req.file.filename}`;
+    }
+
+    const newProduct = new Featured_Product(productData);  
     await newProduct.save();
     res.status(201).json(newProduct);
   } catch (err) {

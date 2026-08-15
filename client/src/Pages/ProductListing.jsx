@@ -1,13 +1,13 @@
 import { useState } from "react";
 import Header from "../assets/components/Home/Header";
 import Footer from "../assets/components/Home/Footer";
+import { Upload, X } from "lucide-react";
 
 export default function ProductListing() {
   const [product, setProduct] = useState({
     title: "",
     description: "",
     price: "",
-    image: "",
     details: "",
     dimensions: "",
     seller: {
@@ -17,6 +17,29 @@ export default function ProductListing() {
       college: ""
     }
   });
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        alert("File size should not exceed 5MB");
+        return;
+      }
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setImageFile(null);
+    setImagePreview(null);
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -34,14 +57,24 @@ export default function ProductListing() {
 
   const handleSubmit = async (e) => {
   e.preventDefault();
+  if (!imageFile) {
+    alert("Please select a product image");
+    return;
+  }
 
   try {
+    const formData = new FormData();
+    formData.append("title", product.title);
+    formData.append("description", product.description);
+    formData.append("price", product.price);
+    formData.append("details", product.details);
+    formData.append("dimensions", product.dimensions);
+    formData.append("seller", JSON.stringify(product.seller));
+    formData.append("productImage", imageFile);
+
     const response = await fetch("http://localhost:3000/api/products", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(product),
+      body: formData,
     });
 
     if (!response.ok) {
@@ -56,7 +89,6 @@ export default function ProductListing() {
       title: "",
       description: "",
       price: "",
-      image: "",
       details: "",
       dimensions: "",
       seller: {
@@ -66,6 +98,7 @@ export default function ProductListing() {
         college: "",
       },
     });
+    removeImage();
 
     alert("✅ Product submitted successfully!");
   } catch (error) {
@@ -131,20 +164,45 @@ export default function ProductListing() {
               />
             </div>
 
-            {/* Image URL */}
+            {/* Product Image */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">
-                Image URL
+                Product Image
               </label>
-              <input
-                type="url"
-                name="image"
-                value={product.image}
-                onChange={handleChange}
-                placeholder="https://images.unsplash.com/photo..."
-                className="w-full p-3 rounded-lg border border-gray-300 focus:border-[#1B6392] focus:ring-1 focus:ring-[#1B6392] transition"
-                required
-              />
+              {!imagePreview ? (
+                <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-[#1B6392] transition-colors cursor-pointer relative bg-white">
+                  <input
+                    type="file"
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    onChange={handleFileChange}
+                    accept="image/jpeg, image/png, image/jpg, image/webp"
+                    required
+                  />
+                  <div className="space-y-1 text-center">
+                    <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                    <div className="flex text-sm text-gray-600 justify-center">
+                      <span className="relative cursor-pointer bg-white rounded-md font-medium text-[#1B6392] hover:text-[#1B6392] focus-within:outline-none">
+                        <span>Upload a file</span>
+                      </span>
+                      <p className="pl-1">or drag and drop</p>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-2">
+                      PNG, JPG, WEBP up to 5MB
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="relative mt-1 rounded-lg overflow-hidden border border-gray-300 w-full max-w-sm mx-auto">
+                  <img src={imagePreview} alt="Preview" className="w-full h-auto object-cover max-h-64" />
+                  <button
+                    type="button"
+                    onClick={removeImage}
+                    className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full hover:bg-red-600 transition shadow-md"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Features */}

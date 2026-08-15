@@ -1,31 +1,55 @@
-const { string } = require('joi');
 const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
 const UserSchema = new Schema({
-    name:{
-        type:String ,
+    name: {
+        type: String,
         required: true,
     },
-    email:{
-        type:String ,
+    studentId: {
+        type: String,
         required: true,
-        unique:true
+        unique: true,
+        trim: true,
     },
-    password:{
-        type:String,
-        require:true
+    email: {
+        type: String,
+        required: true,
+        unique: true,
+    },
+    password: {
+        type: String,
+        required: true,
+    },
+    role: {
+        type: String,
+        enum: ['student'],
+        default: 'student',
+    },
+    university: {
+        type: String,
+        required: true,
+        trim: true,
+    },
+    idCardPath: {
+        type: String,
+        required: true,
+    },
+    studentDeclared: {
+        type: Boolean,
+        default: false,
+    },
+    verificationStatus: {
+        type: String,
+        enum: ['pending', 'verified', 'rejected'],
+        default: 'pending',
     },
     createdAt: {
         type: Date,
-        default: Date.now
+        default: Date.now,
     },
-    isVerified:{
-        type:String,
-        default:"Verified"
-    }
 });
 
-const UserModel = mongoose.model("users",UserSchema);
+const UserModel = mongoose.model('users', UserSchema);
 module.exports = UserModel;
