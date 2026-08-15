@@ -1,20 +1,23 @@
-import { React, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import { API_URL, resolveImageUrl } from "../../../config/api";
+import { productService } from "../../../services/productService";
+import { DEMO_LISTINGS } from "../../../data/images";
 
 export default function BestDeals() {
   const [deals, setDeals] = useState([]);
 
   useEffect(() => {
-    fetch(`${API_URL}/api/deals`)
-      .then((res) => res.json())
+    productService.getProducts({ sortBy: "price-low", limit: 6 })
       .then((data) => {
-        setDeals(data);
+        if (data && data.length > 0) {
+          setDeals(data);
+        } else {
+          setDeals(DEMO_LISTINGS.slice(0, 6));
+        }
       })
-      .catch((err) => {
-        console.error("Error fetching deals:", err);
-        setDeals([]);
+      .catch(() => {
+        setDeals(DEMO_LISTINGS.slice(0, 6));
       });
   }, []);
 
@@ -36,15 +39,15 @@ export default function BestDeals() {
       </div>
       <div className="hidden  md:block m-10 border-1 border-gray-400 rounded-xl p-5">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {deals.map((deal, index) => (
+          {deals.map((deal) => (
             <Link
-              to={`/api/product/${deal._id}`}
-              key={deal._id}
+              to={`/product/${deal._id || deal.id}`}
+              key={deal._id || deal.id}
               className="block"
             >
               <div className="h-full p-4 rounded-md shadow-lg border border-gray-500 hover:shadow-xl transition flex flex-col justify-between">
                 <img
-                  src={resolveImageUrl(deal.image)}
+                  src={deal.image || "/images/products/desk-lamp.png"}
                   alt={deal.title}
                   className="w-full h-40 object-contain mb-2"
                 />
@@ -52,7 +55,9 @@ export default function BestDeals() {
                 <p className=" raleway text-sm text-gray-600 flex-grow">
                   {deal.description}
                 </p>
-                <p className="text-xl text-green-600 font-semibold pt-2">₹ {deal.price}.00</p>
+                <p className="text-xl text-green-600 font-semibold pt-2">
+                  {typeof deal.price === "number" ? `₹ ${deal.price}.00` : deal.price}
+                </p>
               </div>
             </Link>
           ))}
@@ -63,16 +68,18 @@ export default function BestDeals() {
         <div className="grid grid-cols-2 gap-4 ">
           {deals.slice(0,6).map((deal, index) => (
             <Link
-              to={`/api/product/${deal._id}`}
-              key={deal._id}
+              to={`/product/${deal._id || deal.id}`}
+              key={deal._id || deal.id || index}
             >
             <div key={index} className="shadow-lg rounded-md">
               <img
-                src={resolveImageUrl(deal.image)}
+                src={deal.image || "/images/products/desk-lamp.png"}
                 alt={deal.title}
                 className="w-full h-40 object-cover"
               />
-              <p className="text-green-600 font-semibold text-center py-2">₹ {deal.price}.00</p>
+              <p className="text-green-600 font-semibold text-center py-2">
+                {typeof deal.price === "number" ? `₹ ${deal.price}.00` : deal.price}
+              </p>
             </div>
             </Link> 
           ))}

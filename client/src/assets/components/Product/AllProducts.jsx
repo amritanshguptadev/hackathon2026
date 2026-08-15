@@ -1,4 +1,4 @@
-import { ArrowLeft, Filter, SlidersHorizontal, X, Search, Check, RotateCcw } from "lucide-react";
+import { ArrowLeft, Filter, SlidersHorizontal, X, Search, Check, RotateCcw, Loader2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import Header from "../Home/Header";
@@ -6,21 +6,8 @@ import Footer from "../Home/Footer";
 import ProductCard from "../Home/ProductCard";
 import PriceRangeFilter, { formatINR, parsePrice } from "../../../components/PriceRangeFilter";
 import { DEMO_LISTINGS, IMAGES } from "../../../data/images";
-import { API_URL } from "../../../config/api";
-
-const CATEGORIES = [
-  "All Categories",
-  "Electronics",
-  "Books & Notes",
-  "Furniture",
-  "Cycles & Bikes",
-  "Hostel Essentials",
-  "Appliances",
-  "Clothing",
-  "Sports & Fitness",
-  "Stationery",
-  "Free / Giveaway",
-];
+import { productService } from "../../../services/productService";
+import { categoryService, FALLBACK_CATEGORIES } from "../../../services/categoryService";
 
 const CONDITIONS = ["Like New", "Good", "Fair"];
 
@@ -32,74 +19,46 @@ const LOCATIONS = [
   "Block C",
   "East Block",
   "Main Gate",
-  "Delhi University",
-  "Mumbai University",
-  "Christ University",
-  "IIT Gandhinagar",
+  "Boys Hostel",
+  "Girls Hostel",
+  "Central Library",
 ];
 
 const STATUSES = ["Available", "Reserved", "Sold"];
-
-function inferCategory(title = "", desc = "") {
-  const text = `${title} ${desc}`.toLowerCase();
-  if (text.includes("macbook") || text.includes("laptop") || text.includes("headphone") || text.includes("keyboard") || text.includes("phone") || text.includes("charger")) return "Electronics";
-  if (text.includes("book") || text.includes("calculus") || text.includes("notes") || text.includes("gate")) return "Books & Notes";
-  if (text.includes("chair") || text.includes("table") || text.includes("bed") || text.includes("sofa") || text.includes("shelf")) return "Furniture";
-  if (text.includes("cycle") || text.includes("bike")) return "Cycles & Bikes";
-  if (text.includes("lamp") || text.includes("kettle") || text.includes("fridge") || text.includes("hostel")) return "Hostel Essentials";
-  if (text.includes("microwave") || text.includes("oven") || text.includes("appliance")) return "Appliances";
-  if (text.includes("free") || text.includes("giveaway")) return "Free / Giveaway";
-  return "Hostel Essentials";
-}
-
-function inferCondition(meta = "", desc = "") {
-  const text = `${meta} ${desc}`.toLowerCase();
-  if (text.includes("like new") || text.includes("barely used") || text.includes("excellent")) return "Like New";
-  if (text.includes("good condition") || text.includes("well maintained") || text.includes("good")) return "Good";
-  if (text.includes("fair") || text.includes("used") || text.includes("refurbished")) return "Fair";
-  return "Good";
-}
-
-function inferLocation(meta = "", seller = {}) {
-  if (seller?.college) return seller.college;
-  if (seller?.city) return seller.city;
-  const match = meta.match(/•\s*(.*)$/);
-  if (match && match[1] && !match[1].includes("Campus")) return match[1].trim();
-  return "Main Gate";
-}
 
 function normalizeProduct(p, index) {
   const statuses = ["Available", "Available", "Reserved", "Sold"];
   const fallbackImages = Object.values(IMAGES.products);
   const rawPrice = p.price ?? "—";
-  const numPrice = parsePrice(rawPrice);
+  const numPrice = typeof p.numericPrice === "number" ? p.numericPrice : parsePrice(rawPrice);
   const isFree =
     rawPrice === 0 ||
     rawPrice === "0" ||
     rawPrice === "FREE" ||
     rawPrice === "Free" ||
-    p.isFree ||
-    (typeof p.category === "string" && p.category.toLowerCase().includes("free"));
+    p.isFree;
 
   const title = p.title || p.name || "Campus listing";
   const desc = p.description || "";
   const meta =
     p.meta ||
     desc.slice(0, 48) ||
-    `${p.condition || "Good condition"} • ${p.location || "Campus"}`;
+    `${p.condition || "Good condition"} • ${p.location || p.campusLocation || "Campus"}`;
 
-  const category = p.category || inferCategory(title, desc);
-  const condition = p.condition || inferCondition(meta, desc);
-  const location = p.location || inferLocation(meta, p.seller);
+  const category = p.category || (p.categories?.name) || "Hostel Essentials";
+  const condition = p.condition || "Good";
+  const location = p.location || p.campusLocation || "Main Gate";
   const status = p.status || statuses[index % statuses.length];
 
   return {
     _id: p._id || p.id || `item-${index}`,
+    id: p._id || p.id || `item-${index}`,
     title,
-    price: isFree ? "FREE" : (typeof rawPrice === "number" ? rawPrice.toLocaleString("en-IN") : rawPrice),
-    numericPrice: isFree ? 0 : numPrice,
+    price: isFree ? "FREE" : (typeof rawPrice === "number" ? formatINR(rawPrice) : rawPrice),
+    numericPrice: isFree ? 0 : (numPrice || 0),
     isFree,
-    image: p.image || fallbackImages[index % fallbackImages.length],
+    image: p.image || (p.images?.[0]) || fallbackImages[index % fallbackImages.length],
+    images: p.images || [p.image || fallbackImages[index % fallbackImages.length]],
     meta,
     description: desc,
     category,
@@ -111,7 +70,9 @@ function normalizeProduct(p, index) {
 }
 
 export default function AllProducts() {
-  const [rawProducts, setRawProducts] = useState(DEMO_LISTINGS);
+  const [rawProducts, setRawProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [categoriesList, setCategoriesList] = useState(["All Categories", ...FALLBACK_CATEGORIES.map((c) => c.name)]);
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
 
@@ -132,39 +93,25 @@ export default function AllProducts() {
   // Mobile drawer state
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
 
-  // Fetch live products & custom user listings
+  // Fetch live categories from Supabase
   useEffect(() => {
-    const customListings = JSON.parse(localStorage.getItem("studx_user_listings") || "[]");
+    categoryService.getActiveCategories().then((cats) => {
+      if (cats && cats.length > 0) {
+        setCategoriesList(["All Categories", ...cats.map((c) => c.name)]);
+      }
+    });
+  }, []);
 
-    Promise.all([
-      fetch(`${API_URL}/api/featured-products`).then((r) => r.json()).catch(() => []),
-      fetch(`${API_URL}/api/deals`).then((r) => r.json()).catch(() => []),
-    ])
-      .then(([featured, deals]) => {
-        const fetched = [
-          ...(Array.isArray(featured) ? featured : []),
-          ...(Array.isArray(deals) ? deals : []),
-        ];
-        const baseItems = fetched.length > 0 ? fetched : DEMO_LISTINGS;
-        const normalized = [
-          ...customListings.map(normalizeProduct),
-          ...baseItems.map(normalizeProduct),
-        ];
+  // Fetch live products from Supabase
+  useEffect(() => {
+    setLoading(true);
+    productService.getProducts()
+      .then((data) => {
+        const items = data && data.length > 0 ? data : DEMO_LISTINGS;
+        const normalized = items.map(normalizeProduct);
+        setRawProducts(normalized);
 
-        // Deduplicate by _id
-        const unique = [];
-        const seen = new Set();
-        normalized.forEach((item) => {
-          if (!seen.has(item._id)) {
-            seen.add(item._id);
-            unique.push(item);
-          }
-        });
-
-        setRawProducts(unique);
-
-        // Dynamically determine maximum price bound
-        const prices = unique
+        const prices = normalized
           .map((p) => p.numericPrice)
           .filter((p) => p !== null && !isNaN(p) && p > 0);
         if (prices.length > 0) {
@@ -175,21 +122,10 @@ export default function AllProducts() {
         }
       })
       .catch(() => {
-        const normalized = [
-          ...customListings.map(normalizeProduct),
-          ...DEMO_LISTINGS.map(normalizeProduct),
-        ];
+        const normalized = DEMO_LISTINGS.map(normalizeProduct);
         setRawProducts(normalized);
-        const prices = normalized
-          .map((p) => p.numericPrice)
-          .filter((p) => p !== null && !isNaN(p) && p > 0);
-        if (prices.length > 0) {
-          const maxP = Math.max(50000, ...prices);
-          const roundedMax = Math.ceil(maxP / 1000) * 1000;
-          setBoundMax(roundedMax);
-          setMaxPrice(roundedMax);
-        }
-      });
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   // Update query params when category changes from external links
@@ -357,7 +293,7 @@ export default function AllProducts() {
           onChange={(e) => setSelectedCategory(e.target.value)}
           className="w-full rounded-xl border border-[var(--cm-border)] bg-white px-3.5 py-2.5 text-sm text-[var(--cm-ink)] outline-none transition focus:border-[var(--cm-blue)] focus:ring-2 focus:ring-[var(--cm-blue)]/20 cursor-pointer shadow-2xs"
         >
-          {CATEGORIES.map((cat) => (
+          {categoriesList.map((cat) => (
             <option key={cat} value={cat}>
               {cat}
             </option>

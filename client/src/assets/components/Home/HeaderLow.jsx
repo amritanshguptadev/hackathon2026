@@ -1,36 +1,43 @@
 import { MapPin, Info, Headphones, Mail } from "lucide-react";
 import SearchBar from "./SearchBar";
-import React, { useEffect, useState, useRef } from "react";
-import { Link } from 'react-router-dom';
-import { API_URL } from "../../../config/api";
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from 'react-router-dom';
+import { categoryService, FALLBACK_CATEGORIES } from "../../../services/categoryService";
 
-export default function HeaderLow({showSearchBar=true}) {
-  
-  const [categories, setCategories] = useState([]);
-    useEffect(() => {
-      fetch(`${API_URL}/api/category`)
-        .then((res) => res.json())
-        .then((data) => {
-          setCategories(data);
-        })
-        .catch((err) => {
-          console.error("Error fetching categories:", err);
-          setCategories([]);
-        });
-    }, []);
+export default function HeaderLow({ showSearchBar = true }) {
+  const [categories, setCategories] = useState(FALLBACK_CATEGORIES);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    categoryService.getActiveCategories().then((data) => {
+      if (data && data.length > 0) setCategories(data);
+    });
+  }, []);
+
+  const handleCategorySelect = (e) => {
+    const val = e.target.value;
+    if (val && val !== "Select Category") {
+      navigate(`/all-products?category=${encodeURIComponent(val)}`);
+    }
+  };
+
   return (
     <>
       <div className="raleway w-full bg-white border-b border-gray-200 text-sm lg:text-md">
       <div className="hidden md:flex justify-between items-center px-4 py-3">
         <div className="flex gap-6 items-center">
-          <select className=" border ml-2 px- py-1 rounded">
-            <option >
-                Select Category
+          <select
+            onChange={handleCategorySelect}
+            className="border ml-2 px-2 py-1 rounded text-sm bg-white cursor-pointer"
+            defaultValue="Select Category"
+          >
+            <option value="Select Category">
+              Select Category
             </option>
-            {categories.map((category, index) => (
-                <option key={index} >
-                  {category.name}
-                </option>
+            {categories.map((category) => (
+              <option key={category.id || category.name} value={category.name}>
+                {category.name}
+              </option>
             ))}
           </select>
           <Link to="/upcoming" className="flex items-center gap-1">

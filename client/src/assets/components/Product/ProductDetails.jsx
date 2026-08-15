@@ -1,184 +1,222 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import Header from "../Home/Header";
-import { Loader, ArrowLeft, MessageCircle } from "lucide-react";
+import { Loader, ArrowLeft, MessageCircle, Heart, ShieldCheck, MapPin } from "lucide-react";
 import Footer from "../Home/Footer";
-import { ToastContainer } from "react-toastify";
-import { handleError } from "../../../utils";
-import { API_URL, resolveMediaUrl } from "../../../config/api";
+import { ToastContainer, toast } from "react-toastify";
+import { handleError, handleSuccess } from "../../../utils";
+import { productService } from "../../../services/productService";
+import { favoriteService } from "../../../services/favoriteService";
+import { useAuth } from "../../../context/AuthContext";
+import { formatINR } from "../../../components/PriceRangeFilter";
+import { DEMO_LISTINGS } from "../../../data/images";
 
 export default function ProductDetails() {
   const { id } = useParams();
-  const [product, setProduct] = useState({});
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [isFav, setIsFav] = useState(false);
   const [contacting, setContacting] = useState(false);
   const navigate = useNavigate();
+  const { user, isAuthenticated } = useAuth();
 
   useEffect(() => {
-    fetch(`${API_URL}/api/product/${id}`)
-      .then((res) => res.json())
+    setLoading(true);
+    productService.getProductById(id)
       .then((data) => {
-        setProduct(data);
+        if (data) {
+          setProduct(data);
+        } else {
+          const fallback = DEMO_LISTINGS.find((p) => p._id === id || p.id === id);
+          setProduct(fallback || null);
+        }
       })
-      .catch((err) => {
-        console.error("Error fetching product:", err);
-      });
-  }, [id]);
+      .catch(() => {
+        const fallback = DEMO_LISTINGS.find((p) => p._id === id || p.id === id);
+        setProduct(fallback || null);
+      })
+      .finally(() => setLoading(false));
 
-  const handleContactSeller = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) {
+    if (user?.id) {
+      favoriteService.isFavorite(user.id, id).then(setIsFav).catch(() => {});
+    }
+  }, [id, user?.id]);
+
+  const handleToggleFavorite = async () => {
+    if (!isAuthenticated) {
+      toast.info("Please login to save favorite items.");
       navigate("/login");
       return;
     }
-
     try {
-      setContacting(true);
-      const res = await fetch(`${API_URL}/api/conversations`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token,
-        },
-        body: JSON.stringify({ productId: id }),
-      });
-
-      const data = await res.json();
-      if (res.ok && data.success && data.conversation) {
-        navigate(`/messages/${data.conversation._id}`);
+      const favorited = await favoriteService.toggleFavorite(user.id, id);
+      setIsFav(favorited);
+      if (favorited) {
+        toast.success("Added to your saved items!");
       } else {
-        handleError(data.message || "Failed to start conversation");
+        toast.info("Removed from saved items.");
       }
-    } catch (err) {
-      console.error("Error contacting seller:", err);
-      handleError("Could not start conversation. Please try again.");
-    } finally {
-      setContacting(false);
+    } catch {
+      toast.error("Failed to update favorites.");
     }
   };
 
-  if (!product.title) {
+  const handleContactSeller = async () => {
+    if (!isAuthenticated) {
+      navigate("/login");
+      return;
+    }
+    navigate(`/messages`);
+  };
+
+  if (loading) {
     return (
-      <div className="text-center p-4">
-        <Loader size={50} color="black" />
+      <div className="flex h-screen items-center justify-center bg-[var(--cm-bg)]">
+        <Loader size={40} className="animate-spin text-[var(--cm-blue)]" />
       </div>
     );
   }
+
+  if (!product || !product.title) {
+    return (
+      <div className="min-h-screen bg-[var(--cm-bg)] flex flex-col justify-between">
+        <Header showSearchBar={false} />
+        <div className="text-center p-12 max-w-md mx-auto">
+          <h2 className="text-xl font-bold text-[var(--cm-ink)] mb-2">Product Not Found</h2>
+          <p className="text-sm text-[var(--cm-slate)] mb-6">This listing may have been removed or sold.</p>
+          <Link to="/all-products" className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[var(--cm-blue)] text-white font-bold text-sm">
+            <ArrowLeft size={16} /> Return to Marketplace
+          </Link>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  const imagesList = Array.isArray(product.images) && product.images.length > 0
+    ? product.images
+    : [product.image || "/images/products/desk-lamp.png"];
 
   return (
     <>
       <Header showSearchBar={false} />
       <ToastContainer />
-      <div>
-        <div className="px-4 py-1 md:hidden">
-        <button
-          onClick={() => navigate(-1)}
-          className="flex items-center text-blue-600 font-semibold hover:underline "
-        >
-          <ArrowLeft className="mr-2" size={20} />
-          Back
-        </button>
-      </div>
-        <div className="bg-black w-full h-[1px]" />
-        <div className="flex flex-col md:flex-row justify-center w-19/20">
-          <div className="bg-white h-full md:sticky top-0 w-full md:w-1/3 flex justify-center">
-            <div>
-              <img
-                src={resolveMediaUrl(product.image)}
-                className=" h-64 md:h-130 p-6 md:p-10 object-contain my-4 md:my-10 "
-              />
-            </div>
+      <div className="min-h-screen bg-[var(--cm-bg)] py-6">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-4 flex items-center justify-between">
+            <button
+              onClick={() => navigate(-1)}
+              className="inline-flex items-center gap-1.5 text-sm font-bold text-[var(--cm-blue)] hover:underline cursor-pointer"
+            >
+              <ArrowLeft size={18} /> Back
+            </button>
+            <button
+              onClick={handleToggleFavorite}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-bold transition cursor-pointer ${
+                isFav
+                  ? "bg-rose-50 border-rose-200 text-rose-600"
+                  : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
+              }`}
+            >
+              <Heart size={15} className={isFav ? "fill-rose-500 text-rose-500" : ""} />
+              {isFav ? "Saved" : "Save Item"}
+            </button>
           </div>
 
-          <div className="m-4 md:m-10 w-full md:w-2/3">
-            <div className="md:w-2/4">
-              <p className="raleway text-xl md:text-2xl font-black pb-1">
-                {product.description}
-              </p>
-              <p className="raleway text-sm font-black text-gray-500 pb-5">
-                Sell by{" "}
-                <Link className="text-black cursor-pointer">
-                  {product.seller?.name}
-                </Link>
-              </p>
-              <p className="text-xl md:text-2xl pb-5">₹ {product.price}.00</p>
+          <div className="rounded-3xl bg-white p-6 sm:p-8 border border-[var(--cm-border)] shadow-xs flex flex-col md:flex-row gap-8">
+            {/* Gallery Column */}
+            <div className="w-full md:w-1/2 space-y-3">
+              <div className="aspect-[4/3] w-full rounded-2xl bg-slate-50 overflow-hidden border border-slate-200 flex items-center justify-center relative">
+                <img
+                  src={imagesList[activeImageIndex] || imagesList[0]}
+                  alt={product.title}
+                  className="h-full w-full object-contain p-4"
+                />
+                <span className="absolute top-3 left-3 rounded-full bg-emerald-600 px-3 py-1 text-xs font-bold text-white shadow-xs">
+                  {product.status || "Available"}
+                </span>
+                {product.condition && (
+                  <span className="absolute top-3 right-3 rounded-full bg-slate-900/80 backdrop-blur-md px-3 py-1 text-xs font-bold text-white shadow-xs">
+                    {product.condition}
+                  </span>
+                )}
+              </div>
+
+              {imagesList.length > 1 && (
+                <div className="flex gap-2 overflow-x-auto pb-1">
+                  {imagesList.map((img, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setActiveImageIndex(idx)}
+                      className={`h-16 w-16 rounded-xl overflow-hidden border-2 shrink-0 transition-all cursor-pointer ${
+                        activeImageIndex === idx ? "border-[var(--cm-blue)] scale-105" : "border-slate-200 opacity-70"
+                      }`}
+                    >
+                      <img src={img} alt="" className="h-full w-full object-cover" />
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 mt-6 w-full sm:w-auto">
-              <button
-                onClick={handleContactSeller}
-                disabled={contacting}
-                className="flex items-center justify-center gap-2 px-8 py-3 bg-[var(--cm-blue)] text-white rounded-xl shadow-md hover:bg-[var(--cm-blue-dark)] transition text-center font-bold text-base cursor-pointer disabled:opacity-60 active:scale-98"
-              >
-                <MessageCircle size={20} />
-                {contacting ? "Opening Chat..." : "Contact Seller"}
-              </button>
-              <button className="px-8 py-3 bg-orange-500 text-white rounded-xl shadow hover:bg-orange-600 transition font-bold text-base cursor-pointer">
-                <Link to="/upcoming" className="block w-full h-full">Buy Now</Link>
-              </button>
-            </div>
-            <div className="w-full md:w-3/4 py-10">
-              <div className="bg-gray-300 w-full h-[1px]" />
-            </div>
+            {/* Details Column */}
+            <div className="w-full md:w-1/2 flex flex-col justify-between space-y-6">
+              <div>
+                <span className="text-xs font-bold uppercase tracking-wider text-[var(--cm-blue)] block mb-1">
+                  {product.category || "Campus Listing"}
+                </span>
+                <h1 className="text-2xl sm:text-3xl font-black text-[var(--cm-ink)]">{product.title}</h1>
+                <p className="mt-2 text-2xl sm:text-3xl font-black text-[var(--cm-blue)]">
+                  {product.isFree ? "FREE" : (typeof product.price === "number" ? formatINR(product.price) : product.price)}
+                </p>
 
-            <div className="w-full  md:w-3/4">
-              <h2 className="raleway text-xl md:text-2xl font-black mb-2">
-                About this Product
-              </h2>
-              <ul className="raleway text-md list-disc list-inside space-y-1">
-                {product.details.map((detail, index) => (
-                  <li key={index}>{detail}</li>
-                ))}
-              </ul>
-            </div>
+                <p className="mt-4 text-sm text-slate-700 leading-relaxed whitespace-pre-line">
+                  {product.description}
+                </p>
+              </div>
 
-            <div className="w-full md:w-3/4 py-10">
-              <div className="bg-gray-300 w-full h-[1px]" />
-            </div>
-            <div className="w-full md:w-3/4">
-              <h2 className="raleway text-xl md:text-2xl font-black mb-2">
-                About the Seller
-              </h2>
-              <ul className="raleway text-md list-disc list-inside space-y-1">
-                <li>
-                  <span className="font-medium">Sold by:</span>{" "}
-                  {product.seller.name}
-                </li>
-                <li>
-                  <span className="font-medium">College:</span>{" "}
-                  {product.seller.college}
-                </li>
-                <li>
-                  <span className="font-medium">City:</span>{" "}
-                  {product.seller.city}
-                </li>
-                <li>
-                  <span className="font-medium">Email:</span>{" "}
-                  <Link
-                    to={`mailto:${product.seller.email}`}
-                    className="text-blue-600 hover:underline underline-offset-4 hover:text-orange-500"
+              <div className="space-y-4 pt-4 border-t border-slate-100">
+                {/* Location & Condition Badges */}
+                <div className="flex flex-wrap gap-2 text-xs font-semibold">
+                  <span className="inline-flex items-center gap-1 bg-slate-100 px-3 py-1 rounded-full text-slate-700">
+                    <MapPin size={13} /> {product.campusLocation || "Campus"}
+                  </span>
+                  <span className="inline-flex items-center gap-1 bg-blue-50 px-3 py-1 rounded-full text-[var(--cm-blue)]">
+                    <ShieldCheck size={13} /> Verified Student Listing
+                  </span>
+                </div>
+
+                {/* Seller Card */}
+                {product.seller && (
+                  <div className="rounded-2xl bg-[var(--cm-blue-soft)]/60 p-4 border border-[var(--cm-blue)]/15 flex items-center justify-between">
+                    <div>
+                      <p className="text-xs text-[var(--cm-slate)] font-semibold">Listed by</p>
+                      <p className="text-sm font-bold text-[var(--cm-ink)]">{product.seller.name || "Student Seller"}</p>
+                      <p className="text-xs text-[var(--cm-slate)]">{product.seller.college || "Campus Community"}</p>
+                    </div>
+                    <span className="rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2.5 py-1">
+                      Campus Peer
+                    </span>
+                  </div>
+                )}
+
+                {/* CTA Buttons */}
+                <div className="flex gap-3 pt-2">
+                  <button
+                    onClick={handleContactSeller}
+                    className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--cm-blue)] px-6 py-3 text-sm font-bold text-white shadow-md hover:bg-[var(--cm-blue-dark)] transition cursor-pointer"
                   >
-                    {product.seller.email}
+                    <MessageCircle size={18} /> Message Seller
+                  </button>
+                  <Link
+                    to="/all-products"
+                    className="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 transition cursor-pointer"
+                  >
+                    Browse More
                   </Link>
-                </li>
-                <li>
-                  <span className="font-medium">Joined in:</span>{" "}
-                  {new Date(product.seller?.joinedAt).toLocaleDateString(
-                    "en-IN",
-                    {
-                      year: "numeric",
-                      month: "long",
-                    }
-                  )}
-                </li>
-              </ul>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-4 mt-6 p-5 md:w-3/4 justify-items-start">
-              <button className="cursor-pointer w-full px-4 py-2 font-black text-black bg-yellow-400 rounded-md opacity-80 hover:opacity-100">
-                <Link to="/upcoming">Buy Now</Link>
-              </button>
-              <button className="cursor-pointer w-full px-4 py-2 font-black text-black bg-orange-400 rounded-md opacity-90 hover:opacity-100">
-                <Link to="/upcoming">Add to Cart</Link>
-              </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>

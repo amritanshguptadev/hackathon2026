@@ -1,21 +1,24 @@
 import { ArrowRight } from 'lucide-react';
 import React, { useEffect, useState } from "react";
-import {Link} from 'react-router-dom'
-import { API_URL, resolveImageUrl } from "../../../config/api";
-
+import { Link } from 'react-router-dom';
+import { productService } from "../../../services/productService";
+import { DEMO_LISTINGS } from "../../../data/images";
+import { formatINR } from "../../../components/PriceRangeFilter";
 
 export default function FeatureProducts() {
     const [FeatureProduct, setFeatureProduct] = useState([]);
 
     useEffect(() => {
-        fetch(`${API_URL}/api/featured-products`)
-            .then((res) => res.json())
+        productService.getProducts({ limit: 9 })
             .then((data) => {
-                setFeatureProduct(data);
+                if (data && data.length > 0) {
+                    setFeatureProduct(data);
+                } else {
+                    setFeatureProduct(DEMO_LISTINGS);
+                }
             })
-            .catch((err) => {
-                console.error("Error fetching deals:", err);
-                setFeatureProduct([]);
+            .catch(() => {
+                setFeatureProduct(DEMO_LISTINGS);
             });
     }, []);
 

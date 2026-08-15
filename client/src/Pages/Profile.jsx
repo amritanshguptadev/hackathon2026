@@ -23,10 +23,13 @@ import {
   MapPin,
   X,
   Loader2,
+  Heart,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { API_BASE_URL } from "../config/api";
 import { formatINR } from "../components/PriceRangeFilter";
+import { useAuth } from "../context/AuthContext";
+import { productService } from "../services/productService";
+import { favoriteService } from "../services/favoriteService";
 
 const STATUS_BADGES = {
   Available: "bg-emerald-50 text-emerald-700 border-emerald-200",
@@ -34,12 +37,12 @@ const STATUS_BADGES = {
   Sold: "bg-slate-100 text-slate-500 border-slate-200",
 };
 
-export default function Profile({ setIsAuthenticated }) {
-  const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
+export default function Profile() {
+  const { user, profile, logout, updateProfile, isAuthenticated } = useAuth();
   const [myListings, setMyListings] = useState([]);
+  const [favorites, setFavorites] = useState([]);
   const [listingsLoading, setListingsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("listings"); // "listings" | "details"
+  const [activeTab, setActiveTab] = useState("listings"); // "listings" | "saved" | "details"
 
   // Modal states for Edit and Delete
   const [editingProduct, setEditingProduct] = useState(null);
@@ -48,150 +51,51 @@ export default function Profile({ setIsAuthenticated }) {
 
   const navigate = useNavigate();
 
-  // Load Profile & My Listings
+  // Load User Listings and Favorites from Supabase
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    const localName = localStorage.getItem("loggedInUser");
-    const localStudentId = localStorage.getItem("studentId");
-    const localCollege = localStorage.getItem("college");
+    if (!user?.id) return;
 
-    const fetchProfile = async () => {
-      try {
-        if (!token) {
-          if (localName) {
-            setProfile({
-              name: localName,
-              email: localStorage.getItem("email") || "student@campus.edu",
-              studentId: localStudentId || "STU-CAMPUS",
-              college: localCollege || "University Campus",
-              university: localCollege || "University Campus",
-              verificationStatus: "verified",
-              createdAt: new Date().toISOString(),
-            });
-          }
-          setLoading(false);
-          return;
-        }
+    setListingsLoading(true);
+    productService.getUserProducts(user.id)
+      .then((data) => {
+        setMyListings(data || []);
+      })
+      .catch((err) => {
+        console.error("Error loading user listings:", err);
+      })
+      .finally(() => setListingsLoading(false));
 
-        const res = await fetch(`${API_URL}/api/profile`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token,
-          },
-        });
+    favoriteService.getUserFavorites(user.id)
+      .then((favs) => {
+        setFavorites(favs || []);
+      })
+      .catch(() => {});
+  }, [user?.id]);
 
-        if (res.ok) {
-          const data = await res.json();
-          setProfile(data);
-        } else if (localName) {
-          setProfile({
-            name: localName,
-            email: localStorage.getItem("email") || "student@campus.edu",
-            studentId: localStudentId || "STU-CAMPUS",
-            college: localCollege || "University Campus",
-            university: localCollege || "University Campus",
-            verificationStatus: "verified",
-            createdAt: new Date().toISOString(),
-          });
-        }
-      } catch (err) {
-        if (localName) {
-          setProfile({
-            name: localName,
-            email: localStorage.getItem("email") || "student@campus.edu",
-            studentId: localStudentId || "STU-CAMPUS",
-            college: localCollege || "University Campus",
-            university: localCollege || "University Campus",
-            verificationStatus: "verified",
-            createdAt: new Date().toISOString(),
-          });
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const fetchMyListings = async () => {
-      try {
-        let serverListings = [];
-        if (token) {
-          const res = await fetch("http://localhost:3000/api/my-listings", {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          if (res.ok) {
-            serverListings = await res.json();
-          }
-        }
-
-        // Merge with local storage created listings
-        const localListings = JSON.parse(localStorage.getItem("studx_user_listings") || "[]");
-        const merged = [...(Array.isArray(serverListings) ? serverListings : [])];
-
-        // Add local listings if not already in server array
-        localListings.forEach((local) => {
-          if (!merged.some((m) => m._id === local._id)) {
-            merged.push(local);
-          }
-        });
-
-        setMyListings(merged);
-      } catch {
-        const localListings = JSON.parse(localStorage.getItem("studx_user_listings") || "[]");
-        setMyListings(localListings);
-      } finally {
-        setListingsLoading(false);
-      }
-    };
-
-    fetchProfile();
-    fetchMyListings();
-  }, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("loggedInUser");
-    localStorage.removeItem("studentId");
-    localStorage.removeItem("college");
-    if (setIsAuthenticated) setIsAuthenticated(false);
-    handleSuccess("Logged out successfully");
-    setTimeout(() => {
+  const handleLogout = async () => {
+    try {
+      await logout();
+      handleSuccess("Logged out successfully");
+      setTimeout(() => {
+        navigate("/");
+      }, 600);
+    } catch {
       navigate("/");
-    }, 600);
+    }
   };
 
   // Status Change (Available <-> Reserved <-> Sold)
   const handleStatusChange = async (productId, newStatus) => {
     try {
-      const token = localStorage.getItem("token");
-      if (token && !productId.startsWith("custom-")) {
-        await fetch(`http://localhost:3000/api/products/${productId}/status`, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ status: newStatus }),
-        });
-      }
-
-      // Update state
+      await productService.updateProductStatus(productId, newStatus);
       setMyListings((prev) =>
         prev.map((item) =>
-          item._id === productId ? { ...item, status: newStatus } : item
+          item.id === productId || item._id === productId ? { ...item, status: newStatus } : item
         )
       );
-
-      // Update local storage
-      const localListings = JSON.parse(localStorage.getItem("studx_user_listings") || "[]");
-      const updated = localListings.map((item) =>
-        item._id === productId ? { ...item, status: newStatus } : item
-      );
-      localStorage.setItem("studx_user_listings", JSON.stringify(updated));
-
       toast.success(`Listing status updated to ${newStatus}`);
-    } catch {
-      toast.error("Failed to update status.");
+    } catch (err) {
+      toast.error(err.message || "Failed to update status.");
     }
   };
 
@@ -200,25 +104,13 @@ export default function Profile({ setIsAuthenticated }) {
     if (!deletingProductId) return;
 
     try {
-      const token = localStorage.getItem("token");
-      if (token && !deletingProductId.startsWith("custom-")) {
-        await fetch(`http://localhost:3000/api/products/${deletingProductId}`, {
-          method: "DELETE",
-          headers: { Authorization: `Bearer ${token}` },
-        });
-      }
-
-      // Remove from state
-      setMyListings((prev) => prev.filter((item) => item._id !== deletingProductId));
-
-      // Remove from local storage
-      const localListings = JSON.parse(localStorage.getItem("studx_user_listings") || "[]");
-      const filtered = localListings.filter((item) => item._id !== deletingProductId);
-      localStorage.setItem("studx_user_listings", JSON.stringify(filtered));
-
+      await productService.deleteProduct(deletingProductId);
+      setMyListings((prev) =>
+        prev.filter((item) => item.id !== deletingProductId && item._id !== deletingProductId)
+      );
       toast.success("Listing deleted successfully.");
-    } catch {
-      toast.error("Failed to delete listing.");
+    } catch (err) {
+      toast.error(err.message || "Failed to delete listing.");
     } finally {
       setDeletingProductId(null);
     }
@@ -231,42 +123,25 @@ export default function Profile({ setIsAuthenticated }) {
 
     setIsUpdating(true);
     try {
-      const token = localStorage.getItem("token");
-      if (token && !editingProduct._id.startsWith("custom-")) {
-        await fetch(`http://localhost:3000/api/products/${editingProduct._id}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            title: editingProduct.title,
-            price: editingProduct.isFree ? 0 : Number(editingProduct.price),
-            isFree: editingProduct.isFree,
-            description: editingProduct.description,
-            condition: editingProduct.condition,
-            category: editingProduct.category,
-            campusLocation: editingProduct.campusLocation,
-          }),
-        });
-      }
+      const prodId = editingProduct.id || editingProduct._id;
+      const updated = await productService.updateProduct(prodId, {
+        title: editingProduct.title,
+        price: editingProduct.isFree ? 0 : Number(editingProduct.price),
+        isFree: editingProduct.isFree,
+        description: editingProduct.description,
+        condition: editingProduct.condition,
+        campusLocation: editingProduct.campusLocation,
+      });
 
       // Update in state
       setMyListings((prev) =>
-        prev.map((item) => (item._id === editingProduct._id ? editingProduct : item))
+        prev.map((item) => ((item.id === prodId || item._id === prodId) ? (updated || editingProduct) : item))
       );
-
-      // Update in local storage
-      const localListings = JSON.parse(localStorage.getItem("studx_user_listings") || "[]");
-      const updated = localListings.map((item) =>
-        item._id === editingProduct._id ? editingProduct : item
-      );
-      localStorage.setItem("studx_user_listings", JSON.stringify(updated));
 
       toast.success("Listing updated successfully!");
       setEditingProduct(null);
-    } catch {
-      toast.error("Failed to update listing.");
+    } catch (err) {
+      toast.error(err.message || "Failed to save changes.");
     } finally {
       setIsUpdating(false);
     }
