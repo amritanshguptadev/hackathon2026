@@ -17,7 +17,7 @@ import { handleError, handleSuccess } from '../../../utils'
 import Footer from '../Home/Footer'
 import HeaderMain from '../Home/HeaderMain'
 import { IMAGES } from '../../../data/images'
-import { API_URL } from '../../../config/api'
+import { useAuth } from '../../../context/AuthContext'
 
 export default function LoginForm() {
   const [loginInfo, setLoginInfo] = useState({
@@ -27,6 +27,7 @@ export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const navigate = useNavigate()
+  const { login } = useAuth()
 
   useEffect(() => {
     // If user just registered, prefill their email
@@ -51,37 +52,18 @@ export default function LoginForm() {
 
     try {
       setSubmitting(true)
-      const response = await fetch(`${API_URL}/api/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: email.trim().toLowerCase(),
-          password,
-        }),
+      const data = await login({
+        email: email.trim().toLowerCase(),
+        password,
       })
-      const result = await response.json()
-      const { success, message, error, jwtToken, name, studentId, college, university } = result
 
-      if (success) {
-        handleSuccess(message || 'Login successful!')
-        localStorage.setItem('token', jwtToken)
-        localStorage.setItem('loggedInUser', name || 'Student')
-        if (studentId) localStorage.setItem('studentId', studentId)
-        if (college || university) localStorage.setItem('college', college || university)
-
-        setTimeout(() => {
-          navigate('/')
-        }, 1000)
-      } else if (error) {
-        const details = error?.details?.[0]?.message || message
-        handleError(details)
-      } else {
-        handleError(message || 'Login failed. Please check your credentials.')
-      }
+      handleSuccess('Login successful! Welcome back.')
+      setTimeout(() => {
+        navigate('/')
+      }, 800)
     } catch (error) {
-      handleError(error.message || 'Login failed. Please check server connection.')
+      const msg = error.message || 'Login failed. Please check your credentials.'
+      handleError(msg)
     } finally {
       setSubmitting(false)
     }

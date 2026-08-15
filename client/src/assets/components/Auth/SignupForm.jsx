@@ -20,7 +20,7 @@ import { handleError, handleSuccess } from '../../../utils'
 import HeaderMain from '../Home/HeaderMain'
 import Footer from '../Home/Footer'
 import { IMAGES } from '../../../data/images'
-import { API_URL } from '../../../config/api'
+import { useAuth } from '../../../context/AuthContext'
 
 export default function SignupForm() {
   const [signupInfo, setSignupInfo] = useState({
@@ -38,6 +38,7 @@ export default function SignupForm() {
   const [activeStep, setActiveStep] = useState(1) // Visual flow step: 1 = Auth, 2 = User created, 3 = Profile created
 
   const navigate = useNavigate()
+  const { signup } = useAuth()
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -67,15 +68,13 @@ export default function SignupForm() {
 
   const handleSignup = async (e) => {
     e.preventDefault()
-    const { name, email, password, confirmPassword, college, studentId } =
-      signupInfo
+    const { name, email, password, confirmPassword, college, studentId } = signupInfo
 
-    // Client-side validations
-    if (!name.trim()) return handleError('Full Name is required')
+    if (!name.trim()) return handleError('Full name is required')
     if (!email.trim()) return handleError('Email is required')
     if (!password) return handleError('Password is required')
     if (password.length < 6) {
-      return handleError('Password must be at least 6 characters')
+      return handleError('Password must be at least 6 characters long')
     }
     if (!confirmPassword) {
       return handleError('Please confirm your password')
@@ -90,47 +89,27 @@ export default function SignupForm() {
       setSubmitting(true)
       setActiveStep(1) // Step 1: Auth
 
-      // Call registration endpoint
-      const response = await fetch(`${API_URL}/api/auth/signup`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: name.trim(),
-          email: email.trim().toLowerCase(),
-          password,
-          confirmPassword,
-          college: college.trim(),
-          university: college.trim(),
-          studentId: studentId.trim(),
-          studentDeclared: true,
-        }),
+      await signup({
+        email: email.trim().toLowerCase(),
+        password,
+        name: name.trim(),
+        college: college.trim(),
+        campusLocation: 'Campus Main',
+        studentId: studentId.trim(),
       })
 
       setActiveStep(2) // Step 2: User created
+      setActiveStep(3) // Step 3: Profile created
+      handleSuccess('Account created successfully! Welcome to CampusLoop.')
 
-      const result = await response.json()
-      const { success, message, error } = result
+      // Auto-save temporary registration state for seamless UX
+      localStorage.setItem('tempRegisteredEmail', email.trim().toLowerCase())
 
-      if (success) {
-        setActiveStep(3) // Step 3: Profile created
-        handleSuccess(message || 'Account created successfully!')
-
-        // Auto-save temporary registration state for seamless UX
-        localStorage.setItem('tempRegisteredEmail', email.trim().toLowerCase())
-
-        setTimeout(() => {
-          navigate(`/verify-email?email=${encodeURIComponent(email.trim().toLowerCase())}`)
-        }, 1200)
-      } else if (error) {
-        const details = error?.details?.[0]?.message || message
-        handleError(details)
-      } else {
-        handleError(message || 'Registration failed. Please try again.')
-      }
+      setTimeout(() => {
+        navigate('/')
+      }, 1000)
     } catch (error) {
-      handleError(error.message || 'Registration failed. Check server connection.')
+      handleError(error.message || 'Registration failed. Please try again.')
     } finally {
       setSubmitting(false)
     }
