@@ -84,26 +84,6 @@ export default function HeaderMain({ showSearchBar = true }) {
           />
         </Link>
 
-        {/* Global Search Bar */}
-        {showSearchBar && (
-          <form
-            onSubmit={handleSearch}
-            className="relative mx-auto hidden min-w-0 flex-1 max-w-xl md:block"
-          >
-            <Search
-              size={18}
-              className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-indigo-400"
-            />
-            <input
-              type="text"
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              placeholder="Search textbooks, tech, cycle, furniture…"
-              className="w-full rounded-full border border-[var(--cm-border)] bg-[var(--cm-bg)] py-2.5 pl-11 pr-4 text-sm text-[var(--cm-ink)] outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-500/20"
-            />
-          </form>
-        )}
-
         {/* Right Navigation Actions */}
         <div className="ml-auto flex items-center gap-1 sm:gap-2">
           {/* Wishlist / Liked Items */}
