@@ -217,6 +217,10 @@ export default function Cart() {
                         <img
                           src={resolveImageUrl(item.image)}
                           alt={item.title}
+                          onError={(e) => {
+                            e.currentTarget.onerror = null;
+                            e.currentTarget.src = "/images/products/1.jpg";
+                          }}
                           className="h-full w-full object-contain transition group-hover:scale-105"
                         />
                       </Link>

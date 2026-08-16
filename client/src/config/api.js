@@ -5,16 +5,23 @@ export const SOCKET_URL = (import.meta.env.VITE_SOCKET_URL || import.meta.env.VI
 
 // Helper to resolve media and uploaded image paths
 export const resolveMediaUrl = (path) => {
-  if (!path) return '';
-  if (typeof path !== 'string') return '';
-  if (path.startsWith('http://localhost:3000')) {
-    return path.replace('http://localhost:3000', API_URL);
-  }
-  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) {
+  if (!path) return '/images/products/1.jpg';
+  if (typeof path !== 'string') return '/images/products/1.jpg';
+
+  // 1. Full external URLs, Supabase CDN, blob, or base64 data URIs
+  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:') || path.startsWith('blob:')) {
     return path;
   }
+
+  // 2. Express server uploaded files (under /uploads/ or uploads/)
+  if (path.startsWith('/uploads/') || path.startsWith('uploads/')) {
+    const cleanUploadPath = path.startsWith('/') ? path : `/${path}`;
+    return `${API_URL}${cleanUploadPath}`;
+  }
+
+  // 3. Static frontend assets (e.g. /images/products/1.jpg, /images/..., /Sale/..., /hero/...)
   const cleanPath = path.startsWith('/') ? path : `/${path}`;
-  return `${API_URL}${cleanPath}`;
+  return cleanPath;
 };
 
 export const resolveImageUrl = resolveMediaUrl;
@@ -25,4 +32,3 @@ export default {
   resolveMediaUrl,
   resolveImageUrl,
 };
-

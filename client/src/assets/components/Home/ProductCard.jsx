@@ -30,6 +30,10 @@ export default function ProductCard({ product }) {
         <img
           src={resolveImageUrl(product.image)}
           alt={product.title}
+          onError={(e) => {
+            e.currentTarget.onerror = null;
+            e.currentTarget.src = "/images/products/1.jpg";
+          }}
           className="h-full w-full object-contain transition duration-500 group-hover:scale-105"
         />
 

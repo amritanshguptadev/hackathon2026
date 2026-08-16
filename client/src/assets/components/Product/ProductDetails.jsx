@@ -176,6 +176,10 @@ export default function ProductDetails() {
               <img
                 src={resolveMediaUrl(product.image)}
                 alt={product.title}
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = "/images/products/1.jpg";
+                }}
                 className="max-h-96 w-full object-contain transition-transform duration-300 hover:scale-105"
               />
             </div>

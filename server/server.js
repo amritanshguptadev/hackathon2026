@@ -54,8 +54,9 @@ initSocket(server, allowedOrigins);
 
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
-app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/images', express.static(path.join(__dirname, 'uploads/products')));
+app.use('/images', express.static(path.join(__dirname, '../client/public/images')));
 
 // Health Check API (used for Render deployment health monitoring)
 app.get('/health', (req, res) => {

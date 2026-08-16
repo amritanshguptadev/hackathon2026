@@ -84,6 +84,10 @@ export default function FeatureProducts() {
                                         <img
                                             src={resolveImageUrl(product.image)}
                                             alt={product.title}
+                                            onError={(e) => {
+                                                e.currentTarget.onerror = null;
+                                                e.currentTarget.src = "/images/products/1.jpg";
+                                            }}
                                             className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
                                         />
                                     </div>
