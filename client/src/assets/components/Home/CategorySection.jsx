@@ -1,22 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Menu,
   ChevronDown,
   ChevronUp,
-  Car,
-  Bike,
-  Building2,
-  Tv,
-  Smartphone,
-  Truck,
-  Briefcase,
-  Armchair,
-  Shirt,
-  PawPrint,
-  BookOpen,
-  Wrench,
-  Search,
 } from "lucide-react";
 
 const QUICK_CATEGORY_PILLS = [
@@ -165,7 +152,8 @@ const CATEGORIES_DATA = {
 };
 
 export default function CategorySection() {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
   // Dynamic formatted date
@@ -175,15 +163,31 @@ export default function CategorySection() {
     year: "numeric",
   });
 
+  // Close when clicked outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    }
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen]);
+
   const handleCategoryClick = (catName) => {
+    setIsOpen(false);
     navigate(`/all-products?category=${encodeURIComponent(catName)}`);
   };
 
   return (
-    <section className="mx-auto max-w-7xl px-4 pt-4 sm:px-6 lg:px-8">
+    <section ref={dropdownRef} className="mx-auto max-w-7xl px-4 pt-4 sm:px-6 lg:px-8 relative z-30">
       {/* ── TOP HORIZONTAL CATEGORY BAR ── */}
-      <div className="flex items-center gap-2.5 overflow-x-auto pb-3 pt-1 scrollbar-none">
-        {/* ALL CATEGORIES Toggle Button */}
+      <div className="flex items-center gap-2.5 overflow-x-auto pb-2 pt-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+        {/* ALL CATEGORIES Toggle Button (Closed by default, opens on click) */}
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
@@ -212,9 +216,9 @@ export default function CategorySection() {
         </div>
       </div>
 
-      {/* ── MEGA-MENU DROPDOWN CLASSIFIEDS GRID (Matches screenshot) ── */}
+      {/* ── MEGA-MENU DROPDOWN CLASSIFIEDS GRID (Opens strictly on click) ── */}
       {isOpen && (
-        <div className="mt-1 rounded-3xl bg-white border border-slate-200/90 shadow-md p-6 sm:p-8 animate-fade-in transition-all">
+        <div className="mt-2 rounded-3xl bg-white border border-slate-200/90 shadow-2xl p-6 sm:p-8 animate-fade-in transition-all">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {/* COLUMN 1 */}
             <div className="space-y-6">
@@ -233,12 +237,13 @@ export default function CategorySection() {
                     <ul className="space-y-1.5 pl-6 text-xs text-slate-600">
                       {cat.items.map((sub, sIdx) => (
                         <li key={sIdx}>
-                          <Link
-                            to={`/all-products?category=${encodeURIComponent(sub)}`}
-                            className="hover:text-indigo-600 hover:underline transition-colors block py-0.5"
+                          <button
+                            type="button"
+                            onClick={() => handleCategoryClick(sub)}
+                            className="hover:text-indigo-600 hover:underline transition-colors block py-0.5 text-left cursor-pointer"
                           >
                             {sub}
-                          </Link>
+                          </button>
                         </li>
                       ))}
                     </ul>
@@ -264,12 +269,13 @@ export default function CategorySection() {
                     <ul className="space-y-1.5 pl-6 text-xs text-slate-600">
                       {cat.items.map((sub, sIdx) => (
                         <li key={sIdx}>
-                          <Link
-                            to={`/all-products?category=${encodeURIComponent(sub)}`}
-                            className="hover:text-indigo-600 hover:underline transition-colors block py-0.5"
+                          <button
+                            type="button"
+                            onClick={() => handleCategoryClick(sub)}
+                            className="hover:text-indigo-600 hover:underline transition-colors block py-0.5 text-left cursor-pointer"
                           >
                             {sub}
-                          </Link>
+                          </button>
                         </li>
                       ))}
                     </ul>
@@ -295,12 +301,13 @@ export default function CategorySection() {
                     <ul className="space-y-1.5 pl-6 text-xs text-slate-600">
                       {cat.items.map((sub, sIdx) => (
                         <li key={sIdx}>
-                          <Link
-                            to={`/all-products?category=${encodeURIComponent(sub)}`}
-                            className="hover:text-indigo-600 hover:underline transition-colors block py-0.5"
+                          <button
+                            type="button"
+                            onClick={() => handleCategoryClick(sub)}
+                            className="hover:text-indigo-600 hover:underline transition-colors block py-0.5 text-left cursor-pointer"
                           >
                             {sub}
-                          </Link>
+                          </button>
                         </li>
                       ))}
                     </ul>
@@ -326,12 +333,13 @@ export default function CategorySection() {
                     <ul className="space-y-1.5 pl-6 text-xs text-slate-600">
                       {cat.items.map((sub, sIdx) => (
                         <li key={sIdx}>
-                          <Link
-                            to={`/all-products?category=${encodeURIComponent(sub)}`}
-                            className="hover:text-indigo-600 hover:underline transition-colors block py-0.5"
+                          <button
+                            type="button"
+                            onClick={() => handleCategoryClick(sub)}
+                            className="hover:text-indigo-600 hover:underline transition-colors block py-0.5 text-left cursor-pointer"
                           >
                             {sub}
-                          </Link>
+                          </button>
                         </li>
                       ))}
                     </ul>
