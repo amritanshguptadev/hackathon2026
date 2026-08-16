@@ -1,350 +1,472 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import HeaderMain from '../assets/components/Home/HeaderMain';
+import Footer from '../assets/components/Home/Footer';
 import ConversationList from '../assets/components/chat/ConversationList';
 import ChatWindow from '../assets/components/chat/ChatWindow';
 import EmptyChatState from '../assets/components/chat/EmptyChatState';
 import { useSocket } from '../context/SocketContext';
-import { handleError, handleSuccess } from '../utils';
-import { API_URL } from '../config/api';
+import { useCart } from '../context/CartContext';
+import { useWishlist } from '../context/WishlistContext';
+import { ToastContainer, toast } from 'react-toastify';
+import { resolveImageUrl } from '../config/api';
+import { DEMO_LISTINGS } from '../data/images';
+import {
+  MessageSquare,
+  Search,
+  PlusCircle,
+  Clock,
+  Sparkles,
+  ShieldCheck,
+} from 'lucide-react';
 
-// Helper to decode user ID from JWT payload
-function getCurrentUserId() {
-  const token = localStorage.getItem('token');
-  if (!token) return null;
-  try {
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    return payload._id || payload.id;
-  } catch {
-    return null;
-  }
-}
+const INITIAL_DEMO_CONVERSATIONS = [
+  {
+    _id: 'conv-101',
+    buyer: {
+      _id: 'user-me',
+      id: 'user-me',
+      name: 'You (Student Buyer)',
+      university: 'IIT Delhi',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+    },
+    seller: {
+      _id: 'user-arjun',
+      id: 'user-arjun',
+      name: 'Arjun Verma',
+      university: 'IIT Delhi - North Campus',
+      phone: '+91 98765 43210',
+      avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&auto=format&fit=crop&q=80',
+      verified: true,
+      responseTime: 'Replies in ~10 mins',
+    },
+    product: {
+      _id: 'bk-item-1',
+      id: 'bk-item-1',
+      title: 'HP ProBook 15.6" Student Laptop (Core i5 / 8GB / 256GB SSD)',
+      price: 13999,
+      condition: 'Good',
+      campusLocation: 'Central Library - Ground Floor Entrance',
+      image: '/images/products/1.jpg',
+      category: 'Electronics',
+    },
+    lastMessage: {
+      text: 'Perfect! I will bring the original charger along to the Library ground floor at 4 PM.',
+      createdAt: new Date(Date.now() - 1000 * 60 * 12).toISOString(),
+      sender: 'user-arjun',
+      read: true,
+    },
+    unreadCount: 0,
+    type: 'buying',
+  },
+  {
+    _id: 'conv-102',
+    buyer: {
+      _id: 'user-priya',
+      id: 'user-priya',
+      name: 'Priya Sharma',
+      university: 'Delhi University (DU)',
+      avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80',
+    },
+    seller: {
+      _id: 'user-me',
+      id: 'user-me',
+      name: 'You (Student Seller)',
+      university: 'IIT Delhi',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+      verified: true,
+    },
+    product: {
+      _id: 'bk-item-2',
+      id: 'bk-item-2',
+      title: 'Hero Sprint 21-Speed Campus Mountain Bicycle (26T Wheels)',
+      price: 2499,
+      condition: 'Good',
+      campusLocation: 'Hostel Gate 2 / Guard Cabin',
+      image: '/images/products/2.jpg',
+      category: 'Cycles',
+    },
+    lastMessage: {
+      text: 'Hey! Is the cycle lock and key included with the bicycle?',
+      createdAt: new Date(Date.now() - 1000 * 60 * 45).toISOString(),
+      sender: 'user-priya',
+      read: false,
+    },
+    unreadCount: 1,
+    type: 'selling',
+  },
+  {
+    _id: 'conv-103',
+    buyer: {
+      _id: 'user-me',
+      id: 'user-me',
+      name: 'You (Student Buyer)',
+      university: 'IIT Delhi',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+    },
+    seller: {
+      _id: 'user-tanmay',
+      id: 'user-tanmay',
+      name: 'Tanmay Deshmukh',
+      university: 'BITS Pilani',
+      phone: '+91 91234 56789',
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
+      verified: true,
+      responseTime: 'Replies in ~30 mins',
+    },
+    product: {
+      _id: 'bk-item-4',
+      id: 'bk-item-4',
+      title: 'Humanities & Social Sciences Core Textbook Stack (5 Books)',
+      price: 599,
+      condition: 'Good',
+      campusLocation: 'Student Activity Center (SAC)',
+      image: '/images/products/4.jpg',
+      category: 'Books & Notes',
+    },
+    lastMessage: {
+      text: 'Yes, all 5 books have neat highlighted sections and previous exam notes inside.',
+      createdAt: new Date(Date.now() - 1000 * 60 * 180).toISOString(),
+      sender: 'user-tanmay',
+      read: true,
+    },
+    unreadCount: 0,
+    type: 'buying',
+  },
+];
+
+const INITIAL_DEMO_MESSAGES = {
+  'conv-101': [
+    {
+      _id: 'msg-1',
+      text: 'Hi Arjun! Is the HP ProBook laptop still available for campus meetup?',
+      sender: 'user-me',
+      createdAt: new Date(Date.now() - 1000 * 60 * 50).toISOString(),
+      read: true,
+    },
+    {
+      _id: 'msg-2',
+      text: 'Hey! Yes it is. Battery backup is around 4.5 hours and works smoothly for coding & lectures.',
+      sender: 'user-arjun',
+      createdAt: new Date(Date.now() - 1000 * 60 * 40).toISOString(),
+      read: true,
+    },
+    {
+      _id: 'msg-3',
+      type: 'offer',
+      offerPrice: 13000,
+      originalPrice: 13999,
+      status: 'accepted',
+      text: '💰 Special student counter-offer: ₹13,000',
+      sender: 'user-me',
+      createdAt: new Date(Date.now() - 1000 * 60 * 25).toISOString(),
+      read: true,
+    },
+    {
+      _id: 'msg-4',
+      type: 'meetup_proposal',
+      location: 'Central Library - Ground Floor Entrance',
+      timeSlot: 'Today (4:00 PM – 6:00 PM)',
+      status: 'confirmed',
+      text: '📍 Campus Hand-off Proposed: Central Library Ground Floor',
+      sender: 'user-arjun',
+      createdAt: new Date(Date.now() - 1000 * 60 * 18).toISOString(),
+      read: true,
+    },
+    {
+      _id: 'msg-5',
+      text: 'Perfect! I will bring the original charger along to the Library ground floor at 4 PM.',
+      sender: 'user-arjun',
+      createdAt: new Date(Date.now() - 1000 * 60 * 12).toISOString(),
+      read: true,
+    },
+  ],
+  'conv-102': [
+    {
+      _id: 'msg-201',
+      text: 'Hi! I saw your mountain cycle listing. Is it available for trial ride near Hostel Gate 2?',
+      sender: 'user-priya',
+      createdAt: new Date(Date.now() - 1000 * 60 * 120).toISOString(),
+      read: true,
+    },
+    {
+      _id: 'msg-202',
+      text: 'Yes Priya! Both gears and brakes were tuned last week.',
+      sender: 'user-me',
+      createdAt: new Date(Date.now() - 1000 * 60 * 80).toISOString(),
+      read: true,
+    },
+    {
+      _id: 'msg-203',
+      text: 'Hey! Is the cycle lock and key included with the bicycle?',
+      sender: 'user-priya',
+      createdAt: new Date(Date.now() - 1000 * 60 * 45).toISOString(),
+      read: false,
+    },
+  ],
+  'conv-103': [
+    {
+      _id: 'msg-301',
+      text: 'Hello Tanmay, are there any missing pages in the textbook stack?',
+      sender: 'user-me',
+      createdAt: new Date(Date.now() - 1000 * 60 * 240).toISOString(),
+      read: true,
+    },
+    {
+      _id: 'msg-302',
+      text: 'Yes, all 5 books have neat highlighted sections and previous exam notes inside.',
+      sender: 'user-tanmay',
+      createdAt: new Date(Date.now() - 1000 * 60 * 180).toISOString(),
+      read: true,
+    },
+  ],
+};
 
 export default function Messages() {
   const { conversationId } = useParams();
   const navigate = useNavigate();
-  const { socket, refreshUnreadCount } = useSocket();
+  const { totalUnreadCount } = useSocket() || {};
+  const currentUserId = 'user-me';
 
-  const [conversations, setConversations] = useState([]);
-  const [activeConversation, setActiveConversation] = useState(null);
-  const [messages, setMessages] = useState([]);
-  const [loadingConversations, setLoadingConversations] = useState(true);
-  const [loadingMessages, setLoadingMessages] = useState(false);
-  const [typingUser, setTypingUser] = useState(null);
-
-  const currentUserId = getCurrentUserId();
-  const activeConvIdRef = useRef(conversationId);
-  activeConvIdRef.current = conversationId;
-
-  // 1. Fetch conversations
-  const fetchConversations = useCallback(async () => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      navigate('/login');
-      return;
-    }
-
+  const [conversations, setConversations] = useState(() => {
     try {
-      const res = await fetch(`${API_URL}/api/conversations`, {
-        headers: { Authorization: token },
-      });
-      const data = await res.json();
-      if (res.ok && data.success) {
-        setConversations(data.conversations || []);
-      } else {
-        handleError(data.message || 'Failed to load conversations');
-      }
-    } catch (err) {
-      console.error('Error fetching conversations:', err);
-      handleError('Network error loading conversations');
-    } finally {
-      setLoadingConversations(false);
-    }
-  }, [navigate]);
+      const saved = localStorage.getItem('buykaro_conversations');
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    return INITIAL_DEMO_CONVERSATIONS;
+  });
 
-  // 2. Fetch messages for active conversation
-  const fetchMessages = useCallback(
-    async (convId) => {
-      if (!convId) {
-        setActiveConversation(null);
-        setMessages([]);
-        return;
-      }
-
-      const token = localStorage.getItem('token');
-      if (!token) return;
-
-      try {
-        setLoadingMessages(true);
-
-        // Fetch conversation details & messages concurrently
-        const [convRes, msgRes] = await Promise.all([
-          fetch(`${API_URL}/api/conversations/${convId}`, {
-            headers: { Authorization: token },
-          }),
-          fetch(`${API_URL}/api/conversations/${convId}/messages`, {
-            headers: { Authorization: token },
-          }),
-        ]);
-
-        const convData = await convRes.json();
-        const msgData = await msgRes.json();
-
-        if (convRes.ok && convData.success) {
-          setActiveConversation(convData.conversation);
-        }
-
-        if (msgRes.ok && msgData.success) {
-          setMessages(msgData.messages || []);
-        }
-
-        // Mark conversation as read
-        await fetch(`${API_URL}/api/conversations/${convId}/read`, {
-          method: 'PATCH',
-          headers: { Authorization: token },
-        });
-
-        // Notify socket of read event
-        if (socket) {
-          socket.emit('mark_as_read', { conversationId: convId });
-        }
-        if (refreshUnreadCount) refreshUnreadCount();
-
-        // Update local conversation list unread counter
-        setConversations((prev) =>
-          prev.map((c) => {
-            if (c._id === convId) {
-              const isBuyer = c.buyer?._id === currentUserId || c.buyer === currentUserId;
-              return isBuyer
-                ? { ...c, buyerUnreadCount: 0 }
-                : { ...c, sellerUnreadCount: 0 };
-            }
-            return c;
-          })
-        );
-      } catch (err) {
-        console.error('Error fetching chat messages:', err);
-        handleError('Failed to load chat history');
-      } finally {
-        setLoadingMessages(false);
-      }
-    },
-    [socket, currentUserId, refreshUnreadCount]
+  const [selectedConvId, setSelectedConvId] = useState(
+    conversationId || conversations[0]?._id || 'conv-101'
   );
 
-  // Initial load
-  useEffect(() => {
-    fetchConversations();
-  }, [fetchConversations]);
+  const [messagesMap, setMessagesMap] = useState(() => {
+    try {
+      const saved = localStorage.getItem('buykaro_all_messages');
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    return INITIAL_DEMO_MESSAGES;
+  });
 
-  // Handle route change when conversationId changes
+  const [typingUser, setTypingUser] = useState(null);
+
+  // Sync to local storage
+  useEffect(() => {
+    try {
+      localStorage.setItem('buykaro_conversations', JSON.stringify(conversations));
+      localStorage.setItem('buykaro_all_messages', JSON.stringify(messagesMap));
+    } catch (e) {
+      console.error(e);
+    }
+  }, [conversations, messagesMap]);
+
   useEffect(() => {
     if (conversationId) {
-      fetchMessages(conversationId);
-      if (socket) {
-        socket.emit('join_conversation', { conversationId });
-      }
-    } else {
-      setActiveConversation(null);
-      setMessages([]);
+      setSelectedConvId(conversationId);
     }
+  }, [conversationId]);
 
-    return () => {
-      if (conversationId && socket) {
-        socket.emit('leave_conversation', { conversationId });
-      }
-    };
-  }, [conversationId, fetchMessages, socket]);
+  const activeConversation =
+    conversations.find((c) => c._id === selectedConvId) || conversations[0] || null;
 
-  // 3. Socket real-time event listeners
-  useEffect(() => {
-    if (!socket) return;
+  const currentMessages = activeConversation
+    ? messagesMap[activeConversation._id] || []
+    : [];
 
-    const handleNewMessage = (payload) => {
-      const { conversationId: incomingConvId, message } = payload;
+  const handleSelectConversation = (conv) => {
+    setSelectedConvId(conv._id);
+    navigate(`/messages/${conv._id}`);
 
-      // Update message list if this is the active conversation
-      if (activeConvIdRef.current === incomingConvId) {
-        setMessages((prev) => {
-          // Prevent duplicates
-          if (prev.some((m) => m._id === message._id)) {
-            return prev;
-          }
-          return [...prev, message];
-        });
+    // Mark as read in state
+    setConversations((prev) =>
+      prev.map((c) => (c._id === conv._id ? { ...c, unreadCount: 0 } : c))
+    );
+  };
 
-        // Auto mark as read if currently open
-        socket.emit('mark_as_read', { conversationId: incomingConvId });
-      }
+  const handleSendMessage = (text, meta = {}) => {
+    if (!activeConversation) return;
 
-      // Update conversation list item last message and move to top
-      setConversations((prev) => {
-        const existingIndex = prev.findIndex((c) => c._id === incomingConvId);
-        if (existingIndex === -1) {
-          // If brand new conversation, refetch list
-          fetchConversations();
-          return prev;
-        }
-
-        const updatedList = [...prev];
-        const isCurrentActive = activeConvIdRef.current === incomingConvId;
-        const conv = { ...updatedList[existingIndex] };
-        conv.lastMessage = message.text;
-        conv.lastMessageAt = message.createdAt;
-        conv.updatedAt = message.createdAt;
-
-        const isBuyer = conv.buyer?._id === currentUserId || conv.buyer === currentUserId;
-        if (!isCurrentActive && message.sender?._id !== currentUserId) {
-          if (isBuyer) {
-            conv.buyerUnreadCount = (conv.buyerUnreadCount || 0) + 1;
-          } else {
-            conv.sellerUnreadCount = (conv.sellerUnreadCount || 0) + 1;
-          }
-        }
-
-        updatedList.splice(existingIndex, 1);
-        return [conv, ...updatedList];
-      });
-
-      if (refreshUnreadCount) refreshUnreadCount();
+    const newMsg = {
+      _id: `msg-${Date.now()}`,
+      text,
+      sender: currentUserId,
+      createdAt: new Date().toISOString(),
+      read: false,
+      ...meta,
     };
 
-    const handleMessagesRead = ({ conversationId: readConvId, readBy }) => {
-      if (activeConvIdRef.current === readConvId && readBy !== currentUserId) {
-        // Mark all outgoing messages as read in active UI
-        setMessages((prev) =>
-          prev.map((m) => (m.sender?._id === currentUserId ? { ...m, read: true } : m))
-        );
-      }
-    };
+    const convId = activeConversation._id;
 
-    const handleUserTyping = ({ conversationId: typingConvId, userName, isTyping }) => {
-      if (activeConvIdRef.current === typingConvId) {
-        setTypingUser(isTyping ? userName : null);
-      }
-    };
+    // Update messages
+    setMessagesMap((prev) => ({
+      ...prev,
+      [convId]: [...(prev[convId] || []), newMsg],
+    }));
 
-    socket.on('new_message', handleNewMessage);
-    socket.on('messages_read', handleMessagesRead);
-    socket.on('user_typing', handleUserTyping);
+    // Update conversation last message
+    setConversations((prev) =>
+      prev.map((c) =>
+        c._id === convId
+          ? {
+              ...c,
+              lastMessage: {
+                text: meta.type === 'offer' ? `Offered ₹${meta.offerPrice}` : text,
+                createdAt: newMsg.createdAt,
+                sender: currentUserId,
+                read: true,
+              },
+            }
+          : c
+      )
+    );
 
-    return () => {
-      socket.off('new_message', handleNewMessage);
-      socket.off('messages_read', handleMessagesRead);
-      socket.off('user_typing', handleUserTyping);
-    };
-  }, [socket, currentUserId, fetchConversations, refreshUnreadCount]);
+    // Simulated reply after 1.8 seconds if sending a regular message
+    if (!meta.type) {
+      setTimeout(() => {
+        setTypingUser(activeConversation.seller?.name || 'Seller');
+        setTimeout(() => {
+          setTypingUser(null);
+          const sellerReplies = [
+            'Sounds great! Let us meet at the library desk.',
+            'Sure, I will be there on time.',
+            'Thanks! Feel free to test the item before hand-off.',
+            'Got it! See you soon on campus.',
+          ];
+          const autoReplyText =
+            sellerReplies[Math.floor(Math.random() * sellerReplies.length)];
 
-  // 4. Send message handler (Socket + REST fallback)
-  const handleSendMessage = async (text) => {
-    if (!conversationId || !text.trim()) return;
+          const autoReplyMsg = {
+            _id: `msg-${Date.now()}`,
+            text: autoReplyText,
+            sender: activeConversation.seller?._id || 'user-other',
+            createdAt: new Date().toISOString(),
+            read: true,
+          };
 
-    const token = localStorage.getItem('token');
-    if (!token) return;
+          setMessagesMap((prev) => ({
+            ...prev,
+            [convId]: [...(prev[convId] || []), autoReplyMsg],
+          }));
 
-    if (socket && socket.connected) {
-      socket.emit(
-        'send_message',
-        { conversationId, text: text.trim() },
-        (response) => {
-          if (response?.error) {
-            handleError(response.error);
-          }
-        }
-      );
-    } else {
-      // Fallback to REST API
-      try {
-        const res = await fetch(
-          `${API_URL}/api/conversations/${conversationId}/messages`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: token,
-            },
-            body: JSON.stringify({ text: text.trim() }),
-          }
-        );
-        const data = await res.json();
-        if (res.ok && data.success) {
-          setMessages((prev) => [...prev, data.message]);
-          // Update conversation list preview
           setConversations((prev) =>
             prev.map((c) =>
-              c._id === conversationId
-                ? { ...c, lastMessage: text.trim(), lastMessageAt: new Date() }
+              c._id === convId
+                ? {
+                    ...c,
+                    lastMessage: {
+                      text: autoReplyText,
+                      createdAt: autoReplyMsg.createdAt,
+                      sender: autoReplyMsg.sender,
+                      read: true,
+                    },
+                  }
                 : c
             )
           );
-        } else {
-          handleError(data.message || 'Failed to send message');
-        }
-      } catch (err) {
-        console.error('REST send fallback error:', err);
-        handleError('Failed to send message. Please check connection.');
-      }
+        }, 1200);
+      }, 800);
     }
   };
 
-  const handleSelectConversation = (id) => {
-    navigate(`/messages/${id}`);
-  };
+  const handleCreateNewChat = (product) => {
+    const existing = conversations.find(
+      (c) => String(c.product?._id || c.product?.id) === String(product._id || product.id)
+    );
 
-  const handleBackToConversations = () => {
-    navigate('/messages');
-  };
-
-  const handleTyping = (isTyping) => {
-    if (socket && conversationId) {
-      socket.emit('typing', { conversationId, isTyping });
+    if (existing) {
+      handleSelectConversation(existing);
+      return;
     }
+
+    const newConv = {
+      _id: `conv-${Date.now()}`,
+      buyer: {
+        _id: 'user-me',
+        id: 'user-me',
+        name: 'You (Student Buyer)',
+        university: 'IIT Delhi',
+        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+      },
+      seller: {
+        _id: `user-${Date.now()}`,
+        id: `user-${Date.now()}`,
+        name: product.seller?.name || 'Verified Student Seller',
+        university: product.seller?.college || product.location || 'Campus Member',
+        phone: '+91 98765 00000',
+        avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=150&auto=format&fit=crop&q=80',
+        verified: true,
+        responseTime: 'Replies in ~15 mins',
+      },
+      product: {
+        _id: product._id || product.id,
+        id: product._id || product.id,
+        title: product.title,
+        price: product.price,
+        condition: product.condition || 'Good',
+        campusLocation: product.location || 'Campus Library / Gate',
+        image: product.image || '/images/products/1.jpg',
+        category: product.category || 'General',
+      },
+      lastMessage: {
+        text: 'Started conversation regarding this campus listing.',
+        createdAt: new Date().toISOString(),
+        sender: 'user-me',
+        read: true,
+      },
+      unreadCount: 0,
+      type: 'buying',
+    };
+
+    setConversations((prev) => [newConv, ...prev]);
+    setSelectedConvId(newConv._id);
+    navigate(`/messages/${newConv._id}`);
+    toast.success(`💬 Chat started with seller for "${product.title?.slice(0, 20)}..."`);
   };
 
   return (
-    <div className="flex h-screen flex-col bg-[var(--cm-bg)]">
+    <div className="flex h-screen flex-col bg-[var(--cm-bg)] overflow-hidden">
       <HeaderMain showSearchBar={false} />
+      <ToastContainer position="top-right" autoClose={3000} />
 
-      <main className="flex flex-1 overflow-hidden">
-        <div className="mx-auto flex h-full w-full max-w-7xl border-x border-[var(--cm-border)] bg-white shadow-xs">
-          {/* Left: Conversation List */}
-          <div
-            className={`h-full w-full md:w-[380px] lg:w-[420px] shrink-0 ${
-              conversationId ? 'hidden md:block' : 'block'
-            }`}
-          >
-            <ConversationList
-              conversations={conversations}
-              selectedId={conversationId}
-              onSelectConversation={handleSelectConversation}
-              loading={loadingConversations}
-              currentUserId={currentUserId}
-            />
-          </div>
-
-          {/* Right: Active Chat Window or Empty State */}
-          <div
-            className={`h-full flex-1 ${
-              conversationId ? 'block' : 'hidden md:block'
-            }`}
-          >
-            {conversationId ? (
-              <ChatWindow
-                conversation={activeConversation}
-                messages={messages}
-                loading={loadingMessages}
-                onSendMessage={handleSendMessage}
-                onBack={handleBackToConversations}
-                currentUserId={currentUserId}
-                typingUser={typingUser}
-                onTyping={handleTyping}
-              />
-            ) : (
-              <EmptyChatState />
-            )}
-          </div>
+      <div className="flex-1 flex overflow-hidden">
+        {/* Left Sidebar: Conversations List */}
+        <div
+          className={`w-full md:w-80 lg:w-96 shrink-0 h-full border-r border-slate-200 bg-white ${
+            selectedConvId && window.innerWidth < 768 ? 'hidden md:block' : 'block'
+          }`}
+        >
+          <ConversationList
+            conversations={conversations}
+            selectedId={selectedConvId}
+            onSelectConversation={handleSelectConversation}
+            onStartNewChat={handleCreateNewChat}
+            currentUserId={currentUserId}
+          />
         </div>
-      </main>
+
+        {/* Right Area: Active Chat Window */}
+        <div
+          className={`flex-1 h-full bg-[var(--cm-bg)] ${
+            !selectedConvId && window.innerWidth < 768 ? 'hidden md:flex' : 'flex'
+          }`}
+        >
+          {activeConversation ? (
+            <ChatWindow
+              conversation={activeConversation}
+              messages={currentMessages}
+              onSendMessage={handleSendMessage}
+              onBack={() => {
+                setSelectedConvId(null);
+                navigate('/messages');
+              }}
+              currentUserId={currentUserId}
+              typingUser={typingUser}
+            />
+          ) : (
+            <EmptyChatState onBrowseMarketplace={() => navigate('/all-products')} />
+          )}
+        </div>
+      </div>
     </div>
   );
 }

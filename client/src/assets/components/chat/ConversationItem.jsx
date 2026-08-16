@@ -1,5 +1,6 @@
 import React from 'react';
-import { Package } from 'lucide-react';
+import { Package, ShieldCheck } from 'lucide-react';
+import { resolveImageUrl } from '../../../config/api';
 
 function formatRelativeTime(dateString) {
   if (!dateString) return '';
@@ -17,98 +18,114 @@ function formatRelativeTime(dateString) {
   return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
 }
 
-export default function ConversationItem({ conversation, isSelected, onClick, currentUserId }) {
-  // Determine if the current logged-in user is the buyer or seller
+export default function ConversationItem({
+  conversation,
+  isSelected,
+  onSelect,
+  currentUserId,
+}) {
   const isBuyer =
     conversation.buyer?._id?.toString() === currentUserId ||
-    conversation.buyer?.toString() === currentUserId;
+    conversation.buyer?.id?.toString() === currentUserId ||
+    conversation.type === 'buying';
 
   const otherUser = isBuyer ? conversation.seller : conversation.buyer;
-  const unreadCount = isBuyer
-    ? conversation.buyerUnreadCount || 0
-    : conversation.sellerUnreadCount || 0;
-
+  const unreadCount = conversation.unreadCount || 0;
   const otherUserName = otherUser?.name || 'Campus Student';
-  const productTitle =
-    conversation.product?.title ||
-    conversation.product?.description ||
-    'Campus Item';
+  const otherUserUniv = otherUser?.university || 'Campus Member';
 
-  const productImage =
-    conversation.product?.image ||
-    conversation.product?.images?.[0] ||
-    'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=400&auto=format&fit=crop';
+  const product = conversation.product || {};
+  const productTitle = product.title || 'Campus Item';
+  const productImage = resolveImageUrl(product.image);
 
+  const lastMsg = conversation.lastMessage?.text || 'Started discussion...';
   const lastMsgTime = formatRelativeTime(
-    conversation.lastMessageAt || conversation.updatedAt
+    conversation.lastMessage?.createdAt || conversation.updatedAt
   );
 
   return (
     <div
-      onClick={onClick}
+      onClick={onSelect}
       role="button"
       tabIndex={0}
-      className={`group relative flex cursor-pointer items-center gap-3 border-b border-[var(--cm-border)]/70 p-3.5 transition-all hover:bg-[var(--cm-blue-soft)]/60 ${
+      className={`group relative flex cursor-pointer items-start gap-3 p-3.5 transition-all border-l-4 ${
         isSelected
-          ? 'border-l-4 border-l-[var(--cm-blue)] bg-[var(--cm-blue-soft)] shadow-xs'
-          : 'bg-white'
+          ? 'border-l-indigo-600 bg-indigo-50/70 shadow-2xs'
+          : 'border-l-transparent bg-white hover:bg-slate-50'
       }`}
     >
-      {/* Other User Avatar */}
-      <div className="relative shrink-0">
+      {/* Other User Avatar with Online Dot */}
+      <div className="relative shrink-0 mt-0.5">
         <img
-          src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
-            otherUserName
-          )}&background=2563EB&color=fff&rounded=true&size=48`}
+          src={
+            otherUser?.avatar ||
+            `https://ui-avatars.com/api/?name=${encodeURIComponent(
+              otherUserName
+            )}&background=4F46E5&color=fff&rounded=true&size=48`
+          }
           alt={otherUserName}
-          className="h-11 w-11 rounded-full border border-[var(--cm-border)] object-cover shadow-2xs"
+          className="h-11 w-11 rounded-full border border-slate-200 object-cover shadow-2xs"
         />
-        {/* Tiny product badge attached to avatar */}
-        <div className="absolute -bottom-1 -right-1 h-5 w-5 overflow-hidden rounded-md border border-white bg-white shadow-xs">
-          <img
-            src={productImage}
-            alt=""
-            className="h-full w-full object-cover"
-            onError={(e) => {
-              e.currentTarget.src =
-                'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=100&auto=format&fit=crop';
-            }}
-          />
-        </div>
+        <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-emerald-500 ring-2 ring-white" />
       </div>
 
       {/* Conversation Info */}
       <div className="min-w-0 flex-1">
         <div className="flex items-center justify-between gap-1">
-          <h4 className="truncate text-sm font-bold text-[var(--cm-ink)] group-hover:text-[var(--cm-blue)]">
+          <h4 className="truncate text-xs sm:text-sm font-bold text-slate-900 group-hover:text-indigo-600 transition flex items-center gap-1">
             {otherUserName}
+            {otherUser?.verified && (
+              <ShieldCheck size={13} className="text-emerald-500 shrink-0" />
+            )}
           </h4>
-          <span className="shrink-0 text-[11px] font-medium text-[var(--cm-slate)]">
+          <span className="shrink-0 text-[10.5px] font-semibold text-slate-400">
             {lastMsgTime}
           </span>
         </div>
 
-        {/* Product context indicator */}
-        <div className="flex items-center gap-1 text-[11px] text-[var(--cm-slate)] font-medium">
-          <Package size={11} className="shrink-0 text-[var(--cm-blue)]" />
-          <span className="truncate">{productTitle}</span>
-        </div>
+        <p className="text-[11px] text-slate-500 truncate mb-1">
+          {otherUserUniv}
+        </p>
+
+        {/* Product mini pill context */}
+        {productTitle && (
+          <div className="flex items-center gap-1.5 p-1 rounded-lg bg-slate-50 border border-slate-100 mb-1 max-w-full">
+            <div className="h-4 w-4 shrink-0 overflow-hidden rounded bg-white">
+              <img
+                src={productImage}
+                alt=""
+                className="h-full w-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.src = '/images/products/1.jpg';
+                }}
+              />
+            </div>
+            <span className="truncate text-[10.5px] font-semibold text-slate-700">
+              {productTitle}
+            </span>
+            {product.price && (
+              <span className="shrink-0 text-[10px] font-extrabold text-indigo-700 ml-auto">
+                ₹{Number(product.price).toLocaleString('en-IN')}
+              </span>
+            )}
+          </div>
+        )}
 
         {/* Last message preview */}
-        <div className="mt-0.5 flex items-center justify-between gap-2">
+        <div className="flex items-center justify-between gap-2">
           <p
             className={`truncate text-xs ${
               unreadCount > 0
-                ? 'font-bold text-[var(--cm-ink)]'
-                : 'text-[var(--cm-slate)]'
+                ? 'font-bold text-slate-900'
+                : 'text-slate-500'
             }`}
           >
-            {conversation.lastMessage || 'No messages yet. Start chatting!'}
+            {lastMsg}
           </p>
 
           {unreadCount > 0 && (
-            <span className="flex h-5 min-w-[20px] shrink-0 items-center justify-center rounded-full bg-[var(--cm-blue)] px-1.5 text-[10px] font-bold text-white shadow-xs">
-              {unreadCount > 99 ? '99+' : unreadCount}
+            <span className="flex h-4 min-w-[16px] shrink-0 items-center justify-center rounded-full bg-indigo-600 px-1 text-[9.5px] font-bold text-white shadow-xs">
+              {unreadCount}
             </span>
           )}
         </div>
