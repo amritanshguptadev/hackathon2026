@@ -1,5 +1,493 @@
 const featuredProduct = [
   {
+    id: 1,
+    title: "HP ProBook 15.6\" Student Laptop (Core i5 / 8GB / 256GB SSD)",
+    description: "HP ProBook 15.6-inch laptop with Intel Core i5 processor, 8GB RAM, and 256GB SSD. Perfect for coding, college assignments, and web development.",
+    price: 13999,
+    image: "/images/products/1.jpg",
+    images: ["/images/products/1.jpg"],
+    category: "Electronics",
+    condition: "Good",
+    location: "Library Area",
+    campusLocation: "Central Library Entrance",
+    status: "Available",
+    details: [
+      "Intel Core i5 (7th Gen) @ 2.60 GHz with Turbo Boost",
+      "8GB DDR4 RAM + 256GB High-Speed SSD",
+      "15.6-inch Anti-Glare HD Display with full numeric keypad",
+      "Battery backup: ~3.5 hours on normal usage, original HP charger included",
+      "Pre-installed with clean Windows 11 & essential developer tools (VS Code, Git)"
+    ],
+    dimensions: "37.5 x 25.6 x 2.0 cm",
+    seller: {
+      name: "Arjun Verma",
+      email: "arjun.cse@buykaro.in",
+      college: "IIT Delhi",
+      city: "New Delhi",
+      joinedAt: "2024-03-10T10:00:00Z"
+    }
+  },
+  {
+    id: 2,
+    title: "Hero Sprint 21-Speed Mountain Bike (Carrier & Lock)",
+    description: "Sturdy blue campus mountain bike equipped with 21-speed Shimano gears, comfortable dual-cushion seat, and strong rear luggage carrier.",
+    price: 2499,
+    image: "/images/products/2.jpg",
+    images: ["/images/products/2.jpg"],
+    category: "Cycles & Bikes",
+    condition: "Good",
+    location: "Main Gate",
+    campusLocation: "Campus Main Gate",
+    status: "Available",
+    details: [
+      "26T High-tensile steel frame with ergonomic handlebars",
+      "21-Speed Shimano Tourney thumb shifters for easy campus inclines",
+      "Heavy-duty rear luggage rack for carrying college backpack or books",
+      "Recently serviced with brand new brake pads and lubricated chain",
+      "Includes heavy-duty cycle lock & campus parking stand"
+    ],
+    dimensions: "170 x 60 x 100 cm",
+    seller: {
+      name: "Tanmay Deshmukh",
+      email: "tanmay.mech@buykaro.in",
+      college: "BITS Pilani",
+      city: "Pilani",
+      joinedAt: "2024-05-15T10:00:00Z"
+    }
+  },
+  {
+    id: 3,
+    title: "Studio Monitoring Over-Ear DJ Headphones",
+    description: "Closed-back DJ & studio monitoring headphones with thick noise-isolating ear cushions and heavy-duty coiled 3.5mm audio cable.",
+    price: 899,
+    image: "/images/products/3.jpg",
+    images: ["/images/products/3.jpg"],
+    category: "Electronics",
+    condition: "Like New",
+    location: "North Hostel",
+    campusLocation: "North Hostel Reception",
+    status: "Available",
+    details: [
+      "40mm Neodymium dynamic drivers delivering balanced acoustic profile",
+      "Passive noise isolation ear cups for library concentration",
+      "Durable coiled spring cable with 3.5mm gold-plated jack (plus 6.35mm adapter)",
+      "Foldable swivel ear-cups for compact backpack storage"
+    ],
+    dimensions: "19 x 17 x 8.5 cm",
+    seller: {
+      name: "Kavya Nair",
+      email: "kavya.media@buykaro.in",
+      college: "Christ University",
+      city: "Bengaluru",
+      joinedAt: "2024-07-20T10:00:00Z"
+    }
+  },
+  {
+    id: 4,
+    title: "Humanities & Social Sciences Core Textbook Stack",
+    description: "Essential undergraduate semester bundle including Econometrics, Sociology, Molecular Biology of the Cell, and American Governance.",
+    price: 599,
+    image: "/images/products/4.jpg",
+    images: ["/images/products/4.jpg"],
+    category: "Books & Notes",
+    condition: "Good",
+    location: "Library Area",
+    campusLocation: "Arts & Humanities Block",
+    status: "Available",
+    details: [
+      "Using Econometrics by Studenmund (Pearson 6th Edition)",
+      "Macionis Sociology Comprehensive Global Edition",
+      "Molecular Biology of the Cell (Alberts & Watson Edition)",
+      "Clean pages with neatly highlighted exam summary sticky notes included"
+    ],
+    dimensions: "28 x 22 x 15 cm",
+    seller: {
+      name: "Meera Sen",
+      email: "meera.eco@buykaro.in",
+      college: "Delhi University",
+      city: "Delhi",
+      joinedAt: "2024-01-12T10:00:00Z"
+    }
+  },
+  {
+    id: 5,
+    title: "Dell Inspiron 14\" Portable Student Laptop (Core i3 / 8GB RAM)",
+    description: "Compact and lightweight 14-inch Dell Inspiron laptop. Excellent for daily lectures, online quizzes, coding, and YouTube research.",
+    price: 11999,
+    image: "/images/products/5.jpg",
+    images: ["/images/products/5.jpg"],
+    category: "Electronics",
+    condition: "Good",
+    location: "West Campus",
+    campusLocation: "Engineering Academic Block",
+    status: "Available",
+    details: [
+      "Intel Core i3 6th Gen Processor with Intel HD Graphics",
+      "8GB DDR3L RAM & 500GB Storage",
+      "14-inch HD WLED display with crisp integrated 720p HD webcam",
+      "Compact footprint fits easily into standard college backpacks",
+      "Original Dell 45W AC adapter included"
+    ],
+    dimensions: "34.5 x 24.0 x 2.1 cm",
+    seller: {
+      name: "Sameer Joshi",
+      email: "sameer.civil@buykaro.in",
+      college: "MIT Pune",
+      city: "Pune",
+      joinedAt: "2023-11-05T10:00:00Z"
+    }
+  },
+  {
+    id: 6,
+    title: "Budget 4G Android Smartphones Combo Choice",
+    description: "Reliable secondary 4G Android smartphones (Redmi 9 / Infinix / Samsung Galaxy). Ideal as a testing device for app development or backup phone.",
+    price: 3999,
+    image: "/images/products/6.jpg",
+    images: ["/images/products/6.jpg"],
+    category: "Electronics",
+    condition: "Fair",
+    location: "Block C",
+    campusLocation: "Student Center SAC",
+    status: "Available",
+    details: [
+      "Tested and 100% working display, camera, Wi-Fi hotspot, and calling",
+      "Dual SIM 4G VoLTE support with dedicated MicroSD slot",
+      "Long-lasting 5000mAh battery for all-day hotspot sharing",
+      "Factory reset and ready for immediate login"
+    ],
+    dimensions: "16.4 x 7.6 x 0.9 cm",
+    seller: {
+      name: "Rahul Saxena",
+      email: "rahul.ece@buykaro.in",
+      college: "DTU Delhi",
+      city: "Delhi",
+      joinedAt: "2024-02-18T10:00:00Z"
+    }
+  },
+  {
+    id: 7,
+    title: "Apple iPad 9.7\" Retina Display Tablet (32GB Space Gray)",
+    description: "Apple iPad with 9.7-inch crisp Retina display. Incredible tool for PDF textbook annotation, GoodNotes study notes, and lecture video streaming.",
+    price: 10999,
+    image: "/images/products/7.jpg",
+    images: ["/images/products/7.jpg"],
+    category: "Electronics",
+    condition: "Like New",
+    location: "East Block",
+    campusLocation: "Hostel Block D Gate",
+    status: "Available",
+    details: [
+      "9.7-inch Retina Display (2048 x 1536 resolution, 264 ppi)",
+      "32GB Storage with fast Apple A-Series chip",
+      "Touch ID fingerprint scanner for secure logins",
+      "Battery health at 88% — lasts up to 9 hours on single charge",
+      "Includes protective magnetic flip case and Lightning charging cable"
+    ],
+    dimensions: "24.0 x 16.9 x 0.75 cm",
+    seller: {
+      name: "Aayush Agarwal",
+      email: "aayush.cse@buykaro.in",
+      college: "VIT Vellore",
+      city: "Vellore",
+      joinedAt: "2024-04-22T10:00:00Z"
+    }
+  },
+  {
+    id: 8,
+    title: "STEM Engineering & Science Textbook Bundle (Calculus & Chemistry)",
+    description: "First-year and second-year STEM bundle: Calculus and Its Applications, Atoms-Focused General Chemistry, and Olin's Construction Principles.",
+    price: 450,
+    image: "/images/products/8.jpg",
+    images: ["/images/products/8.jpg"],
+    category: "Books & Notes",
+    condition: "Good",
+    location: "Library Area",
+    campusLocation: "Science Dept Lawn",
+    status: "Available",
+    details: [
+      "Calculus & Its Applications (11th Edition, Bittinger & Ellenbogen)",
+      "Chemistry: An Atoms-Focused Approach (Gilbert, Kirss, Foster)",
+      "Olin's Construction Principles and Materials (9th Edition)",
+      "Binding is intact with zero missing pages"
+    ],
+    dimensions: "26 x 20 x 12 cm",
+    seller: {
+      name: "Sneha Mukherjee",
+      email: "sneha.sci@buykaro.in",
+      college: "Jadavpur University",
+      city: "Kolkata",
+      joinedAt: "2024-06-11T10:00:00Z"
+    }
+  },
+  {
+    id: 9,
+    title: "HP 15s Slim Core i5 15.6\" FHD Laptop (8GB / Fast NVMe SSD)",
+    description: "Sleek HP 15s notebook in jet black. Fast NVMe SSD, 8GB DDR4 RAM, full-size keyboard with numeric keypad. Perfect for computer science projects.",
+    price: 17500,
+    image: "/images/products/9.jpg",
+    images: ["/images/products/9.jpg"],
+    category: "Electronics",
+    condition: "Like New",
+    location: "North Hostel",
+    campusLocation: "Boys Hostel Block B",
+    status: "Available",
+    details: [
+      "Intel Core i5 8th Gen Quad-Core Processor",
+      "8GB DDR4 RAM (expandable to 16GB) + 256GB M.2 NVMe SSD",
+      "15.6-inch Full HD (1920x1080) Micro-edge display",
+      "Dual speakers with HP Audio Boost, fast Wi-Fi 5 & Bluetooth 5",
+      "Battery lasts 4+ hours, original 65W fast charger included"
+    ],
+    dimensions: "35.8 x 24.2 x 1.79 cm",
+    seller: {
+      name: "Aditya Khurana",
+      email: "aditya.se@buykaro.in",
+      college: "SRM Chennai",
+      city: "Chennai",
+      joinedAt: "2024-01-30T10:00:00Z"
+    }
+  },
+  {
+    id: 10,
+    title: "Toshiba / WD Canvio 1TB Portable External HDD (USB 3.0)",
+    description: "Super-slim 1TB portable external hard drive with high-speed USB 3.0 interface and cable. Great for storing course recordings, datasets, and VMs.",
+    price: 1699,
+    image: "/images/products/10.jpg",
+    images: ["/images/products/10.jpg"],
+    category: "Electronics",
+    condition: "Like New",
+    location: "West Campus",
+    campusLocation: "Central Library Steps",
+    status: "Available",
+    details: [
+      "1TB (1000GB) formatted NTFS storage capacity",
+      "USB 3.0 transfer speeds up to 130 MB/s (backward compatible with USB 2.0)",
+      "Matte shock-resistant slim casing fits in pocket",
+      "100% Health verified via CrystalDiskInfo (zero bad sectors)"
+    ],
+    dimensions: "10.9 x 7.8 x 1.4 cm",
+    seller: {
+      name: "Varun Nair",
+      email: "varun.it@buykaro.in",
+      college: "Manipal University",
+      city: "Manipal",
+      joinedAt: "2024-03-25T10:00:00Z"
+    }
+  },
+  {
+    id: 11,
+    title: "3-Pack High-Speed USB 3.0 Flash Drives (SanDisk & Kingston)",
+    description: "Trio pack of tested high-speed USB pen drives (SanDisk & Kingston). Essential for campus lab submissions, OS installations, and printing.",
+    price: 320,
+    image: "/images/products/11.jpg",
+    images: ["/images/products/11.jpg"],
+    category: "Electronics",
+    condition: "Good",
+    location: "Library Area",
+    campusLocation: "College Xerox Center",
+    status: "Available",
+    details: [
+      "Pack of 3 flash drives (Total ~128GB combined storage)",
+      "Plug and play across Windows, Mac, Linux, and college lab PCs",
+      "Keyring loop hole for attaching to college ID lanyard or room keys"
+    ],
+    dimensions: "6.0 x 1.8 x 0.8 cm",
+    seller: {
+      name: "Devika Pillai",
+      email: "devika.ee@buykaro.in",
+      college: "NIT Trichy",
+      city: "Tiruchirappalli",
+      joinedAt: "2024-08-01T10:00:00Z"
+    }
+  },
+  {
+    id: 12,
+    title: "4-Socket Heavy-Duty Power Strip Extension Board (3m Cord)",
+    description: "Must-have hostel room extension cord with 4 universal 3-pin sockets and thick 3-meter heavy-gauge cable.",
+    price: 250,
+    image: "/images/products/12.jpg",
+    images: ["/images/products/12.jpg"],
+    category: "Hostel Essentials",
+    condition: "Good",
+    location: "North Hostel",
+    campusLocation: "Hostel 4 Ground Floor",
+    status: "Available",
+    details: [
+      "4 Universal AC sockets with safety shutter protection",
+      "3 Meter heavy-duty insulated copper power cord",
+      "Built-in master on/off switch with LED indicator",
+      "Wall mountable hanging slots on the back"
+    ],
+    dimensions: "28 x 6.5 x 3.5 cm",
+    seller: {
+      name: "Rajat Chauhan",
+      email: "rajat.hostel@buykaro.in",
+      college: "IIT Roorkee",
+      city: "Roorkee",
+      joinedAt: "2023-10-15T10:00:00Z"
+    }
+  },
+  {
+    id: 13,
+    title: "Seagate Backup Plus Slim 1TB External Hard Drive",
+    description: "Brushed metal finish Seagate Backup Plus 1TB portable hard drive. High read/write speed for quick project backups and heavy media files.",
+    price: 1550,
+    image: "/images/products/13.jpg",
+    images: ["/images/products/13.jpg"],
+    category: "Electronics",
+    condition: "Good",
+    location: "East Block",
+    campusLocation: "Architecture Studio",
+    status: "Available",
+    details: [
+      "1TB Storage with USB 3.0 high-speed data bus",
+      "Premium brushed black aluminum protective top cover",
+      "Tested 100% functional with zero drive errors",
+      "Comes with original reinforced micro-B to USB-A data cable"
+    ],
+    dimensions: "11.3 x 7.6 x 1.2 cm",
+    seller: {
+      name: "Pooja Hegde",
+      email: "pooja.design@buykaro.in",
+      college: "CEPT Ahmedabad",
+      city: "Ahmedabad",
+      joinedAt: "2024-02-14T10:00:00Z"
+    }
+  },
+  {
+    id: 14,
+    title: "4-Piece High-Durability USB Pen Drive Assortment",
+    description: "Assorted 4-piece pen drive collection including metal swivel drive, slider drive, and rugged rubberized thumb drive.",
+    price: 399,
+    image: "/images/products/14.jpg",
+    images: ["/images/products/14.jpg"],
+    category: "Electronics",
+    condition: "Good",
+    location: "Main Gate",
+    campusLocation: "Main Gate Cafe",
+    status: "Available",
+    details: [
+      "4 Functional USB thumb drives formatted and wiped clean",
+      "Capless slider and 360-degree metal swivel designs prevent lost caps",
+      "Ideal for bootable Linux drives, assignments, and campus xerox runs"
+    ],
+    dimensions: "6.5 x 2.0 x 1.0 cm",
+    seller: {
+      name: "Nitin Singhania",
+      email: "nitin.phys@buykaro.in",
+      college: "BHU Varanasi",
+      city: "Varanasi",
+      joinedAt: "2023-09-08T10:00:00Z"
+    }
+  },
+  {
+    id: 15,
+    title: "6-Outlet Surge Protector Spike Guard with Master Switch",
+    description: "Long 6-socket surge suppressor power strip with overload protection fuse. Powers laptop, monitor, phone charger, and table lamp simultaneously.",
+    price: 299,
+    image: "/images/products/15.jpg",
+    images: ["/images/products/15.jpg"],
+    category: "Hostel Essentials",
+    condition: "Good",
+    location: "Block C",
+    campusLocation: "Hostel 7 Common Room",
+    status: "Available",
+    details: [
+      "6 Indian/Universal sockets with surge protection varistor",
+      "Overload reset switch prevents room fuse trips during power spikes",
+      "Thick 2-meter fire-retardant power cord"
+    ],
+    dimensions: "36 x 6.5 x 3.8 cm",
+    seller: {
+      name: "Vikram Batra",
+      email: "vikram.thapar@buykaro.in",
+      college: "Thapar University",
+      city: "Patiala",
+      joinedAt: "2024-04-05T10:00:00Z"
+    }
+  },
+  {
+    id: 16,
+    title: "Epson / NEC LCD Multimedia Classroom & Movie Projector",
+    description: "High-brightness 3LCD multimedia projector with HDMI and VGA ports. Perfect for student club presentations, hackathons, and dorm movie nights.",
+    price: 5999,
+    image: "/images/products/16.jpg",
+    images: ["/images/products/16.jpg"],
+    category: "Electronics",
+    condition: "Good",
+    location: "West Campus",
+    campusLocation: "SAC Auditorium Entrance",
+    status: "Available",
+    details: [
+      "3000 ANSI Lumens brightness delivers clear visuals even with room lights on",
+      "HDMI, VGA, USB, and Audio In/Out connectivity",
+      "Adjustable focus and keystone correction wheel with lens cap",
+      "Includes power cable and 2-meter gold-plated HDMI cable"
+    ],
+    dimensions: "30.2 x 23.4 x 8.7 cm",
+    seller: {
+      name: "Campus Tech Club",
+      email: "techclub.iitb@buykaro.in",
+      college: "IIT Bombay",
+      city: "Mumbai",
+      joinedAt: "2023-08-15T10:00:00Z"
+    }
+  },
+  {
+    id: 17,
+    title: "Symphony Personal Room Air Cooler with Caster Wheels",
+    description: "Personal evaporative desert air cooler on 4 smooth caster wheels. Essential for surviving hot campus summers in hostel rooms.",
+    price: 1750,
+    image: "/images/products/17.jpg",
+    images: ["/images/products/17.jpg"],
+    category: "Appliances",
+    condition: "Good",
+    location: "North Hostel",
+    campusLocation: "Hostel Block B Parking",
+    status: "Available",
+    details: [
+      "25L Water tank capacity with clear water level indicator",
+      "Honeycomb cooling pads and high-velocity blower with motorized louvers",
+      "Low power consumption (only 120W) — runs smoothly on hostel inverters",
+      "4 Multi-directional caster wheels for effortless relocation"
+    ],
+    dimensions: "45 x 30 x 78 cm",
+    seller: {
+      name: "Kunal Bansal",
+      email: "kunal.mnit@buykaro.in",
+      college: "MNIT Jaipur",
+      city: "Jaipur",
+      joinedAt: "2024-03-01T10:00:00Z"
+    }
+  },
+  {
+    id: 18,
+    title: "Compact Mini Dorm Refrigerator with Freezer (White)",
+    description: "Double-door compact student refrigerator with dedicated top freezer compartment. Keeps milk, fruits, cold beverages, and snacks fresh.",
+    price: 3650,
+    image: "/images/products/18.jpg",
+    images: ["/images/products/18.jpg"],
+    category: "Appliances",
+    condition: "Good",
+    location: "Block C",
+    campusLocation: "Hostel 3 Main Lobby",
+    status: "Available",
+    details: [
+      "Compact dimensions fit perfectly beside hostel study desks",
+      "Dedicated top freezer section for ice cubes and frozen treats",
+      "Adjustable wire shelf and in-door can/bottle storage racks",
+      "Energy efficient compressor with ultra-quiet 38dB operation"
+    ],
+    dimensions: "48 x 45 x 85 cm",
+    seller: {
+      name: "Aniket & Roommates",
+      email: "aniket.bits@buykaro.in",
+      college: "BITS Goa",
+      city: "Goa",
+      joinedAt: "2023-12-10T10:00:00Z"
+    }
+  },
+  {
     id: 11,
     title: "Wooden Bookshelf",
     description:
@@ -16,7 +504,7 @@ const featuredProduct = [
     dimensions: "60 x 25 x 120 cm",
     seller: {
       name: "Ravi Malhotra",
-      email: "ravi.chennai@gmail.com",
+      email: "ravi.chennai@buykaro.in",
       joinedAt: "2023-08-20T10:12:45Z",
       city: "Chennai",
       college: "SRM University",
@@ -39,447 +527,12 @@ const featuredProduct = [
     dimensions: "45 x 47 x 50 cm",
     seller: {
       name: "Ananya Verma",
-      email: "ananya.coolgadgets@buykaro.com",
+      email: "ananya.coolgadgets@buykaro.in",
       joinedAt: "2024-02-14T15:00:00Z",
       city: "Delhi",
       college: "Lady Shri Ram College",
     },
-  },
-  {
-    id: 13,
-    title: "LED Study Lamp",
-    description:
-      "Basic study lamp featuring an adjustable neck and LED bulb. Provides focused lighting for reading or working at night.",
-    price: 349,
-    image:
-      "https://rukminim2.flixcart.com/image/812/974/xif0q/table-lamp/o/q/4/neonglow-study-lamp-neonglow-study-lamp-24-energy-9-5-original-imahdmkyzpugg7pt.jpeg?q=60&crop=false",
-    details: [
-      "Focused Illumination: Emits a soft yet bright glow, preventing glare and shadows for an optimal study experience.",
-      "Modern Design: The minimalist matte body pairs well with any desk setup, from rustic wood to modern white themes.",
-      "Energy Efficient: Fitted with a long-life LED that consumes less power and produces less heat, ideal for prolonged use.",
-      "Adjustable Neck: Flexi-neck allows 360° movement so you can direct light precisely where needed for books, screens, or sketchpads.",
-    ],
-    dimensions: "20 x 12 x 35 cm",
-    seller: {
-      name: "Nikhil Rao",
-      email: "nikhil.electro@buykaro.com",
-      joinedAt: "2022-11-10T08:30:00Z",
-      city: "Mumbai",
-      college: "IIT Bombay",
-    },
-  },
-  {
-    id: 14,
-    title: "Foldable Laptop Stand",
-    description:
-      "Foldable and portable laptop stand with a sturdy aluminum body. Offers ergonomic height for comfortable working posture.",
-    price: 599,
-    image:
-      "https://rukminim2.flixcart.com/image/812/974/xif0q/laptop-stand/f/r/3/200-aluminum-amextron-original-imahdpybgzavtsym.jpeg?q=60&crop=false",
-    details: [
-      "Ergonomic Comfort: Lifts laptop to eye-level, reducing strain on the neck and back during online classes or coding sessions.",
-      "Space-Saving Elegance: The stand folds flat and occupies minimal space, ideal for compact hostel rooms or shared tables.",
-      "Anti-Slip Base: Rubber grips keep your laptop in place even while typing aggressively or using external peripherals.",
-      "Durable Build: Lightweight yet strong aluminum frame supports devices up to 17 inches with ease.",
-    ],
-    dimensions: "28 x 22 x 6 cm (folded)",
-    seller: {
-      name: "Priya Sharma",
-      email: "priya.gearhub@buykaro.com",
-      joinedAt: "2024-06-01T09:15:00Z",
-      city: "Pune",
-      college: "MIT WPU",
-    },
-  },
-  {
-    id: 15,
-    title: "Steel Clothes Rack",
-    description:
-      "Durable steel clothes rack with a space-saving foldable design. Ideal for drying or organizing clothes in limited spaces.",
-    price: 899,
-    image:
-      "https://rukminim2.flixcart.com/image/1466/352/xif0q/cloth-dryer-stand/r/d/d/100-g-cds-sumo-mini-grazia-1-tier-original-imah7tnw2syjpd9e.jpeg?q=60",
-    details: [
-      "Multi-Tier Utility: Dual levels with multiple rods offer ample space for drying shirts, pants, and delicates simultaneously.",
-      "Rust-Free Steel: Made from stainless steel tubes with anti-corrosive coating for longer lifespan, even in humid environments.",
-      "Odour-Free Drying: Open-frame structure allows better air circulation for faster, fresher drying without mildew smells.",
-      "Portable & Foldable: Easily folds flat for storage under the bed or behind doors when not in use.",
-    ],
-    dimensions: "70 x 55 x 145 cm",
-    seller: {
-      name: "Amit Jha",
-      email: "amit.homeneeds@buykaro.com",
-      joinedAt: "2023-12-18T18:45:00Z",
-      city: "Bangalore",
-      college: "Christ University",
-    },
-  },
-  {
-    id: 16,
-    title: "Table Fan - 3 Speed",
-    description:
-      "Efficient table fan with 3-speed settings and low-noise operation. Great for personal cooling during hot weather days.",
-    price: 799,
-    image:
-      "https://rukminim2.flixcart.com/image/192/240/xif0q/fan/w/6/f/-original-imahfg3wv6ycmska.jpeg?q=60",
-    details: [
-      "Whisper-Quiet Operation: Powerful airflow with minimal noise, ideal for use in shared spaces or libraries.",
-      "Portable Design: Lightweight and easy to move around for localized cooling—perfect for dorm setups.",
-      "3 Speed Settings: Adjust between low, medium, and high depending on your comfort and weather conditions.",
-      "Energy Saving: Designed for low power consumption, ensuring cost-effective cooling over long hours.",
-    ],
-    dimensions: "30 x 25 x 45 cm",
-    seller: {
-      name: "Sonal Mehta",
-      email: "sonal.coolcorner@buykaro.com",
-      joinedAt: "2025-01-05T12:00:00Z",
-      city: "Hyderabad",
-      college: "Osmania University",
-    },
-  },
-  {
-    id: 17,
-    title: "3L Pressure Cooker",
-    description:
-      "Basic 3-liter pressure cooker made of stainless steel. Suitable for daily cooking needs with quick and even heating.",
-    price: 699,
-    image:
-      "https://rukminim2.flixcart.com/image/1466/352/xif0q/pressure-cooker/y/8/k/yes-1-18014-kent-original-imah3t8hzzf5hscv.jpeg?q=60",
-    details: [
-      "Fast Cooking: Uses high pressure to cook dals, rice, curries, and vegetables quickly—perfect for students in a rush.",
-      "Contemporary Look: Elegant mirror finish body that suits any kitchen style, from minimal to traditional.",
-      "Safe to Use: Pressure-regulating safety valve and heat-resistant handles offer a secure cooking experience.",
-      "Multipurpose: Compatible with gas, electric, and induction stoves—versatile for various living conditions.",
-    ],
-    dimensions: "25 x 25 x 18 cm",
-    seller: {
-      name: "Rakesh Bhatt",
-      email: "rakesh.kitchenware@buykaro.com",
-      joinedAt: "2023-04-22T14:10:00Z",
-      city: "Ahmedabad",
-      college: "Nirma University",
-    },
-  },
-  {
-    id: 18,
-    title: "Modern Wall Clock",
-    description:
-      "Battery-operated wall clock with a sleek and modern design. Perfect for home, office, or any minimalistic space.",
-    price: 499,
-    image:
-      "https://rukminim2.flixcart.com/image/1470/1470/xif0q/wall-clock/t/j/z/ajanta-small-and-fancy-wall-clock-for-home-and-office-22-original-imagycxfpbbdpbyy.jpeg?q=60",
-    details: [
-      "Contemporary Luxury: Matte black and white contrast adds a stylish accent to study areas, bedrooms, or lounges.",
-      "Odour-Free Design: Dust-resistant face cover keeps the dial clean and legible even in humid or dusty areas.",
-      "Silent Sweep: Second hand moves silently without the annoying ticking noise, perfect for peaceful concentration.",
-      "Multi-Location Use: Suitable for hostels, kitchens, offices, or classrooms for punctuality with elegance.",
-    ],
-    dimensions: "30 x 30 x 4 cm",
-    seller: {
-      name: "Shruti Patel",
-      email: "shruti.homevibe@buykaro.com",
-      joinedAt: "2022-10-03T07:25:00Z",
-      city: "Indore",
-      college: "DAVV",
-    },
-  },
-  {
-    id: 19,
-    title: "Laundry Basket - Woven",
-    description:
-      "Woven-style laundry basket that enhances room appearance while maintaining hygiene. Ideal for bedrooms or bathrooms.",
-    price: 649,
-    image: "https://m.media-amazon.com/images/I/71gDgdgh15L._SX679_.jpg",
-    details: [
-      "Versatile and Stylish: Blends effortlessly with any bedroom or bathroom decor, adding a touch of elegance to your space.",
-      "Odour-Free Design: Features a vented body that ensures airflow to prevent moisture buildup and unpleasant smells.",
-      "Contemporary Luxury: Crafted with a premium woven texture that mimics natural materials while offering durability and hygiene.",
-      "Convenient Handling: Integrated side handles make lifting and transporting the basket easy, even when it's full of clothes.",
-    ],
-
-    dimensions: "44 x 35 x 61 cm",
-    seller: {
-      name: "Karan Desai",
-      email: "karan.organizeit@buykaro.com",
-      joinedAt: "2023-09-10T16:45:00Z",
-      city: "Surat",
-      college: "SVNIT",
-    },
-  },
-  {
-    id: 20,
-    title: "Noise Cancelling Headphones",
-    description: "High-fidelity wireless headphones with ANC",
-    price: 2499,
-    image:
-      "https://rukminim2.flixcart.com/image/832/832/xif0q/headphone/o/h/f/-original-imahdxvsuftg7njp.jpeg?q=70&crop=false",
-    details: [
-      "Advanced Active Noise Cancellation: Reduces ambient sound by up to 30dB, allowing for immersive music and focused study sessions.",
-      "Immersive Sound Output: Equipped with 40mm drivers that deliver punchy bass, crisp mids, and clear treble across all genres.",
-      "Long-Lasting Battery & Connectivity: Bluetooth 5.2 ensures fast pairing and up to 20 hours of playback time on a single charge.",
-      "Ergonomic Design: Features soft, memory foam ear cushions and an adjustable headband for all-day comfort during prolonged use.",
-    ],
-
-    dimensions: "18 x 16 x 9 cm",
-    seller: {
-      name: "Ananya Mehta",
-      email: "ananya.mehta@gmail.com",
-      joinedAt: "2023-12-15T00:00:00Z",
-      city: "Kolkata",
-      college: "Jadavpur University",
-    },
-  },
-  {
-    id: 21,
-    title: "Ergonomic Study Chair",
-    description: "Adjustable and cushioned chair ideal for long study sessions",
-    price: 3199,
-    image:
-      "https://thesleepcompany.in/cdn/shop/files/1_52578784-331e-40b0-8f56-4c767f3cfef1.webp?v=1753711047&width=860",
-    details: [
-      "Ergonomically designed mesh backrest provides optimal lumbar support, reducing strain during prolonged study or work hours.",
-      "Smooth 360° swivel wheels ensure easy movement without damaging flooring, perfect for compact study areas or shared spaces.",
-      "Height-adjustable pneumatic seat lets you customize sitting posture for maximum comfort and back alignment.",
-      "Soft, breathable cushion with high-density foam enhances comfort and prevents heat build-up during long sitting sessions.",
-    ],
-    dimensions: "60 x 60 x 100 cm",
-    seller: {
-      name: "Ravi Sharma",
-      email: "ravi.sharma123@gmail.com",
-      joinedAt: "2024-04-12T00:00:00Z",
-      city: "Delhi",
-      college: "Delhi Technological University",
-    },
-  },
-  {
-    id: 22,
-    title: "Scientific Calculator",
-    description:
-      "Multi-functional calculator suitable for engineering students",
-    price: 899,
-    image:
-      "https://vlebazaar.in/image/cache/catalog/Casio-FX-82MS-2nd-Gen-Non-Programmable-Scientific-Calculator-240-Functio/Casio-FX-82MS-2nd-Gen-Non-Programmable-Scientific-Calculator-240-Functions-and-2-1100x1100.jpg",
-    details: [
-      "Offers over 240 advanced mathematical functions including trigonometry, logarithms, statistics, and algebra for engineering-level computations.",
-      "Dual power system ensures uninterrupted usage—solar power under bright light and battery backup for dim conditions.",
-      "Responsive and clearly labeled plastic keys provide a tactile and durable input experience, even with heavy usage.",
-      "Dual-line display allows simultaneous viewing of inputs and results, reducing calculation errors and improving learning.",
-    ],
-    dimensions: "15 x 8 x 1.8 cm",
-    seller: {
-      name: "Sneha Kapoor",
-      email: "sneha.kapoor@outlook.com",
-      joinedAt: "2024-09-05T00:00:00Z",
-      city: "Bhopal",
-      college: "MANIT Bhopal",
-    },
-  },
-  {
-    id: 23,
-    title: "Graph Paper Notebook",
-    description: "A4 size graph notebook with thick pages",
-    price: 179,
-    image:
-      "https://cdn.zeptonow.com/production/ik-seo/tr:w-640,ar-1200-1200,pr-true,f-auto,q-80/cms/product_variant/414f1c7a-82fd-4d3f-8411-d4e7aee7b45c/Ranka-Supremo-Graph-Book-Ruled-32-Pages-Assorted.jpg",
-    details: [
-      "High-quality 80 GSM thick paper minimizes ink bleed and feathering, suitable for technical drawing and mathematics.",
-      "Innovative hybrid layout combining single-line ruling with graph sheets for versatile academic usage.",
-      "Contains 100 neatly printed pages ideal for plotting, data recording, and engineering lab work.",
-      "Durable spiral binding and hard cover provide rigidity and portability, making it perfect for daily college use.",
-    ],
-    dimensions: "29.7 x 21 x 1.5 cm",
-    seller: {
-      name: "Aman Verma",
-      email: "aman.verma1999@gmail.com",
-      joinedAt: "2023-11-20T00:00:00Z",
-      city: "Pune",
-      college: "MIT WPU",
-    },
-  },
-  {
-    id: 24,
-    title: "External Hard Drive - 1TB",
-    description: "Portable HDD with USB 3.0 interface for fast data transfer",
-    price: 3799,
-    image: "https://m.media-amazon.com/images/I/41eFUZh+nHL.jpg",
-    details: [
-      "Massive 1TB storage capacity ideal for backing up project files, assignments, and multimedia content for college use.",
-      "Equipped with USB 3.0 interface for high-speed data transfers, while supporting older USB 2.0 ports for compatibility.",
-      "Rugged, shock-resistant casing protects data from minor bumps and accidental drops during transit.",
-      "Plug-and-play functionality—no drivers or software needed; compatible with Windows, macOS, and Linux systems.",
-    ],
-    dimensions: "11.5 x 8 x 1.5 cm",
-    seller: {
-      name: "Ritika Das",
-      email: "ritika.das@gmail.com",
-      joinedAt: "2024-01-10T00:00:00Z",
-      city: "Chennai",
-      college: "SRM University",
-    },
-  },
-  {
-    id: 25,
-    title: "Desk Organizer Set",
-    description: "5-in-1 set to keep your study desk clutter-free",
-    price: 549,
-    image: "https://m.media-amazon.com/images/I/41VSiPyZlzL.jpg",
-    details: [
-      "Includes a multifunctional pen stand, tray for papers or notes, and sticky note holder — ideal for daily study essentials.",
-      "Crafted from 100% recycled plastic, making it an eco-friendly and sustainable addition to your workspace.",
-      "Lightweight yet highly durable — can withstand daily use without wear and tear.",
-      "Features a modern minimalist matte black finish that blends seamlessly with any desk decor.",
-    ],
-
-    dimensions: "25 x 18 x 10 cm",
-    seller: {
-      name: "Harshit Sinha",
-      email: "harshit.sinha12@gmail.com",
-      joinedAt: "2024-05-06T00:00:00Z",
-      city: "Lucknow",
-      college: "IET Lucknow",
-    },
-  },
-  {
-    id: 26,
-    title: "Digital Drawing Tablet",
-    description:
-      "Perfect for online classes, note-taking, and creative sketches",
-    price: 2499,
-    image:
-      "https://m.media-amazon.com/images/I/51QoBaZBsjL._AC_SX296_SY426_FMwebp_QL65_.jpg",
-    details: [
-      "8192 levels of pressure sensitivity offer precise strokes and a natural writing/drawing feel — perfect for artists and students.",
-      "Battery-free stylus ensures uninterrupted usage without the hassle of charging.",
-      "Wide compatibility with major operating systems including Windows, macOS, and Android devices.",
-      "Compact working area (6 x 4 inches) ideal for note-taking, digital art, and editing tasks on the go.",
-    ],
-
-    dimensions: "20 x 14 x 1 cm",
-    seller: {
-      name: "Manya Arora",
-      email: "manya.arora22@gmail.com",
-      joinedAt: "2024-03-18T00:00:00Z",
-      city: "Jaipur",
-      college: "MNIT Jaipur",
-    },
-  },
-  {
-    id: 27,
-    title: "Rechargeable Desk Lamp",
-    description: "Eye-care LED lamp with adjustable brightness levels",
-    price: 699,
-    image:
-      "https://m.media-amazon.com/images/I/71hRle2Q7tL._AC_SX296_SY426_FMwebp_QL65_.jpg",
-    details: [
-      "Three adjustable brightness modes (low, medium, high) to suit different lighting needs like reading, writing, or relaxing.",
-      "Touch-sensitive control panel for easy operation with just a tap.",
-      "360° flexible neck design allows you to adjust the light angle in any direction for optimal focus.",
-      "Built-in 2000mAh rechargeable battery with USB charging support — offers up to 10 hours of usage per charge.",
-    ],
-
-    dimensions: "35 x 10 x 8 cm",
-    seller: {
-      name: "Pranav Mishra",
-      email: "pranav.mishra@gmail.com",
-      joinedAt: "2023-10-28T00:00:00Z",
-      city: "Bangalore",
-      college: "PES University",
-    },
-  },
-  {
-    id: 28,
-    title: "Portable Whiteboard",
-    description: "Double-sided mini whiteboard for quick notes and study plans",
-    price: 449,
-    image:
-      "https://m.media-amazon.com/images/I/51Hque+SehL._AC_SX296_SY426_FMwebp_QL65_.jpg",
-    details: [
-      "Dual-sided writing surface with magnetic support for notes or reminders — both erasable and rewritable.",
-      "Includes a marker, eraser, and built-in pen holder for convenience and quick use.",
-      "Durable aluminum frame and reinforced corners provide extra stability and long-lasting use.",
-      "Ideal for hostel rooms, dorm walls, or desk mounting — helps with daily planning and quick study recaps.",
-    ],
-
-    dimensions: "30 x 25 x 2 cm",
-    seller: {
-      name: "Divya Jain",
-      email: "divya.jain@studentmail.com",
-      joinedAt: "2024-06-09T00:00:00Z",
-      city: "Hyderabad",
-      college: "IIIT Hyderabad",
-    },
-  },
-  {
-    id: 29,
-    title: "Fitness Resistance Bands Set",
-    description: "Pack of 5 resistance bands for home workouts",
-    price: 599,
-    image:
-      "https://m.media-amazon.com/images/I/81ZbU6VSK8L._AC_SX444_SY639_FMwebp_QL65_.jpg",
-    details: [
-      "Set includes 5 resistance levels ranging from light to extra heavy, perfect for beginners to advanced users.",
-      "Constructed from 100% natural latex, offering flexibility, durability, and a skin-friendly texture.",
-      "Slip-resistant surface and tear-resistant design ensure safety during workouts.",
-      "Portable carry pouch included for easy storage and travel use — take your workouts anywhere.",
-    ],
-
-    dimensions: "25 x 5 x 4 cm",
-    seller: {
-      name: "Ishaan Ghosh",
-      email: "ishaan.ghosh@hotmail.com",
-      joinedAt: "2024-02-07T00:00:00Z",
-      city: "Kolkata",
-      college: "St. Xavier's College",
-    },
-  },
-  {
-    id: 30,
-    title: "Laptop Cooling Pad",
-    description: "Silent cooling pad with 5 fans for overheating laptops",
-    price: 1099,
-    image:
-      "https://m.media-amazon.com/images/I/61Lj90UBLGL._AC_SX444_SY639_FMwebp_QL65_.jpg",
-    details: [
-      "Equipped with 5 ultra-quiet high-speed fans that reduce laptop heat buildup effectively and silently.",
-      "Supports laptops up to 17 inches — compatible with most major laptop brands and models.",
-      "Integrated LED display and fan control buttons allow you to monitor and adjust speed settings.",
-      "Ergonomically designed with adjustable tilt angles to improve posture and typing comfort.",
-    ],
-
-    dimensions: "38 x 28 x 3.5 cm",
-    seller: {
-      name: "Tanvi Rathi",
-      email: "tanvi.rathi@gmail.com",
-      joinedAt: "2023-12-02T00:00:00Z",
-      city: "Mumbai",
-      college: "KJ Somaiya College",
-    },
-  },
-  {
-  id: 123456,
-  title: "MacBook Pro M2 13-inch",
-  description: "Lightly used MacBook Pro M2 with 1TB SSD, 16GB RAM — excellent condition and battery life.",
-  price: 114999,
-  image: "https://www.aptronixindia.com/media/catalog/product/cache/31f0162e6f7d821d2237f39577122a8a/m/b/mbp14-spacegray-gallery1-202310-removebg-preview.png",
-  details: [
-    "Apple M2 chip with 8-core CPU and 10-core GPU ensures lightning-fast performance and seamless multitasking.",
-    "1TB SSD delivers ultra-fast boot times, rapid file access, and ample storage for creative projects and development environments.",
-    "16GB unified memory supports heavy tasks like video editing, Xcode, Docker, and simultaneous app usage without lag.",
-    "13.3-inch Retina display with True Tone offers brilliant colors, crisp text, and exceptional brightness for all lighting conditions.",
-    "Battery health is above 95%, with up to 18 hours of typical usage per charge — ideal for long coding or design sessions.",
-    "Pre-installed with macOS Ventura and essential development tools like VS Code, Xcode, and Homebrew.",
-    "Sleek aluminum body with no scratches or dents, backlit Magic Keyboard, and large Force Touch trackpad.",
-    "Includes original 67W USB-C power adapter and box packaging."
-  ],
-  dimensions: "30.41 x 21.24 x 1.56 cm",
-  seller: {
-    name: "Rohan Mehta",
-    email: "rohan.mac@gmail.com",
-    joinedAt: "2024-11-15T15:30:00Z",
-    city: "Bengaluru",
-    college: "RV College of Engineering"
   }
-}
 ];
 
-module.exports = featuredProduct;
+export default featuredProduct;

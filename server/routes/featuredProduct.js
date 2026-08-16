@@ -1,15 +1,19 @@
 import express from 'express';
 import FeaturedProduct from '../models/featuredProduct.js';
+import featuredProductData from '../data/FeaturedProduct.js';
 
 const router = express.Router();
 
 router.get('/', async (req, res) => {
   try {
     const featuredProduct = await FeaturedProduct.find();
-    res.json(featuredProduct);
+    if (featuredProduct && featuredProduct.length > 0) {
+      return res.json(featuredProduct);
+    }
+    return res.json(featuredProductData);
   } catch (error) {
-    console.error('Error fetching featured products:', error.message);
-    res.status(500).json({ message: 'Error fetching deals', error });
+    console.warn('MongoDB query failed, returning fallback featured products:', error.message);
+    res.json(featuredProductData);
   }
 });
 

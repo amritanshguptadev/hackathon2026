@@ -1,21 +1,22 @@
 import { ArrowRight } from 'lucide-react';
 import React, { useEffect, useState } from "react";
-import {Link} from 'react-router-dom'
+import { Link } from 'react-router-dom';
 import { API_URL, resolveImageUrl } from "../../../config/api";
-
+import { DEMO_LISTINGS } from "../../../data/images";
 
 export default function FeatureProducts() {
-    const [FeatureProduct, setFeatureProduct] = useState([]);
+    const [FeatureProduct, setFeatureProduct] = useState(DEMO_LISTINGS);
 
     useEffect(() => {
         fetch(`${API_URL}/api/featured-products`)
             .then((res) => res.json())
             .then((data) => {
-                setFeatureProduct(data);
+                if (Array.isArray(data) && data.length > 0) {
+                    setFeatureProduct(data);
+                }
             })
             .catch((err) => {
-                console.error("Error fetching deals:", err);
-                setFeatureProduct([]);
+                console.error("Error fetching featured products:", err);
             });
     }, []);
 
@@ -55,24 +56,35 @@ export default function FeatureProducts() {
                     </div>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 w-full">
-                    {FeatureProduct.slice(0, 9).map((product) => (
-                        <Link key={product._id}
-                        to={`/api/product/${product._id}`}
-                        className="group"
-                        >
-                            <div
-                            className="p-4 rounded-2xl bg-white shadow-xs border border-indigo-50 hover:border-indigo-200 hover:shadow-lg transition-all duration-300 mb-6 flex flex-col justify-between h-80"
-                        >
-                                <img
-                                src={resolveImageUrl(product.image)}
-                                alt={product.title}
-                                className="w-full h-32 md:h-40 object-contain mb-2 transition-transform duration-300 group-hover:scale-105"
-                            />
-                            <p className="line-clamp-3 text-sm font-medium text-slate-700">{product.title || product.description}</p>
-                            <p className="text-lg text-emerald-600 font-bold mt-2">₹{product.price}</p>
-                        </div>
-                        </Link>
-                    ))}
+                    {FeatureProduct.slice(0, 9).map((product, index) => {
+                        const prodId = product._id || product.id || `bk-item-${index + 1}`;
+                        return (
+                            <Link
+                                key={prodId}
+                                to={`/api/product/${prodId}`}
+                                className="group"
+                            >
+                                <div className="p-4 rounded-2xl bg-white shadow-xs border border-indigo-50 hover:border-indigo-200 hover:shadow-lg transition-all duration-300 mb-6 flex flex-col justify-between h-80">
+                                    <div className="w-full h-36 md:h-44 bg-slate-50 rounded-xl p-2 flex items-center justify-center overflow-hidden mb-2">
+                                        <img
+                                            src={resolveImageUrl(product.image)}
+                                            alt={product.title}
+                                            className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
+                                        />
+                                    </div>
+                                    <p className="line-clamp-2 text-sm font-bold text-slate-800 group-hover:text-indigo-600 transition-colors">
+                                        {product.title || product.description}
+                                    </p>
+                                    <div className="flex items-center justify-between mt-2 pt-1 border-t border-slate-100">
+                                        <p className="text-base text-indigo-700 font-extrabold">₹{product.price}</p>
+                                        <span className="text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">
+                                            {product.condition || 'Verified'}
+                                        </span>
+                                    </div>
+                                </div>
+                            </Link>
+                        );
+                    })}
                 </div>
             </div>
         </section>

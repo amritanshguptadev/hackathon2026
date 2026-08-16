@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import FeaturedProduct from '../models/featuredProduct.js';
 import Deals from '../models/deals.js';
 import User from '../models/user.js';
+import featuredProductData from '../data/FeaturedProduct.js';
 import uploadProductImage from '../middleware/uploadProductImage.js';
 
 const router = express.Router();
@@ -25,18 +26,35 @@ async function getAuthUser(req) {
 
 // 1. GET Single Product Details by ID
 router.get('/api/product/:id', async (req, res) => {
+  const productId = req.params.id;
   try {
-    const productId = req.params.id;
-    let product = await FeaturedProduct.findById(productId);
-    if (!product) {
-      product = await Deals.findById(productId);
+    let product = null;
+    if (productId.match(/^[0-9a-fA-F]{24}$/)) {
+      product = await FeaturedProduct.findById(productId);
+      if (!product) {
+        product = await Deals.findById(productId);
+      }
     }
+    
+    if (!product) {
+      product = featuredProductData.find(
+        (p) => String(p.id) === String(productId) || String(p._id) === String(productId) || `bk-item-${p.id}` === String(productId)
+      );
+    }
+
     if (!product) {
       return res.status(404).json({ error: 'Product not found.' });
     }
 
     res.status(200).json(product);
   } catch (err) {
+    // Fallback search in memory dataset
+    const product = featuredProductData.find(
+      (p) => String(p.id) === String(productId) || String(p._id) === String(productId) || `bk-item-${p.id}` === String(productId)
+    );
+    if (product) {
+      return res.status(200).json(product);
+    }
     console.error('Error fetching product:', err);
     res.status(500).json({ error: 'Server error.' });
   }
