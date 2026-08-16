@@ -1,10 +1,84 @@
-import { Search, ShieldCheck, Zap, Sparkles, MapPin, Tag, ArrowRight } from "lucide-react";
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import {
+  Search,
+  ShieldCheck,
+  Zap,
+  MapPin,
+  Tag,
+  ChevronLeft,
+  ChevronRight,
+  School,
+  Sparkles,
+} from "lucide-react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+
+const REAL_CAMPUS_SLIDES = [
+  {
+    id: 1,
+    image:
+      "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=1200&auto=format&fit=crop&q=80",
+    campus: "IIT Delhi - North Campus",
+    spot: "Central Library Quad",
+    activity: "Laptop & Tech Peer Exchange",
+    badge: "💻 Up to 70% Off Student Tech",
+    badgeColor: "from-blue-600 to-indigo-600",
+  },
+  {
+    id: 2,
+    image:
+      "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=1200&auto=format&fit=crop&q=80",
+    campus: "Delhi University (DU) - North Campus",
+    spot: "Arts Faculty Book Bazaar",
+    activity: "Second-hand Textbooks & Notes",
+    badge: "📚 2,500+ Books & Notes Traded",
+    badgeColor: "from-indigo-600 to-purple-600",
+  },
+  {
+    id: 3,
+    image:
+      "https://images.unsplash.com/photo-1519452635265-7b1fbfd1e4e0?w=1200&auto=format&fit=crop&q=80",
+    campus: "BITS Pilani - SAC Plaza",
+    spot: "Student Activity Center Courtyard",
+    activity: "Campus Cycles & Dorm Essentials",
+    badge: "🚲 Instant Free Hand-off on Campus",
+    badgeColor: "from-emerald-600 to-teal-600",
+  },
+  {
+    id: 4,
+    image:
+      "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1200&auto=format&fit=crop&q=80",
+    campus: "IIT Bombay - Powai Campus",
+    spot: "Main Academic Building & Hostel 12",
+    activity: "Calculators, Lab Gear & Monitors",
+    badge: "🛡️ 100% Verified Student Members",
+    badgeColor: "from-rose-600 to-pink-600",
+  },
+];
 
 export default function Hero() {
   const [query, setQuery] = useState("");
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
   const navigate = useNavigate();
+
+  // Auto-play slideshow timer (every 4 seconds)
+  useEffect(() => {
+    if (isPaused) return;
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % REAL_CAMPUS_SLIDES.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, [isPaused]);
+
+  const handleNextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % REAL_CAMPUS_SLIDES.length);
+  };
+
+  const handlePrevSlide = () => {
+    setCurrentSlide((prev) =>
+      prev === 0 ? REAL_CAMPUS_SLIDES.length - 1 : prev - 1
+    );
+  };
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -19,9 +93,11 @@ export default function Hero() {
     navigate(`/all-products?category=${encodeURIComponent(tag)}`);
   };
 
+  const activeSlideData = REAL_CAMPUS_SLIDES[currentSlide];
+
   return (
     <section className="mx-auto max-w-7xl px-4 pt-4 sm:px-6 lg:px-8">
-      {/* ── CREATIVE SPLIT HERO SHOWCASE ── */}
+      {/* ── SPLIT HERO SHOWCASE WITH REAL CAMPUS SLIDESHOW ── */}
       <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-950 text-white shadow-xl border border-indigo-900/60 p-6 sm:p-10 lg:p-12">
         {/* Ambient Glows */}
         <div className="pointer-events-none absolute -top-24 -left-24 h-96 w-96 rounded-full bg-blue-600/25 blur-[100px]" />
@@ -32,7 +108,7 @@ export default function Hero() {
           <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-xs font-bold text-indigo-300 shadow-xs">
               <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>Live Campus Peer-to-Peer Marketplace</span>
+              <span>Live Indian Campus Peer-to-Peer Marketplace</span>
             </div>
 
             <h1
@@ -47,7 +123,7 @@ export default function Hero() {
             </h1>
 
             <p className="text-sm sm:text-base text-slate-300 max-w-xl mx-auto lg:mx-0 leading-relaxed font-normal">
-              Join thousands of verified students trading second-hand textbooks, electronics, cycles, and dorm essentials with zero shipping fees &amp; instant physical hand-offs.
+              Join thousands of students across IITs, BITS, DU, NITs &amp; top universities trading second-hand textbooks, electronics, cycles, and dorm gear with zero shipping fees.
             </p>
 
             {/* Global Quick Search Form */}
@@ -59,7 +135,7 @@ export default function Hero() {
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search laptops, cycles, books, monitors…"
+                placeholder="Search laptops, cycles, books, lab gear…"
                 className="min-w-0 flex-1 rounded-full bg-transparent px-4 py-2.5 text-xs sm:text-sm text-slate-900 outline-none placeholder:text-slate-400"
               />
               <button
@@ -120,42 +196,89 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* ── RIGHT: Creative 3D Illustration & Floating Badges (5 Cols) ── */}
-          <div className="lg:col-span-5 relative flex items-center justify-center">
-            {/* Visual Container */}
-            <div className="relative w-full rounded-3xl overflow-hidden shadow-2xl border-2 border-white/20 group">
-              <img
-                src="/images/hero_creative.jpg"
-                alt="BuyKaro Student Marketplace 3D Campus"
-                className="w-full h-auto object-cover transform transition-transform duration-700 group-hover:scale-105"
-                onError={(e) => {
-                  e.currentTarget.src =
-                    "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=1200&auto=format&fit=crop&q=80";
-                }}
-              />
-
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
-
-              {/* Floating Badge 1: Top Right (Recent Hand-off) */}
-              <div className="absolute top-3 right-3 rounded-2xl bg-slate-900/85 backdrop-blur-md p-2.5 border border-white/20 shadow-xl flex items-center gap-2 text-left animate-float">
-                <div className="h-8 w-8 rounded-xl bg-blue-600 flex items-center justify-center text-white shrink-0">
-                  <Tag size={15} />
+          {/* ── RIGHT: Real Indian Campus Interactive Slideshow (5 Cols) ── */}
+          <div
+            className="lg:col-span-5 relative"
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
+          >
+            {/* Slideshow Container Frame */}
+            <div className="relative aspect-[4/3] sm:aspect-[16/11] w-full rounded-3xl overflow-hidden shadow-2xl border-2 border-white/20 group">
+              {REAL_CAMPUS_SLIDES.map((slide, idx) => (
+                <div
+                  key={slide.id}
+                  className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
+                    idx === currentSlide ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none"
+                  }`}
+                >
+                  <img
+                    src={slide.image}
+                    alt={slide.campus}
+                    className="w-full h-full object-cover transform transition-transform duration-1000 scale-100 group-hover:scale-105"
+                  />
+                  {/* Subtle gradient vignette */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/30" />
                 </div>
-                <div>
-                  <p className="text-[11px] font-extrabold text-white leading-none">MacBook &amp; Tech</p>
-                  <p className="text-[9.5px] font-semibold text-emerald-400 mt-0.5">Up to 70% Off</p>
+              ))}
+
+              {/* Floating Top Badge: Campus Name */}
+              <div className="absolute top-3 left-3 z-20 rounded-2xl bg-slate-900/90 backdrop-blur-md py-1.5 px-3 border border-white/20 shadow-xl flex items-center gap-2">
+                <School size={14} className="text-indigo-400" />
+                <span className="text-xs font-bold text-white tracking-tight">
+                  {activeSlideData.campus}
+                </span>
+              </div>
+
+              {/* Floating Top Right Tag */}
+              <div className="absolute top-3 right-3 z-20 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 backdrop-blur-md py-1.5 px-3 border border-white/20 shadow-xl text-[10.5px] font-extrabold text-white">
+                {activeSlideData.badge}
+              </div>
+
+              {/* Bottom Caption Overlay */}
+              <div className="absolute bottom-3 left-3 right-3 z-20 rounded-2xl bg-slate-900/90 backdrop-blur-md p-3.5 border border-white/20 shadow-xl flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-1.5 text-slate-300 text-xs font-bold truncate">
+                    <MapPin size={13} className="text-emerald-400 shrink-0" />
+                    <span className="truncate">{activeSlideData.spot}</span>
+                  </div>
+                  <p className="text-[11px] text-slate-400 truncate mt-0.5">
+                    {activeSlideData.activity}
+                  </p>
+                </div>
+
+                {/* Slideshow Arrow Navigation */}
+                <div className="flex items-center gap-1 shrink-0">
+                  <button
+                    onClick={handlePrevSlide}
+                    className="h-7 w-7 rounded-full bg-white/15 hover:bg-white/30 text-white flex items-center justify-center transition cursor-pointer"
+                    aria-label="Previous slide"
+                  >
+                    <ChevronLeft size={16} />
+                  </button>
+                  <button
+                    onClick={handleNextSlide}
+                    className="h-7 w-7 rounded-full bg-white/15 hover:bg-white/30 text-white flex items-center justify-center transition cursor-pointer"
+                    aria-label="Next slide"
+                  >
+                    <ChevronRight size={16} />
+                  </button>
                 </div>
               </div>
 
-              {/* Floating Badge 2: Bottom Left (Meetup Safe Zone) */}
-              <div className="absolute bottom-3 left-3 rounded-2xl bg-slate-900/85 backdrop-blur-md p-2.5 border border-white/20 shadow-xl flex items-center gap-2 text-left">
-                <div className="h-8 w-8 rounded-xl bg-emerald-600 flex items-center justify-center text-white shrink-0">
-                  <MapPin size={15} />
-                </div>
-                <div>
-                  <p className="text-[11px] font-extrabold text-white leading-none">Library &amp; SAC Spot</p>
-                  <p className="text-[9.5px] font-semibold text-slate-300 mt-0.5">Same-day Hand-off</p>
-                </div>
+              {/* Slide Indicators / Dots */}
+              <div className="absolute bottom-16 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5">
+                {REAL_CAMPUS_SLIDES.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setCurrentSlide(idx)}
+                    className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                      idx === currentSlide
+                        ? "w-6 bg-white shadow-xs"
+                        : "w-1.5 bg-white/40 hover:bg-white/70"
+                    }`}
+                    aria-label={`Go to slide ${idx + 1}`}
+                  />
+                ))}
               </div>
             </div>
           </div>
