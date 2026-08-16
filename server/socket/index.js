@@ -1,9 +1,9 @@
-const { Server } = require('socket.io');
-const jwt = require('jsonwebtoken');
-const mongoose = require('mongoose');
-const UserModel = require('../models/user');
-const Conversation = require('../models/conversation');
-const Message = require('../models/message');
+import { Server } from 'socket.io';
+import jwt from 'jsonwebtoken';
+import mongoose from 'mongoose';
+import UserModel from '../models/user.js';
+import Conversation from '../models/conversation.js';
+import Message from '../models/message.js';
 
 const MAX_MESSAGE_LENGTH = 2000;
 const RATE_LIMIT_WINDOW_MS = 5000; // 5 seconds
@@ -289,4 +289,4 @@ function initSocket(server, allowedOrigins = []) {
   return io;
 }
 
-module.exports = initSocket;
+export default initSocket;

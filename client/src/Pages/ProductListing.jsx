@@ -21,18 +21,9 @@ import {
 import Header from "../assets/components/Home/Header";
 import Footer from "../assets/components/Home/Footer";
 import { formatINR } from "../components/PriceRangeFilter";
-import { API_BASE_URL } from "../config/api";
-
-const CATEGORIES = [
-  "Hostel Essentials",
-  "Electronics & Gadgets",
-  "Textbooks & Notes",
-  "Bicycles & Mobility",
-  "Fashion & Accessories",
-  "Sports & Fitness",
-  "Free / Giveaway",
-  "Others",
-];
+import { useAuth } from "../context/AuthContext";
+import { productService } from "../services/productService";
+import { categoryService, FALLBACK_CATEGORIES } from "../services/categoryService";
 
 const CONDITIONS = [
   { id: "Like New", label: "Like New", desc: "Barely used, in pristine condition with no defects." },
@@ -48,23 +39,23 @@ const LOCATIONS = [
   "Main Academic Block",
   "Sports Complex",
   "College Main Gate",
+  "North Hostel",
+  "West Campus",
   "Other / Negotiable",
 ];
 
 export default function ProductListing() {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
+  const { user, profile, isAuthenticated } = useAuth();
 
-  // Authenticated user state
-  const token = localStorage.getItem("token");
-  const userName = localStorage.getItem("loggedInUser") || "Campus Student";
-  const userCollege = localStorage.getItem("college") || "University Campus";
-  const userStudentId = localStorage.getItem("studentId") || "STU-1001";
-  const isAuthenticated = !!token || !!localStorage.getItem("loggedInUser");
+  // Dynamic categories from Supabase
+  const [categoriesList, setCategoriesList] = useState(FALLBACK_CATEGORIES);
 
   // Form states
   const [title, setTitle] = useState("");
-  const [category, setCategory] = useState("Hostel Essentials");
+  const [categoryId, setCategoryId] = useState("");
+  const [categoryName, setCategoryName] = useState("Hostel Essentials");
   const [price, setPrice] = useState("");
   const [isFree, setIsFree] = useState(false);
   const [condition, setCondition] = useState("Good");
@@ -81,6 +72,16 @@ export default function ProductListing() {
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
+
+  useEffect(() => {
+    categoryService.getActiveCategories().then((cats) => {
+      if (cats && cats.length > 0) {
+        setCategoriesList(cats);
+        setCategoryId(cats[0].id);
+        setCategoryName(cats[0].name);
+      }
+    });
+  }, []);
 
   // Handle Free Toggle
   const handleFreeToggle = (e) => {
@@ -198,72 +199,63 @@ export default function ProductListing() {
       return;
     }
 
+    if (!isAuthenticated || !user?.id) {
+      toast.info("Please login to list items.");
+      navigate("/login");
+      return;
+    }
+
     setIsSubmitting(true);
-    let savedProduct = null;
-    const sellerData = {
-      name: userName,
-      college: userCollege,
-      studentId: userStudentId,
-    };
-
     try {
-      const formData = new FormData();
-      formData.append("title", title.trim());
-      formData.append("description", description.trim());
-      formData.append("price", isFree ? "0" : price);
-      formData.append("details", features.trim());
-      formData.append("dimensions", dimensions.trim());
-      formData.append("category", category);
-      formData.append("condition", condition);
-      formData.append("location", campusLocation);
-      formData.append("seller", JSON.stringify(sellerData));
+      const imageFiles = images.map((i) => i.file).filter(Boolean);
 
-      if (images.length > 0 && images[0].file) {
-        formData.append("productImage", images[0].file);
-      }
+      const productPayload = {
+        sellerId: user.id,
+        categoryId: categoryId || null,
+        title: title.trim(),
+        description: description.trim() + (features ? `\n\nFeatures:\n${features.trim()}` : ""),
+        price: isFree ? 0 : price,
+        isFree: !!isFree,
+        condition,
+        campusLocation,
+      };
 
-      try {
-        const response = await fetch(`${API_BASE_URL}/api/products`, {
-          method: "POST",
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-          body: formData,
-        });
+      const created = await productService.createProduct(productPayload, imageFiles);
 
-        if (response.ok) {
-          savedProduct = await response.json();
-        }
-      } catch (networkErr) {
-        console.warn("Backend API not reachable, falling back to local storage sync:", networkErr);
-      }
+      // Persist to local listings storage as well so it appears in My Listings & Marketplace
+      const fallbackItem = {
+        _id: created?.id || `custom-${Date.now()}`,
+        id: created?.id,
+        title: title.trim(),
+        description: description.trim(),
+        price: isFree ? "FREE" : Number(price),
+        numericPrice: isFree ? 0 : Number(price),
+        isFree: !!isFree,
+        category: categoryName || "Hostel Essentials",
+        condition,
+        campusLocation,
+        location: campusLocation,
+        status: "Available",
+        image: images[0]?.preview || "/images/products/desk-lamp.png",
+        images: images.map((i) => i.preview),
+        seller: {
+          name: profile?.fullName || user?.email?.split("@")[0] || "Campus Seller",
+          email: user?.email || "seller@buykaro.in",
+          college: profile?.college || "Campus Member",
+        },
+        timeAgo: "Just now",
+        createdAt: new Date().toISOString(),
+      };
 
-      // If backend was offline or saved locally, construct fallback item
-      if (!savedProduct) {
-        savedProduct = {
-          _id: `custom-${Date.now()}`,
-          title: title.trim(),
-          description: description.trim(),
-          price: isFree ? "FREE" : Number(price),
-          numericPrice: isFree ? 0 : Number(price),
-          isFree,
-          category,
-          condition,
-          campusLocation,
-          location: campusLocation,
-          status: "Available",
-          image: images[0]?.preview || "/images/products/desk-lamp.png",
-          images: images.map((i) => i.preview),
-          seller: sellerData,
-          timeAgo: "Just now",
-          createdAt: new Date().toISOString(),
-        };
-      }
-
-      // Persist to local listings storage so it appears in My Listings & Marketplace
-      const existingCustom = JSON.parse(localStorage.getItem("buykaro_user_listings") || localStorage.getItem("studx_user_listings") || "[]");
-      existingCustom.unshift(savedProduct);
+      const existingCustom = JSON.parse(
+        localStorage.getItem("buykaro_user_listings") ||
+        localStorage.getItem("studx_user_listings") ||
+        "[]"
+      );
+      existingCustom.unshift(fallbackItem);
       localStorage.setItem("buykaro_user_listings", JSON.stringify(existingCustom));
 
-      toast.success("🎉 Your item has been listed successfully!");
+      toast.success("🎉 Your item has been listed successfully on BuyKaro!");
       setShowPreviewModal(false);
 
       setTimeout(() => {
@@ -271,7 +263,7 @@ export default function ProductListing() {
       }, 900);
     } catch (err) {
       console.error("Publishing error:", err);
-      toast.error("Failed to publish listing. Please try again.");
+      toast.error(err.message || "Failed to publish listing. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -442,13 +434,18 @@ export default function ProductListing() {
                 Category <span className="text-rose-500">*</span>
               </label>
               <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
+                value={categoryId}
+                onChange={(e) => {
+                  const selId = e.target.value;
+                  setCategoryId(selId);
+                  const found = categoriesList.find((c) => c.id === selId);
+                  if (found) setCategoryName(found.name);
+                }}
                 className="w-full rounded-2xl border border-[var(--cm-border)] bg-slate-50/50 px-4 py-3 text-sm text-[var(--cm-ink)] outline-none transition focus:border-[var(--cm-blue)] focus:bg-white focus:ring-2 focus:ring-[var(--cm-blue)]/20 cursor-pointer"
               >
-                {CATEGORIES.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat}
+                {categoriesList.map((cat) => (
+                  <option key={cat.id || cat.name} value={cat.id || cat.name}>
+                    {cat.emoji ? `${cat.emoji} ` : ""}{cat.name}
                   </option>
                 ))}
               </select>

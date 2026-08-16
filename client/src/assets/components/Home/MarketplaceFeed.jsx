@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Search, ShieldCheck } from "lucide-react";
 import ProductCard from "./ProductCard";
 import { DEMO_LISTINGS, IMAGES } from "../../../data/images";
-import { API_URL } from "../../../config/api";
+import { productService } from "../../../services/productService";
 
 const WANTED = [
   "Looking for a second-hand cycle",
@@ -15,7 +15,8 @@ function normalizeProduct(p, index) {
   const statuses = ["Available", "Available", "Reserved", "Sold"];
   const fallbackImages = Object.values(IMAGES.products);
   return {
-    _id: p._id,
+    _id: p._id || p.id,
+    id: p._id || p.id,
     title: p.title || p.name || "Campus listing",
     price: p.price ?? "—",
     image: p.image || fallbackImages[index % fallbackImages.length],
@@ -31,17 +32,13 @@ export default function MarketplaceFeed() {
   const [listings, setListings] = useState(DEMO_LISTINGS);
 
   useEffect(() => {
-    Promise.all([
-      fetch(`${API_URL}/api/featured-products`).then((r) => r.json()),
-      fetch(`${API_URL}/api/deals`).then((r) => r.json()),
-    ])
-      .then(([featured, deals]) => {
-        const merged = [
-          ...(Array.isArray(featured) ? featured : []),
-          ...(Array.isArray(deals) ? deals : []),
-        ];
-        if (merged.length === 0) return;
-        setListings(merged.slice(0, 6).map(normalizeProduct));
+    productService.getProducts({ limit: 6 })
+      .then((data) => {
+        if (data && data.length > 0) {
+          setListings(data.map(normalizeProduct));
+        } else {
+          setListings(DEMO_LISTINGS);
+        }
       })
       .catch(() => setListings(DEMO_LISTINGS));
   }, []);

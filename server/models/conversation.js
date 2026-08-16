@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
 const conversationSchema = new Schema(
@@ -74,6 +74,6 @@ conversationSchema.index({ seller: 1, updatedAt: -1 });
 // Query index for finding conversations linked to a specific product
 conversationSchema.index({ product: 1 });
 
-const Conversation = mongoose.model('Conversation', conversationSchema);
+const Conversation = mongoose.models.Conversation || mongoose.model('Conversation', conversationSchema);
 
-module.exports = Conversation;
+export default Conversation;

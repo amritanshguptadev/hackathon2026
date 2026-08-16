@@ -3,9 +3,12 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import Header from "../Home/Header";
 import Footer from "../Home/Footer";
 import { useCart } from "../../../context/CartContext";
-import { ToastContainer } from "react-toastify";
-import { handleError } from "../../../utils";
-import { API_URL, resolveMediaUrl } from "../../../config/api";
+import { useAuth } from "../../../context/AuthContext";
+import { productService } from "../../../services/productService";
+import { favoriteService } from "../../../services/favoriteService";
+import { ToastContainer, toast } from "react-toastify";
+import { resolveMediaUrl } from "../../../config/api";
+import { DEMO_LISTINGS } from "../../../data/images";
 import {
   Loader,
   ArrowLeft,
@@ -16,79 +19,97 @@ import {
   MapPin,
   School,
   Calendar,
-  Mail,
   Sparkles,
   Tag,
-  CheckCircle2
+  CheckCircle2,
+  Heart
 } from "lucide-react";
 
 export default function ProductDetails() {
   const { id } = useParams();
-  const [product, setProduct] = useState({});
+  const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isFav, setIsFav] = useState(false);
   const [contacting, setContacting] = useState(false);
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { user, isAuthenticated } = useAuth();
 
   useEffect(() => {
     setLoading(true);
-    fetch(`${API_URL}/api/product/${id}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setProduct(data);
-      })
-      .catch((err) => {
-        console.error("Error fetching product:", err);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    if (productService?.getProductById) {
+      productService
+        .getProductById(id)
+        .then((data) => {
+          if (data) {
+            setProduct(data);
+          } else {
+            const fallback = DEMO_LISTINGS.find(
+              (p) => String(p._id) === String(id) || String(p.id) === String(id)
+            );
+            setProduct(fallback || null);
+          }
+        })
+        .catch(() => {
+          const fallback = DEMO_LISTINGS.find(
+            (p) => String(p._id) === String(id) || String(p.id) === String(id)
+          );
+          setProduct(fallback || null);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    } else {
+      const fallback = DEMO_LISTINGS.find(
+        (p) => String(p._id) === String(id) || String(p.id) === String(id)
+      );
+      setProduct(fallback || null);
+      setLoading(false);
+    }
   }, [id]);
 
   const handleAddToCart = () => {
-    if (!product || !product._id) return;
+    if (!product) return;
     addToCart(product, 1);
   };
 
   const handleBuyNow = () => {
-    if (!product || !product._id) return;
+    if (!product) return;
     addToCart(product, 1);
-    navigate('/cart');
+    navigate("/cart");
   };
 
-  const handleContactSeller = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) {
+  const handleToggleFavorite = async () => {
+    if (!isAuthenticated) {
+      toast.info("Please log in to save items to your wishlist");
       navigate("/login");
       return;
     }
-
     try {
-      setContacting(true);
-      const res = await fetch(`${API_URL}/api/conversations`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token,
-        },
-        body: JSON.stringify({ productId: id }),
-      });
-
-      const data = await res.json();
-      if (res.ok && data.success && data.conversation) {
-        navigate(`/messages/${data.conversation._id}`);
+      if (isFav) {
+        await favoriteService?.removeFavorite?.(user.id, id);
+        setIsFav(false);
+        toast.info("Removed from saved items");
       } else {
-        handleError(data.message || "Failed to start conversation");
+        await favoriteService?.addFavorite?.(user.id, id);
+        setIsFav(true);
+        toast.success("Saved to your campus wishlist!");
       }
-    } catch (err) {
-      console.error("Error contacting seller:", err);
-      handleError("Could not start conversation. Please try again.");
-    } finally {
-      setContacting(false);
+    } catch {
+      setIsFav(!isFav);
     }
   };
 
-  if (loading || !product.title) {
+  const handleContactSeller = () => {
+    if (!isAuthenticated) {
+      toast.info("Please log in to chat with student sellers");
+      navigate("/login");
+      return;
+    }
+    navigate("/messages");
+  };
+
+  if (loading) {
     return (
       <div className="min-h-screen bg-[var(--cm-bg)] flex flex-col justify-between">
         <Header showSearchBar={false} />
@@ -101,25 +122,54 @@ export default function ProductDetails() {
     );
   }
 
+  if (!product || !product.title) {
+    return (
+      <div className="min-h-screen bg-[var(--cm-bg)] flex flex-col justify-between">
+        <Header showSearchBar={false} />
+        <div className="text-center p-12 max-w-md mx-auto">
+          <h2 className="text-xl font-bold text-slate-900 mb-2">Product Not Found</h2>
+          <p className="text-sm text-slate-500 mb-6">This listing may have been removed or sold.</p>
+          <Link
+            to="/all-products"
+            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full cm-gradient-btn text-white font-bold text-sm shadow-md"
+          >
+            <ArrowLeft size={16} /> Return to Marketplace
+          </Link>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[var(--cm-bg)] flex flex-col justify-between">
       <Header showSearchBar={false} />
       <ToastContainer position="top-right" autoClose={3000} />
 
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6">
-        {/* Navigation bar */}
-        <div className="mb-6">
+        {/* Navigation & Favorite */}
+        <div className="mb-6 flex items-center justify-between">
           <button
             onClick={() => navigate(-1)}
             className="inline-flex items-center gap-2 text-sm font-semibold text-indigo-600 hover:text-indigo-800 transition cursor-pointer"
           >
             <ArrowLeft size={16} /> Back to Marketplace
           </button>
+          <button
+            onClick={handleToggleFavorite}
+            className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full border text-xs font-bold transition cursor-pointer ${
+              isFav
+                ? "bg-rose-50 border-rose-200 text-rose-600"
+                : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
+            }`}
+          >
+            <Heart size={15} className={isFav ? "fill-rose-500 text-rose-500" : ""} />
+            {isFav ? "Saved" : "Save Item"}
+          </button>
         </div>
 
         {/* Product Details Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          
           {/* Left Column: Image Card */}
           <div className="lg:col-span-5">
             <div className="rounded-3xl bg-white border border-indigo-100 p-6 sm:p-8 shadow-sm flex items-center justify-center sticky top-24">
@@ -133,7 +183,6 @@ export default function ProductDetails() {
 
           {/* Right Column: Information & Actions */}
           <div className="lg:col-span-7 space-y-6">
-            
             {/* Title & Price Card */}
             <div className="rounded-3xl bg-white border border-indigo-100 p-6 sm:p-8 shadow-sm">
               <div className="flex items-center gap-2 mb-3">
@@ -153,16 +202,20 @@ export default function ProductDetails() {
                 {product.title}
               </h1>
 
-              <p className="mt-2 text-sm text-slate-600 leading-relaxed">
+              <p className="mt-2 text-sm text-slate-600 leading-relaxed whitespace-pre-line">
                 {product.description}
               </p>
 
               {/* Price Banner */}
               <div className="mt-5 p-4 rounded-2xl bg-gradient-to-r from-blue-50/80 via-indigo-50/80 to-purple-50/80 border border-indigo-100 flex items-center justify-between">
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Student Price</p>
+                  <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                    Student Price
+                  </p>
                   <p className="text-3xl font-extrabold text-indigo-700">
-                    ₹{product.price}
+                    {product.isFree || product.price === 0
+                      ? "FREE"
+                      : `₹${typeof product.price === "number" ? product.price.toLocaleString("en-IN") : product.price}`}
                   </p>
                 </div>
                 <div className="text-right text-xs font-semibold text-emerald-700 bg-emerald-100/80 px-3 py-1.5 rounded-xl">
@@ -271,9 +324,7 @@ export default function ProductDetails() {
                 </div>
               </div>
             )}
-
           </div>
-
         </div>
       </main>
 

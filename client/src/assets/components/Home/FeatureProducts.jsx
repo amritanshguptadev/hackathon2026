@@ -3,21 +3,36 @@ import React, { useEffect, useState } from "react";
 import { Link } from 'react-router-dom';
 import { API_URL, resolveImageUrl } from "../../../config/api";
 import { DEMO_LISTINGS } from "../../../data/images";
+import { productService } from "../../../services/productService";
 
 export default function FeatureProducts() {
     const [FeatureProduct, setFeatureProduct] = useState(DEMO_LISTINGS);
 
     useEffect(() => {
-        fetch(`${API_URL}/api/featured-products`)
-            .then((res) => res.json())
-            .then((data) => {
-                if (Array.isArray(data) && data.length > 0) {
-                    setFeatureProduct(data);
-                }
-            })
-            .catch((err) => {
-                console.error("Error fetching featured products:", err);
-            });
+        if (productService?.getProducts) {
+            productService.getProducts({ limit: 9 })
+                .then((data) => {
+                    if (data && data.length > 0) {
+                        setFeatureProduct(data);
+                    } else {
+                        setFeatureProduct(DEMO_LISTINGS);
+                    }
+                })
+                .catch(() => {
+                    setFeatureProduct(DEMO_LISTINGS);
+                });
+        } else {
+            fetch(`${API_URL}/api/featured-products`)
+                .then((res) => res.json())
+                .then((data) => {
+                    if (Array.isArray(data) && data.length > 0) {
+                        setFeatureProduct(data);
+                    }
+                })
+                .catch(() => {
+                    setFeatureProduct(DEMO_LISTINGS);
+                });
+        }
     }, []);
 
     return (
@@ -76,7 +91,9 @@ export default function FeatureProducts() {
                                         {product.title || product.description}
                                     </p>
                                     <div className="flex items-center justify-between mt-2 pt-1 border-t border-slate-100">
-                                        <p className="text-base text-indigo-700 font-extrabold">₹{product.price}</p>
+                                        <p className="text-base text-indigo-700 font-extrabold">
+                                            ₹{typeof product.price === "number" ? product.price.toLocaleString("en-IN") : product.price}
+                                        </p>
                                         <span className="text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">
                                             {product.condition || 'Verified'}
                                         </span>
