@@ -3,55 +3,37 @@ import {
   ShieldCheck,
   Zap,
   MapPin,
-  Tag,
   ChevronLeft,
   ChevronRight,
-  School,
-  Sparkles,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-const REAL_CAMPUS_SLIDES = [
+const CAMPUS_SLIDES = [
   {
     id: 1,
-    image:
-      "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=1200&auto=format&fit=crop&q=80",
-    campus: "Dev Sanskriti Vishwavidyalaya (DSVV)",
-    spot: "Central Library & Shantikunj Quad",
-    activity: "Laptop & Tech Peer Exchange",
-    badge: "💻 Up to 70% Off Student Tech",
-    badgeColor: "from-blue-600 to-indigo-600",
+    image: "/images/c1.jpg",
+    alt: "Dev Sanskriti Vishwavidyalaya Campus 1",
   },
   {
     id: 2,
-    image:
-      "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=1200&auto=format&fit=crop&q=80",
-    campus: "Dev Sanskriti Vishwavidyalaya",
-    spot: "Academic Block Book Bazaar",
-    activity: "Second-hand Textbooks & Notes",
-    badge: "📚 2,500+ Books & Notes Traded",
-    badgeColor: "from-indigo-600 to-purple-600",
+    image: "/images/c2.jpg",
+    alt: "Dev Sanskriti Vishwavidyalaya Campus 2",
   },
   {
     id: 3,
-    image:
-      "https://images.unsplash.com/photo-1519452635265-7b1fbfd1e4e0?w=1200&auto=format&fit=crop&q=80",
-    campus: "Dev Sanskriti Vishwavidyalaya",
-    spot: "Mahakal Hostel & Sports Complex",
-    activity: "Campus Cycles & Dorm Essentials",
-    badge: "🚲 Instant Free Hand-off on Campus",
-    badgeColor: "from-emerald-600 to-teal-600",
+    image: "/images/c3.jpg",
+    alt: "Dev Sanskriti Vishwavidyalaya Campus 3",
   },
   {
     id: 4,
-    image:
-      "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1200&auto=format&fit=crop&q=80",
-    campus: "Dev Sanskriti Vishwavidyalaya",
-    spot: "Yagya Shala & Main Gate Area",
-    activity: "Calculators, Lab Gear & Electronics",
-    badge: "🛡️ 100% Verified DSVV Members",
-    badgeColor: "from-rose-600 to-pink-600",
+    image: "/images/c4.jpg",
+    alt: "Dev Sanskriti Vishwavidyalaya Campus 4",
+  },
+  {
+    id: 5,
+    image: "/images/c9.jpg",
+    alt: "Dev Sanskriti Vishwavidyalaya Campus 5",
   },
 ];
 
@@ -61,22 +43,22 @@ export default function Hero() {
   const [isPaused, setIsPaused] = useState(false);
   const navigate = useNavigate();
 
-  // Auto-play slideshow timer (every 4 seconds)
+  // Auto-play slideshow timer (every 3.5 seconds)
   useEffect(() => {
     if (isPaused) return;
     const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % REAL_CAMPUS_SLIDES.length);
-    }, 4000);
+      setCurrentSlide((prev) => (prev + 1) % CAMPUS_SLIDES.length);
+    }, 3500);
     return () => clearInterval(timer);
   }, [isPaused]);
 
   const handleNextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % REAL_CAMPUS_SLIDES.length);
+    setCurrentSlide((prev) => (prev + 1) % CAMPUS_SLIDES.length);
   };
 
   const handlePrevSlide = () => {
     setCurrentSlide((prev) =>
-      prev === 0 ? REAL_CAMPUS_SLIDES.length - 1 : prev - 1
+      prev === 0 ? CAMPUS_SLIDES.length - 1 : prev - 1
     );
   };
 
@@ -93,11 +75,9 @@ export default function Hero() {
     navigate(`/all-products?category=${encodeURIComponent(tag)}`);
   };
 
-  const activeSlideData = REAL_CAMPUS_SLIDES[currentSlide];
-
   return (
     <section className="mx-auto max-w-7xl px-4 pt-4 sm:px-6 lg:px-8">
-      {/* ── SPLIT HERO SHOWCASE WITH REAL CAMPUS SLIDESHOW ── */}
+      {/* ── SPLIT HERO SHOWCASE WITH CLEAN CAMPUS SLIDESHOW ── */}
       <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-950 text-white shadow-xl border border-indigo-900/60 p-6 sm:p-10 lg:p-12">
         {/* Ambient Glows */}
         <div className="pointer-events-none absolute -top-24 -left-24 h-96 w-96 rounded-full bg-blue-600/25 blur-[100px]" />
@@ -170,7 +150,7 @@ export default function Hero() {
                 </div>
                 <div>
                   <p className="text-xs font-bold text-white leading-none">100% Verified</p>
-                  <p className="text-[10px] text-slate-400 mt-0.5">Campus Students</p>
+                  <p className="text-[10px] text-slate-400 mt-0.5">DSVV Students</p>
                 </div>
               </div>
 
@@ -190,21 +170,21 @@ export default function Hero() {
                 </div>
                 <div>
                   <p className="text-xs font-bold text-white leading-none">Campus Spots</p>
-                  <p className="text-[10px] text-slate-400 mt-0.5">Library / Hostels</p>
+                  <p className="text-[10px] text-slate-400 mt-0.5">Hostels &amp; Library</p>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* ── RIGHT: Real Indian Campus Interactive Slideshow (5 Cols) ── */}
+          {/* ── RIGHT: Clean Real Campus Image Slideshow (5 Cols) ── */}
           <div
             className="lg:col-span-5 relative"
             onMouseEnter={() => setIsPaused(true)}
             onMouseLeave={() => setIsPaused(false)}
           >
             {/* Slideshow Container Frame */}
-            <div className="relative aspect-[4/3] sm:aspect-[16/11] w-full rounded-3xl overflow-hidden shadow-2xl border-2 border-white/20 group">
-              {REAL_CAMPUS_SLIDES.map((slide, idx) => (
+            <div className="relative aspect-[4/3] sm:aspect-[16/11] w-full rounded-3xl overflow-hidden shadow-2xl border-2 border-white/20 group bg-slate-950">
+              {CAMPUS_SLIDES.map((slide, idx) => (
                 <div
                   key={slide.id}
                   className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
@@ -213,68 +193,43 @@ export default function Hero() {
                 >
                   <img
                     src={slide.image}
-                    alt={slide.campus}
+                    alt={slide.alt}
                     className="w-full h-full object-cover transform transition-transform duration-1000 scale-100 group-hover:scale-105"
+                    onError={(e) => {
+                      e.currentTarget.src =
+                        "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=1200&auto=format&fit=crop&q=80";
+                    }}
                   />
-                  {/* Subtle gradient vignette */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/30" />
                 </div>
               ))}
 
-              {/* Floating Top Badge: Campus Name */}
-              <div className="absolute top-3 left-3 z-20 rounded-2xl bg-slate-900/90 backdrop-blur-md py-1.5 px-3 border border-white/20 shadow-xl flex items-center gap-2">
-                <School size={14} className="text-indigo-400" />
-                <span className="text-xs font-bold text-white tracking-tight">
-                  {activeSlideData.campus}
-                </span>
-              </div>
+              {/* Minimal Left / Right Arrows on Hover */}
+              <button
+                onClick={handlePrevSlide}
+                className="absolute left-3 top-1/2 -translate-y-1/2 z-20 h-9 w-9 rounded-full bg-black/40 hover:bg-black/70 text-white flex items-center justify-center backdrop-blur-md transition-all opacity-80 hover:opacity-100 hover:scale-110 cursor-pointer"
+                aria-label="Previous slide"
+              >
+                <ChevronLeft size={20} />
+              </button>
 
-              {/* Floating Top Right Tag */}
-              <div className="absolute top-3 right-3 z-20 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 backdrop-blur-md py-1.5 px-3 border border-white/20 shadow-xl text-[10.5px] font-extrabold text-white">
-                {activeSlideData.badge}
-              </div>
+              <button
+                onClick={handleNextSlide}
+                className="absolute right-3 top-1/2 -translate-y-1/2 z-20 h-9 w-9 rounded-full bg-black/40 hover:bg-black/70 text-white flex items-center justify-center backdrop-blur-md transition-all opacity-80 hover:opacity-100 hover:scale-110 cursor-pointer"
+                aria-label="Next slide"
+              >
+                <ChevronRight size={20} />
+              </button>
 
-              {/* Bottom Caption Overlay */}
-              <div className="absolute bottom-3 left-3 right-3 z-20 rounded-2xl bg-slate-900/90 backdrop-blur-md p-3.5 border border-white/20 shadow-xl flex items-center justify-between gap-3">
-                <div className="min-w-0">
-                  <div className="flex items-center gap-1.5 text-slate-300 text-xs font-bold truncate">
-                    <MapPin size={13} className="text-emerald-400 shrink-0" />
-                    <span className="truncate">{activeSlideData.spot}</span>
-                  </div>
-                  <p className="text-[11px] text-slate-400 truncate mt-0.5">
-                    {activeSlideData.activity}
-                  </p>
-                </div>
-
-                {/* Slideshow Arrow Navigation */}
-                <div className="flex items-center gap-1 shrink-0">
-                  <button
-                    onClick={handlePrevSlide}
-                    className="h-7 w-7 rounded-full bg-white/15 hover:bg-white/30 text-white flex items-center justify-center transition cursor-pointer"
-                    aria-label="Previous slide"
-                  >
-                    <ChevronLeft size={16} />
-                  </button>
-                  <button
-                    onClick={handleNextSlide}
-                    className="h-7 w-7 rounded-full bg-white/15 hover:bg-white/30 text-white flex items-center justify-center transition cursor-pointer"
-                    aria-label="Next slide"
-                  >
-                    <ChevronRight size={16} />
-                  </button>
-                </div>
-              </div>
-
-              {/* Slide Indicators / Dots */}
-              <div className="absolute bottom-16 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5">
-                {REAL_CAMPUS_SLIDES.map((_, idx) => (
+              {/* Clean Dot Indicators at Bottom */}
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/20">
+                {CAMPUS_SLIDES.map((_, idx) => (
                   <button
                     key={idx}
                     onClick={() => setCurrentSlide(idx)}
-                    className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                    className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
                       idx === currentSlide
                         ? "w-6 bg-white shadow-xs"
-                        : "w-1.5 bg-white/40 hover:bg-white/70"
+                        : "w-2 bg-white/50 hover:bg-white/80"
                     }`}
                     aria-label={`Go to slide ${idx + 1}`}
                   />
