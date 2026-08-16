@@ -1,113 +1,347 @@
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { Search, ChevronRight } from "lucide-react";
-import { categoryService, FALLBACK_CATEGORIES } from "../../../services/categoryService";
-import { wantedService } from "../../../services/wantedService";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  Menu,
+  ChevronDown,
+  ChevronUp,
+  Car,
+  Bike,
+  Building2,
+  Tv,
+  Smartphone,
+  Truck,
+  Briefcase,
+  Armchair,
+  Shirt,
+  PawPrint,
+  BookOpen,
+  Wrench,
+  Search,
+} from "lucide-react";
 
-const FALLBACK_WANTED = [
-  "Looking for a second-hand cycle",
-  "Need a mini fridge for hostel",
-  "Wanted: Scientific calculator",
-  "Looking for GATE prep books",
+const QUICK_CATEGORY_PILLS = [
+  "Cars",
+  "Motorcycles",
+  "Mobile Phones",
+  "For Sale: Houses & Apartments",
+  "For Rent: Houses & Apartments",
+  "Beds-Wardrobes",
+  "TVs, Video - Audio",
 ];
 
+const CATEGORIES_DATA = {
+  col1: [
+    {
+      title: "Cars",
+      icon: "🚗",
+      items: [],
+    },
+    {
+      title: "Bikes",
+      icon: "🏍️",
+      items: ["Motorcycles", "Scooters", "Spare Parts", "Bicycles"],
+    },
+    {
+      title: "Properties",
+      icon: "🏢",
+      items: [
+        "For Sale: Houses & Apartments",
+        "For Rent: Houses & Apartments",
+        "Lands & Plots",
+        "For Sale: New Projects & Properties",
+        "For Rent: Shops & Offices",
+        "For Sale: Shops & Offices",
+        "PG & Guest Houses",
+      ],
+    },
+    {
+      title: "Electronics & Appliances",
+      icon: "🖥️",
+      items: [
+        "TVs, Video - Audio",
+        "Kitchen & Other Appliances",
+        "Computers & Laptops",
+        "Cameras & Lenses",
+        "Games & Entertainment",
+        "Fridges",
+        "Computer Accessories",
+        "Hard Disks, Printers & Monitors",
+        "ACs",
+        "Washing Machines",
+      ],
+    },
+  ],
+  col2: [
+    {
+      title: "Mobiles",
+      icon: "📱",
+      items: ["Mobile Phones", "Accessories", "Tablets"],
+    },
+    {
+      title: "Commercial Vehicles & Spares",
+      icon: "🛺",
+      items: ["Commercial & Other Vehicles", "Spare Parts"],
+    },
+    {
+      title: "Jobs",
+      icon: "💼",
+      items: [
+        "Data entry & Back office",
+        "Sales & Marketing",
+        "BPO & Telecaller",
+        "Driver",
+        "Office Assistant",
+        "Delivery & Collection",
+        "Teacher",
+        "Cook",
+        "Receptionist & Front office",
+        "Operator & Technician",
+        "IT Engineer & Developer",
+        "Hotel & Travel Executive",
+        "Accountant",
+        "Warehouse Staff",
+        "Designer",
+        "Security Guards",
+        "Other Jobs",
+      ],
+    },
+  ],
+  col3: [
+    {
+      title: "Furniture",
+      icon: "🛋️",
+      items: [
+        "Sofa & Dining",
+        "Beds & Wardrobes",
+        "Home Decor & Garden",
+        "Kids Furniture",
+        "Other Household Items",
+      ],
+    },
+    {
+      title: "Fashion",
+      icon: "👕",
+      items: ["Men", "Women", "Kids"],
+    },
+    {
+      title: "Pets",
+      icon: "🐶",
+      items: [
+        "Fishes & Aquarium",
+        "Pet Food & Accessories",
+        "Dogs",
+        "Other Pets",
+      ],
+    },
+  ],
+  col4: [
+    {
+      title: "Books, Sports & Hobbies",
+      icon: "🎸",
+      items: [
+        "Books",
+        "Gym & Fitness",
+        "Musical Instruments",
+        "Sports Equipment",
+        "Other Hobbies",
+      ],
+    },
+    {
+      title: "Services",
+      icon: "🛠️",
+      items: [
+        "Education & Classes",
+        "Tours & Travel",
+        "Electronics Repair & Services",
+        "Health & Beauty",
+        "Home Renovation & Repair",
+        "Cleaning & Pest Control",
+        "Legal & Documentation Services",
+        "Packers & Movers",
+        "Other Services",
+      ],
+    },
+  ],
+};
+
 export default function CategorySection() {
-  const [categories, setCategories] = useState(FALLBACK_CATEGORIES);
-  const [wantedList, setWantedList] = useState(FALLBACK_WANTED);
+  const [isOpen, setIsOpen] = useState(true);
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    categoryService?.getActiveCategories?.()
-      .then((data) => {
-        if (data && data.length > 0) setCategories(data);
-      })
-      .catch(() => {});
+  // Dynamic formatted date
+  const todayDateStr = new Date().toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
 
-    wantedService?.getWantedPosts?.("Open")
-      .then((posts) => {
-        if (posts && posts.length > 0) {
-          setWantedList(posts.slice(0, 4).map((p) => p.title));
-        }
-      })
-      .catch(() => {});
-  }, []);
+  const handleCategoryClick = (catName) => {
+    navigate(`/all-products?category=${encodeURIComponent(catName)}`);
+  };
 
   return (
-    <section className="mx-auto max-w-7xl px-4 pt-8 sm:px-6 lg:px-8">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:gap-6">
-        {/* ── LEFT: Categories ── */}
-        <div className="flex-1 min-w-0">
-          <div className="mb-3 flex items-center justify-between">
-            <h2
-              className="text-lg font-bold text-[var(--cm-ink)] sm:text-xl"
-              style={{ fontFamily: "var(--font-display)" }}
-            >
-              Explore Categories
-            </h2>
-            <Link
-              to="/all-products"
-              className="flex items-center gap-0.5 text-xs font-semibold text-indigo-600 hover:text-indigo-700 transition"
-            >
-              See all <ChevronRight size={13} />
-            </Link>
-          </div>
+    <section className="mx-auto max-w-7xl px-4 pt-4 sm:px-6 lg:px-8">
+      {/* ── TOP HORIZONTAL CATEGORY BAR ── */}
+      <div className="flex items-center gap-2.5 overflow-x-auto pb-3 pt-1 scrollbar-none">
+        {/* ALL CATEGORIES Toggle Button */}
+        <button
+          type="button"
+          onClick={() => setIsOpen(!isOpen)}
+          className="shrink-0 flex items-center gap-2 px-4 py-2 rounded-full bg-[#002f34] text-white font-extrabold text-xs uppercase tracking-wider shadow-sm hover:bg-[#003d44] transition-colors cursor-pointer"
+        >
+          <Menu size={16} />
+          <span>ALL CATEGORIES</span>
+          {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+        </button>
 
-          {/* Amazon-style compact grid */}
-          <div className="rounded-2xl bg-white border border-indigo-100/90 overflow-hidden shadow-xs">
-            <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 divide-x divide-y divide-indigo-50">
-              {categories.map((cat) => (
-                <Link
-                  key={cat.id || cat.name}
-                  to={`/all-products?category=${encodeURIComponent(cat.name)}`}
-                  className="group flex flex-col items-center gap-1.5 px-2 py-3.5 transition hover:bg-gradient-to-b hover:from-indigo-50/60 hover:to-purple-50/40"
-                >
-                  <span
-                    className="flex h-10 w-10 items-center justify-center rounded-xl text-xl shadow-2xs transition group-hover:scale-110"
-                    style={{ backgroundColor: cat.color || "#eef2ff" }}
+        {/* Quick Category Horizontal Pills */}
+        {QUICK_CATEGORY_PILLS.map((pill) => (
+          <button
+            key={pill}
+            type="button"
+            onClick={() => handleCategoryClick(pill)}
+            className="shrink-0 px-3.5 py-1.5 rounded-full bg-white border border-slate-200 hover:border-slate-400 hover:bg-slate-50 text-slate-800 text-xs font-semibold shadow-2xs transition cursor-pointer whitespace-nowrap"
+          >
+            {pill}
+          </button>
+        ))}
+
+        {/* Dynamic Date Tag */}
+        <div className="shrink-0 ml-auto hidden lg:flex items-center gap-2 text-xs font-semibold text-slate-400 pl-2 border-l border-slate-200">
+          <span>{todayDateStr}</span>
+        </div>
+      </div>
+
+      {/* ── MEGA-MENU DROPDOWN CLASSIFIEDS GRID (Matches screenshot) ── */}
+      {isOpen && (
+        <div className="mt-1 rounded-3xl bg-white border border-slate-200/90 shadow-md p-6 sm:p-8 animate-fade-in transition-all">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {/* COLUMN 1 */}
+            <div className="space-y-6">
+              {CATEGORIES_DATA.col1.map((cat, idx) => (
+                <div key={idx} className="space-y-2">
+                  <button
+                    type="button"
+                    onClick={() => handleCategoryClick(cat.title)}
+                    className="flex items-center gap-2 text-sm font-black text-slate-900 hover:text-indigo-600 transition cursor-pointer text-left"
                   >
-                    {cat.emoji || "📦"}
-                  </span>
-                  <span className="text-center text-[11px] font-semibold leading-tight text-slate-700 group-hover:text-indigo-600 transition-colors">
-                    {cat.name}
-                  </span>
-                </Link>
+                    <span className="text-base">{cat.icon}</span>
+                    <span>{cat.title}</span>
+                  </button>
+
+                  {cat.items.length > 0 && (
+                    <ul className="space-y-1.5 pl-6 text-xs text-slate-600">
+                      {cat.items.map((sub, sIdx) => (
+                        <li key={sIdx}>
+                          <Link
+                            to={`/all-products?category=${encodeURIComponent(sub)}`}
+                            className="hover:text-indigo-600 hover:underline transition-colors block py-0.5"
+                          >
+                            {sub}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* COLUMN 2 */}
+            <div className="space-y-6">
+              {CATEGORIES_DATA.col2.map((cat, idx) => (
+                <div key={idx} className="space-y-2">
+                  <button
+                    type="button"
+                    onClick={() => handleCategoryClick(cat.title)}
+                    className="flex items-center gap-2 text-sm font-black text-slate-900 hover:text-indigo-600 transition cursor-pointer text-left"
+                  >
+                    <span className="text-base">{cat.icon}</span>
+                    <span>{cat.title}</span>
+                  </button>
+
+                  {cat.items.length > 0 && (
+                    <ul className="space-y-1.5 pl-6 text-xs text-slate-600">
+                      {cat.items.map((sub, sIdx) => (
+                        <li key={sIdx}>
+                          <Link
+                            to={`/all-products?category=${encodeURIComponent(sub)}`}
+                            className="hover:text-indigo-600 hover:underline transition-colors block py-0.5"
+                          >
+                            {sub}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* COLUMN 3 */}
+            <div className="space-y-6">
+              {CATEGORIES_DATA.col3.map((cat, idx) => (
+                <div key={idx} className="space-y-2">
+                  <button
+                    type="button"
+                    onClick={() => handleCategoryClick(cat.title)}
+                    className="flex items-center gap-2 text-sm font-black text-slate-900 hover:text-indigo-600 transition cursor-pointer text-left"
+                  >
+                    <span className="text-base">{cat.icon}</span>
+                    <span>{cat.title}</span>
+                  </button>
+
+                  {cat.items.length > 0 && (
+                    <ul className="space-y-1.5 pl-6 text-xs text-slate-600">
+                      {cat.items.map((sub, sIdx) => (
+                        <li key={sIdx}>
+                          <Link
+                            to={`/all-products?category=${encodeURIComponent(sub)}`}
+                            className="hover:text-indigo-600 hover:underline transition-colors block py-0.5"
+                          >
+                            {sub}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* COLUMN 4 */}
+            <div className="space-y-6">
+              {CATEGORIES_DATA.col4.map((cat, idx) => (
+                <div key={idx} className="space-y-2">
+                  <button
+                    type="button"
+                    onClick={() => handleCategoryClick(cat.title)}
+                    className="flex items-center gap-2 text-sm font-black text-slate-900 hover:text-indigo-600 transition cursor-pointer text-left"
+                  >
+                    <span className="text-base">{cat.icon}</span>
+                    <span>{cat.title}</span>
+                  </button>
+
+                  {cat.items.length > 0 && (
+                    <ul className="space-y-1.5 pl-6 text-xs text-slate-600">
+                      {cat.items.map((sub, sIdx) => (
+                        <li key={sIdx}>
+                          <Link
+                            to={`/all-products?category=${encodeURIComponent(sub)}`}
+                            className="hover:text-indigo-600 hover:underline transition-colors block py-0.5"
+                          >
+                            {sub}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
               ))}
             </div>
           </div>
         </div>
-
-        {/* ── RIGHT: Post a Request ── */}
-        <div className="w-full lg:w-[270px] shrink-0">
-          <div className="mb-3">
-            <h2
-              className="text-lg font-bold text-[var(--cm-ink)] sm:text-xl"
-              style={{ fontFamily: "var(--font-display)" }}
-            >
-              Wanted by Students
-            </h2>
-          </div>
-
-          <div className="rounded-2xl bg-gradient-to-br from-indigo-50/90 via-purple-50/60 to-blue-50/80 p-4 border border-indigo-200/80 shadow-xs">
-            <ul className="space-y-2.5 mb-4">
-              {wantedList.map((text, idx) => (
-                <li key={idx} className="flex items-start gap-2">
-                  <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white text-indigo-600 shadow-2xs border border-indigo-100">
-                    <Search size={12} />
-                  </span>
-                  <p className="text-xs leading-snug font-medium text-slate-800">
-                    {text}
-                  </p>
-                </li>
-              ))}
-            </ul>
-            <Link
-              to="/sell"
-              className="flex w-full items-center justify-center rounded-full cm-gradient-btn py-2.5 text-xs font-bold text-white shadow-md transition"
-            >
-              Browse Wanted Listings
-            </Link>
-          </div>
-        </div>
-      </div>
+      )}
     </section>
   );
 }
