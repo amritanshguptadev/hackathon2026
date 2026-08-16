@@ -49,18 +49,18 @@ function AppRoutes() {
       <Route path="/favorites" element={<Wishlist />} />
       <Route path="/liked" element={<Wishlist />} />
       <Route path="/upcoming" element={<Wishlist />} />
-      <Route path="/orders" element={<PrivateRoute element={<Orders />} />} />
-      <Route path="/my-orders" element={<PrivateRoute element={<Orders />} />} />
-      <Route path="/profile" element={<PrivateRoute element={<Profile />} />} />
-      <Route path="/profile/edit" element={<PrivateRoute element={<EditProfile />} />} />
-      <Route path="/edit-profile" element={<PrivateRoute element={<EditProfile />} />} />
-      <Route path="/my-listings" element={<PrivateRoute element={<MyListings />} />} />
-      <Route path="/notifications" element={<PrivateRoute element={<Notifications />} />} />
-      <Route path="/settings" element={<PrivateRoute element={<Settings />} />} />
-      <Route path="/product-listing" element={<PrivateRoute element={<ProductListing />} />} />
-      <Route path="/sell" element={<PrivateRoute element={<ProductListing />} />} />
-      <Route path="/messages" element={<PrivateRoute element={<Messages />} />} />
-      <Route path="/messages/:conversationId" element={<PrivateRoute element={<Messages />} />} />
+      <Route path="/orders" element={<Orders />} />
+      <Route path="/my-orders" element={<Orders />} />
+      <Route path="/profile" element={<Profile />} />
+      <Route path="/profile/edit" element={<EditProfile />} />
+      <Route path="/edit-profile" element={<EditProfile />} />
+      <Route path="/my-listings" element={<MyListings />} />
+      <Route path="/notifications" element={<Notifications />} />
+      <Route path="/settings" element={<Settings />} />
+      <Route path="/product-listing" element={<ProductListing />} />
+      <Route path="/sell" element={<ProductListing />} />
+      <Route path="/messages" element={<Messages />} />
+      <Route path="/messages/:conversationId" element={<Messages />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

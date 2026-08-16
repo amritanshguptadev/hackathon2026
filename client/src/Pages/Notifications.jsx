@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import Header from "../assets/components/Home/Header";
 import Footer from "../assets/components/Home/Footer";
@@ -15,6 +15,8 @@ import {
   TrendingDown,
   Sparkles,
   ShoppingBag,
+  PlusCircle,
+  Check,
 } from "lucide-react";
 
 const INITIAL_NOTIFICATIONS = [
@@ -26,6 +28,7 @@ const INITIAL_NOTIFICATIONS = [
     timeAgo: "10m ago",
     read: false,
     link: "/orders",
+    actionLabel: "View Meetup Pass",
     icon: Clock,
     color: "bg-blue-50 text-blue-600 border-blue-100",
   },
@@ -37,6 +40,7 @@ const INITIAL_NOTIFICATIONS = [
     timeAgo: "2h ago",
     read: false,
     link: "/wishlist",
+    actionLabel: "View Liked Item",
     icon: TrendingDown,
     color: "bg-rose-50 text-rose-600 border-rose-100",
   },
@@ -48,6 +52,7 @@ const INITIAL_NOTIFICATIONS = [
     timeAgo: "5h ago",
     read: true,
     link: "/messages",
+    actionLabel: "Reply to Chat",
     icon: MessageCircle,
     color: "bg-purple-50 text-purple-600 border-purple-100",
   },
@@ -59,6 +64,7 @@ const INITIAL_NOTIFICATIONS = [
     timeAgo: "1d ago",
     read: true,
     link: "/profile",
+    actionLabel: "View Badge",
     icon: ShieldCheck,
     color: "bg-emerald-50 text-emerald-600 border-emerald-100",
   },
@@ -67,6 +73,7 @@ const INITIAL_NOTIFICATIONS = [
 export default function Notifications() {
   const [notifications, setNotifications] = useState(INITIAL_NOTIFICATIONS);
   const [filter, setFilter] = useState("All");
+  const navigate = useNavigate();
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
@@ -80,10 +87,60 @@ export default function Notifications() {
     toast.info("Cleared all notifications.");
   };
 
-  const markSingle = (id) => {
+  const markSingle = (id, e) => {
+    e?.stopPropagation?.();
     setNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, read: true } : n))
     );
+  };
+
+  const deleteSingle = (id, e) => {
+    e?.stopPropagation?.();
+    setNotifications((prev) => prev.filter((n) => n.id !== id));
+    toast.info("Notification removed.");
+  };
+
+  const handleSendTestAlert = () => {
+    const testAlerts = [
+      {
+        title: "⚡ Flash Campus Deal!",
+        message: "A senior student just listed an iPad 9th Gen for ₹14,500 near North Campus!",
+        type: "price_drop",
+        link: "/all-products",
+        actionLabel: "Check Listing",
+        icon: TrendingDown,
+        color: "bg-amber-50 text-amber-600 border-amber-100",
+      },
+      {
+        title: "📦 Meetup Location Updated",
+        message: "Seller requested to meet near Hostel 4 Cafeteria instead.",
+        type: "meetup",
+        link: "/orders",
+        actionLabel: "View Order",
+        icon: Clock,
+        color: "bg-blue-50 text-blue-600 border-blue-100",
+      },
+      {
+        title: "💬 New Offer on your Listing!",
+        message: "Pooja Sharma offered ₹750 for your Calculus textbook set.",
+        type: "chat",
+        link: "/messages",
+        actionLabel: "Accept / Counter",
+        icon: MessageCircle,
+        color: "bg-purple-50 text-purple-600 border-purple-100",
+      },
+    ];
+
+    const pick = testAlerts[Math.floor(Math.random() * testAlerts.length)];
+    const newNotif = {
+      id: `notif-${Date.now()}`,
+      timeAgo: "Just now",
+      read: false,
+      ...pick,
+    };
+
+    setNotifications((prev) => [newNotif, ...prev]);
+    toast.info(`🔔 New Campus Alert: ${pick.title}`);
   };
 
   const filteredNotifs = notifications.filter((n) => {
@@ -126,23 +183,32 @@ export default function Notifications() {
             </p>
           </div>
 
-          {notifications.length > 0 && (
-            <div className="flex items-center gap-2">
-              <button
-                onClick={markAllAsRead}
-                className="text-xs font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 px-3.5 py-2 rounded-full border border-indigo-100 transition cursor-pointer"
-              >
-                Mark all as read
-              </button>
-              <button
-                onClick={clearAll}
-                className="text-xs font-bold text-slate-500 hover:text-rose-600 p-2 rounded-full hover:bg-rose-50 transition cursor-pointer"
-                title="Clear all"
-              >
-                <Trash2 size={16} />
-              </button>
-            </div>
-          )}
+          <div className="flex items-center gap-2 self-start sm:self-auto">
+            <button
+              onClick={handleSendTestAlert}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full border border-indigo-200 bg-white hover:bg-indigo-50 text-indigo-700 text-xs font-bold shadow-2xs transition cursor-pointer"
+            >
+              <PlusCircle size={14} />
+              Test Alert
+            </button>
+            {notifications.length > 0 && (
+              <>
+                <button
+                  onClick={markAllAsRead}
+                  className="text-xs font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 px-3.5 py-2 rounded-full border border-indigo-100 transition cursor-pointer"
+                >
+                  Mark read
+                </button>
+                <button
+                  onClick={clearAll}
+                  className="text-xs font-bold text-slate-500 hover:text-rose-600 p-2 rounded-full hover:bg-rose-50 transition cursor-pointer"
+                  title="Clear all"
+                >
+                  <Trash2 size={16} />
+                </button>
+              </>
+            )}
+          </div>
         </div>
 
         {/* Filter Pills */}
@@ -177,12 +243,20 @@ export default function Notifications() {
             <p className="text-sm text-slate-500 max-w-sm mx-auto mb-6">
               No new alerts right now. We will notify you when a seller confirms your hand-off or when an item on your wishlist drops in price.
             </p>
-            <Link
-              to="/all-products"
-              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full cm-gradient-btn text-xs font-bold text-white shadow-md transition"
-            >
-              Browse Campus Marketplace <ArrowRight size={14} />
-            </Link>
+            <div className="flex items-center justify-center gap-2">
+              <button
+                onClick={handleSendTestAlert}
+                className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full border border-indigo-200 bg-indigo-50/50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold transition cursor-pointer"
+              >
+                <PlusCircle size={14} /> Send Sample Alert
+              </button>
+              <Link
+                to="/all-products"
+                className="inline-flex items-center gap-1.5 px-6 py-2.5 rounded-full cm-gradient-btn text-xs font-bold text-white shadow-md transition"
+              >
+                Browse Marketplace <ArrowRight size={14} />
+              </Link>
+            </div>
           </div>
         ) : (
           <div className="space-y-3 mb-12">
@@ -190,11 +264,13 @@ export default function Notifications() {
               const IconComp = notif.icon || Bell;
 
               return (
-                <Link
+                <div
                   key={notif.id}
-                  to={notif.link || "/profile"}
-                  onClick={() => markSingle(notif.id)}
-                  className={`block rounded-2xl p-4 sm:p-5 border transition-all duration-200 shadow-2xs group ${
+                  onClick={() => {
+                    markSingle(notif.id);
+                    if (notif.link) navigate(notif.link);
+                  }}
+                  className={`rounded-2xl p-4 sm:p-5 border transition-all duration-200 shadow-2xs group cursor-pointer ${
                     notif.read
                       ? "bg-white border-slate-200/80 hover:border-indigo-200"
                       : "bg-indigo-50/40 border-indigo-200 hover:bg-indigo-50/70"
@@ -221,13 +297,32 @@ export default function Notifications() {
                       <p className="text-xs text-slate-600 mt-1 leading-relaxed">
                         {notif.message}
                       </p>
-                    </div>
 
-                    <div className="self-center pl-2 text-slate-400 group-hover:text-indigo-600 transition">
-                      <ArrowRight size={16} />
+                      <div className="flex items-center gap-3 mt-3 pt-2 border-t border-slate-100/60">
+                        {notif.actionLabel && (
+                          <span className="inline-flex items-center gap-1 text-xs font-bold text-indigo-600 hover:text-indigo-800">
+                            {notif.actionLabel} →
+                          </span>
+                        )}
+                        {!notif.read && (
+                          <button
+                            onClick={(e) => markSingle(notif.id, e)}
+                            className="text-[11px] font-semibold text-slate-500 hover:text-slate-900 flex items-center gap-1 ml-auto"
+                          >
+                            <Check size={12} /> Mark read
+                          </button>
+                        )}
+                        <button
+                          onClick={(e) => deleteSingle(notif.id, e)}
+                          className="text-[11px] font-semibold text-slate-400 hover:text-rose-600 p-1"
+                          title="Delete alert"
+                        >
+                          <Trash2 size={13} />
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </Link>
+                </div>
               );
             })}
           </div>

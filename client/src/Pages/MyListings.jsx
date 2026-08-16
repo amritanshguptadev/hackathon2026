@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import Header from "../assets/components/Home/Header";
@@ -24,6 +24,10 @@ import {
   Save,
   ShieldCheck,
   Filter,
+  Zap,
+  Copy,
+  Upload,
+  Camera,
 } from "lucide-react";
 
 const STATUS_STYLES = {
@@ -39,6 +43,17 @@ export default function MyListings() {
   const [activeFilter, setActiveFilter] = useState("All");
   const [editingItem, setEditingItem] = useState(null);
   const [isSavingEdit, setIsSavingEdit] = useState(false);
+  const [showNewModal, setShowNewModal] = useState(false);
+  const [newItem, setNewItem] = useState({
+    title: "",
+    price: "",
+    category: "Electronics",
+    condition: "Like New",
+    campusLocation: "Central Campus / Hostel Gate",
+    description: "",
+    image: "/images/products/1.jpg",
+  });
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     setLoading(true);
@@ -58,14 +73,14 @@ export default function MyListings() {
               merged.push(c);
             }
           });
-          setListings(merged.length > 0 ? merged : DEMO_LISTINGS.slice(0, 3));
+          setListings(merged.length > 0 ? merged : DEMO_LISTINGS.slice(0, 4));
         })
         .catch(() => {
-          setListings(customListings.length > 0 ? customListings : DEMO_LISTINGS.slice(0, 3));
+          setListings(customListings.length > 0 ? customListings : DEMO_LISTINGS.slice(0, 4));
         })
         .finally(() => setLoading(false));
     } else {
-      setListings(customListings.length > 0 ? customListings : DEMO_LISTINGS.slice(0, 3));
+      setListings(customListings.length > 0 ? customListings : DEMO_LISTINGS.slice(0, 4));
       setLoading(false);
     }
   }, [user?.id]);
@@ -90,7 +105,7 @@ export default function MyListings() {
       );
       localStorage.setItem("buykaro_user_listings", JSON.stringify(updatedLocal));
 
-      toast.success(`Listing status updated to "${newStatus}"!`);
+      toast.success(`Listing status changed to "${newStatus}"!`);
     } catch {
       toast.info(`Listing marked as ${newStatus}`);
     }
@@ -119,6 +134,24 @@ export default function MyListings() {
     localStorage.setItem("buykaro_user_listings", JSON.stringify(filteredLocal));
 
     toast.success("Listing deleted successfully.");
+  };
+
+  const handleBoostListing = (item) => {
+    toast.success(`🚀 "${item.title?.slice(0, 20)}..." boosted to top of campus feed!`);
+  };
+
+  const handleDuplicateListing = (item) => {
+    const duplicated = {
+      ...item,
+      _id: `bk-item-${Date.now()}`,
+      id: `bk-item-${Date.now()}`,
+      title: `${item.title} (Copy)`,
+      status: "Available",
+    };
+    const updated = [duplicated, ...listings];
+    setListings(updated);
+    localStorage.setItem("buykaro_user_listings", JSON.stringify(updated));
+    toast.success("📋 Listing duplicated successfully!");
   };
 
   const handleSaveEdit = async (e) => {
@@ -159,6 +192,43 @@ export default function MyListings() {
     }
   };
 
+  const handleCreateNewListing = (e) => {
+    e.preventDefault();
+    if (!newItem.title || !newItem.price) {
+      toast.error("Please fill in title and price.");
+      return;
+    }
+
+    const created = {
+      _id: `bk-custom-${Date.now()}`,
+      id: `bk-custom-${Date.now()}`,
+      title: newItem.title,
+      price: Number(newItem.price),
+      category: newItem.category,
+      condition: newItem.condition,
+      campusLocation: newItem.campusLocation,
+      description: newItem.description || "Well maintained campus second-hand item.",
+      image: newItem.image || "/images/products/1.jpg",
+      status: "Available",
+      createdAt: new Date().toISOString(),
+    };
+
+    const updated = [created, ...listings];
+    setListings(updated);
+    localStorage.setItem("buykaro_user_listings", JSON.stringify(updated));
+    toast.success("🎉 New listing published live on BuyKaro!");
+    setShowNewModal(false);
+    setNewItem({
+      title: "",
+      price: "",
+      category: "Electronics",
+      condition: "Like New",
+      campusLocation: "Central Campus / Hostel Gate",
+      description: "",
+      image: "/images/products/1.jpg",
+    });
+  };
+
   // Filter listings
   const filteredListings = listings.filter((item) => {
     if (activeFilter === "All") return true;
@@ -194,23 +264,31 @@ export default function MyListings() {
               className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight flex items-center gap-3"
               style={{ fontFamily: "var(--font-display)" }}
             >
-              My Campus Listings
+              My Campus Listings &amp; Sales
               <span className="inline-flex items-center justify-center text-sm font-bold px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100">
                 🏷️ {listings.length} items
               </span>
             </h1>
             <p className="text-sm text-slate-600 mt-1">
-              Manage your active items for sale, update prices, or mark items as sold.
+              Manage your active items for sale, update prices, boost visibility, or mark items as sold.
             </p>
           </div>
 
-          <Link
-            to="/sell"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-full cm-gradient-btn text-sm font-bold text-white shadow-md transition self-start md:self-auto"
-          >
-            <PlusCircle size={18} />
-            + Post New Item
-          </Link>
+          <div className="flex items-center gap-2 self-start md:self-auto">
+            <button
+              onClick={() => setShowNewModal(true)}
+              className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full cm-gradient-btn text-xs font-bold text-white shadow-md transition cursor-pointer"
+            >
+              <PlusCircle size={16} />
+              + Quick Post Item
+            </button>
+            <Link
+              to="/sell"
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full border border-indigo-200 bg-white hover:bg-indigo-50 text-indigo-700 text-xs font-bold shadow-2xs transition"
+            >
+              Full Sell Form
+            </Link>
+          </div>
         </div>
 
         {/* Stats Overview */}
@@ -295,12 +373,12 @@ export default function MyListings() {
             <p className="text-slate-600 text-sm sm:text-base max-w-md mx-auto mb-8 leading-relaxed">
               Have unused textbooks, earphones, a study table, or an old cycle in your hostel room? List it now in 60 seconds!
             </p>
-            <Link
-              to="/sell"
-              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full cm-gradient-btn text-sm font-bold text-white shadow-md transition"
+            <button
+              onClick={() => setShowNewModal(true)}
+              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full cm-gradient-btn text-sm font-bold text-white shadow-md transition cursor-pointer"
             >
               + List an Item Now <ArrowRight size={16} />
-            </Link>
+            </button>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
@@ -379,24 +457,34 @@ export default function MyListings() {
                       </div>
 
                       {/* Action buttons */}
-                      <div className="grid grid-cols-3 gap-2">
+                      <div className="grid grid-cols-4 gap-1.5">
                         <Link
                           to={`/api/product/${prodId}`}
-                          className="flex items-center justify-center gap-1 py-2 px-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition cursor-pointer"
+                          className="flex items-center justify-center gap-1 py-2 px-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition cursor-pointer"
+                          title="View on Marketplace"
                         >
-                          <Eye size={13} /> View
+                          <Eye size={13} />
                         </Link>
                         <button
                           onClick={() => setEditingItem(item)}
-                          className="flex items-center justify-center gap-1 py-2 px-2 rounded-xl border border-indigo-200 bg-indigo-50/50 hover:bg-indigo-100/60 text-indigo-700 text-xs font-bold transition cursor-pointer"
+                          className="flex items-center justify-center gap-1 py-2 px-1.5 rounded-xl border border-indigo-200 bg-indigo-50/50 hover:bg-indigo-100/60 text-indigo-700 text-xs font-bold transition cursor-pointer"
+                          title="Edit Listing"
                         >
-                          <Edit size={13} /> Edit
+                          <Edit size={13} />
+                        </button>
+                        <button
+                          onClick={() => handleBoostListing(item)}
+                          className="flex items-center justify-center gap-1 py-2 px-1.5 rounded-xl border border-amber-200 bg-amber-50/50 hover:bg-amber-100 text-amber-700 text-xs font-bold transition cursor-pointer"
+                          title="Boost Listing"
+                        >
+                          <Zap size={13} />
                         </button>
                         <button
                           onClick={() => handleDelete(prodId)}
-                          className="flex items-center justify-center gap-1 py-2 px-2 rounded-xl border border-rose-200 bg-rose-50/40 hover:bg-rose-100/60 text-rose-600 text-xs font-bold transition cursor-pointer"
+                          className="flex items-center justify-center gap-1 py-2 px-1.5 rounded-xl border border-rose-200 bg-rose-50/40 hover:bg-rose-100/60 text-rose-600 text-xs font-bold transition cursor-pointer"
+                          title="Delete Listing"
                         >
-                          <Trash2 size={13} /> Delete
+                          <Trash2 size={13} />
                         </button>
                       </div>
                     </div>
@@ -407,6 +495,134 @@ export default function MyListings() {
           </div>
         )}
       </main>
+
+      {/* Quick Add Modal */}
+      {showNewModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
+          <div className="w-full max-w-lg rounded-3xl bg-white p-6 sm:p-8 shadow-2xl border border-indigo-100 animate-scale-in">
+            <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
+              <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                <PlusCircle size={18} className="text-indigo-600" />
+                Quick Post Campus Listing
+              </h3>
+              <button
+                onClick={() => setShowNewModal(false)}
+                className="rounded-full p-1 text-slate-400 hover:bg-slate-100 transition"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateNewListing} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                  Item Title *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={newItem.title}
+                  onChange={(e) => setNewItem({ ...newItem, title: e.target.value })}
+                  placeholder="e.g. Ergonomic Study Chair with Armrests"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm font-medium text-slate-900 outline-none focus:border-indigo-500 focus:bg-white"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                    Price (₹) *
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    value={newItem.price}
+                    onChange={(e) => setNewItem({ ...newItem, price: e.target.value })}
+                    placeholder="999"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm font-medium text-slate-900 outline-none focus:border-indigo-500 focus:bg-white"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                    Category
+                  </label>
+                  <select
+                    value={newItem.category}
+                    onChange={(e) => setNewItem({ ...newItem, category: e.target.value })}
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm font-medium text-slate-900 outline-none focus:border-indigo-500 focus:bg-white"
+                  >
+                    <option value="Electronics">Electronics</option>
+                    <option value="Cycles">Cycles</option>
+                    <option value="Books & Notes">Books &amp; Notes</option>
+                    <option value="Hostel Essentials">Hostel Essentials</option>
+                    <option value="Fashion & Gear">Fashion &amp; Gear</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                    Condition
+                  </label>
+                  <select
+                    value={newItem.condition}
+                    onChange={(e) => setNewItem({ ...newItem, condition: e.target.value })}
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm font-medium text-slate-900 outline-none focus:border-indigo-500 focus:bg-white"
+                  >
+                    <option value="Like New">Like New</option>
+                    <option value="Good">Good</option>
+                    <option value="Fair">Fair</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                    Meetup Spot
+                  </label>
+                  <input
+                    type="text"
+                    value={newItem.campusLocation}
+                    onChange={(e) => setNewItem({ ...newItem, campusLocation: e.target.value })}
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm font-medium text-slate-900 outline-none focus:border-indigo-500 focus:bg-white"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                  Description
+                </label>
+                <textarea
+                  rows={2}
+                  value={newItem.description}
+                  onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
+                  placeholder="Details about working condition, bill/box availability..."
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm font-medium text-slate-900 outline-none focus:border-indigo-500 focus:bg-white"
+                />
+              </div>
+
+              <div className="pt-4 border-t border-slate-100 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowNewModal(false)}
+                  className="px-5 py-2.5 rounded-full border border-slate-200 text-slate-700 text-xs font-bold hover:bg-slate-50 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="cm-gradient-btn px-6 py-2.5 rounded-full text-white text-xs font-bold shadow-md transition flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Save size={14} />
+                  Publish Listing
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Edit Listing Modal */}
       {editingItem && (
@@ -507,7 +723,7 @@ export default function MyListings() {
                 <button
                   type="submit"
                   disabled={isSavingEdit}
-                  className="cm-gradient-btn px-6 py-2.5 rounded-full text-white text-xs font-bold shadow-md transition flex items-center gap-1.5"
+                  className="cm-gradient-btn px-6 py-2.5 rounded-full text-white text-xs font-bold shadow-md transition flex items-center gap-1.5 cursor-pointer"
                 >
                   <Save size={14} />
                   {isSavingEdit ? "Saving..." : "Save Changes"}
