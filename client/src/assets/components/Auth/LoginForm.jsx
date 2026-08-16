@@ -27,7 +27,8 @@ export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const navigate = useNavigate()
-  const { login } = useAuth()
+  const { signIn, login } = useAuth()
+  const authenticateUser = signIn || login
 
   useEffect(() => {
     // If user just registered, prefill their email
@@ -44,7 +45,11 @@ export default function LoginForm() {
   }
 
   const handleLogin = async (e) => {
-    e.preventDefault()
+    if (e && e.preventDefault) e.preventDefault()
+
+    // Prevent duplicate submissions
+    if (submitting) return
+
     const { email, password } = loginInfo
 
     if (!email.trim()) return handleError('Email is required')
@@ -52,15 +57,15 @@ export default function LoginForm() {
 
     try {
       setSubmitting(true)
-      const data = await login({
+      await authenticateUser({
         email: email.trim().toLowerCase(),
         password,
       })
 
       handleSuccess('Login successful! Welcome back.')
       setTimeout(() => {
-        navigate('/')
-      }, 800)
+        navigate('/profile')
+      }, 600)
     } catch (error) {
       const msg = error.message || 'Login failed. Please check your credentials.'
       handleError(msg)
@@ -105,7 +110,7 @@ export default function LoginForm() {
               </p>
             </div>
 
-            {/* Login Form */}
+            {/* Login Form - single submit handler with duplicate submission lock */}
             <form className="space-y-5" onSubmit={handleLogin}>
               
               {/* Field 1: Email */}

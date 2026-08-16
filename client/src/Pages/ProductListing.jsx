@@ -1,191 +1,136 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import {
-  Upload,
-  X,
-  Eye,
-  CheckCircle2,
-  Sparkles,
   ArrowLeft,
-  Image as ImageIcon,
   ShieldCheck,
   Tag,
   MapPin,
-  FileText,
-  DollarSign,
-  AlertCircle,
+  Sparkles,
+  Eye,
   Loader2,
-  Package,
-  PlusCircle,
+  AlertCircle,
+  CheckCircle2,
+  Lock,
+  UserCheck,
+  Gift,
+  Coins,
 } from "lucide-react";
 import Header from "../assets/components/Home/Header";
 import Footer from "../assets/components/Home/Footer";
+import ImageUploader from "../components/ImageUploader";
+import ProductPreview from "../components/ProductPreview";
 import { formatINR } from "../components/PriceRangeFilter";
 import { useAuth } from "../context/AuthContext";
 import { productService } from "../services/productService";
 import { categoryService, FALLBACK_CATEGORIES } from "../services/categoryService";
 
 const CONDITIONS = [
-  { id: "Like New", label: "Like New", desc: "Barely used, in pristine condition with no defects." },
-  { id: "Good", label: "Good Condition", desc: "Fully functional with slight signs of regular campus use." },
-  { id: "Fair", label: "Fair / Budget", desc: "Shows noticeable wear or marks, but works completely fine." },
+  {
+    id: "Like New",
+    label: "Like New",
+    desc: "Hardly used, in pristine condition with no defects or scratches.",
+    badge: "Mint",
+  },
+  {
+    id: "Good",
+    label: "Good",
+    desc: "Used but fully functional with slight normal campus wear.",
+    badge: "Popular",
+  },
+  {
+    id: "Fair",
+    label: "Fair",
+    desc: "Visible wear or cosmetic marks, but works completely fine.",
+    badge: "Budget",
+  },
 ];
 
-const LOCATIONS = [
-  "Central Library Quad",
-  "Mahakal Hostel Block",
-  "Academic Block Ground Floor",
-  "Shantikunj Gate Area",
-  "Campus Cafeteria & Canteen",
-  "Yagya Shala Plaza",
-  "Main Gate / Guard Cabin",
-  "Hostel Mess & Sports Area",
-  "Other / Negotiable Spot",
-];
-
-const PRESET_SAMPLE_PHOTOS = [
-  { label: "Laptop", url: "/images/products/1.jpg" },
-  { label: "Cycle", url: "/images/products/2.jpg" },
-  { label: "Headphones", url: "/images/products/3.jpg" },
-  { label: "Textbooks", url: "/images/products/4.jpg" },
-  { label: "Phone", url: "/images/products/6.jpg" },
-  { label: "Tablet", url: "/images/products/7.jpg" },
+const CAMPUS_LOCATIONS = [
+  "Boys Hostel",
+  "Girls Hostel",
+  "Main Campus",
+  "Library Area",
+  "Academic Block",
+  "Canteen",
+  "Campus Gate",
+  "Other",
 ];
 
 export default function ProductListing() {
   const navigate = useNavigate();
-  const fileInputRef = useRef(null);
-  const { user, profile, isAuthenticated } = useAuth();
+  const { user, profile, isAuthenticated, loading: authLoading, updateProfile } = useAuth();
 
-  // Dynamic categories
+  // Dynamic categories from Supabase
   const [categoriesList, setCategoriesList] = useState(FALLBACK_CATEGORIES);
+  const [loadingCategories, setLoadingCategories] = useState(true);
 
   // Form states
   const [title, setTitle] = useState("");
   const [categoryId, setCategoryId] = useState("");
-  const [categoryName, setCategoryName] = useState("Electronics");
+  const [categoryName, setCategoryName] = useState("Hostel Essentials");
   const [price, setPrice] = useState("");
   const [isFree, setIsFree] = useState(false);
   const [condition, setCondition] = useState("Good");
-  const [campusLocation, setCampusLocation] = useState(LOCATIONS[0]);
+  const [campusLocation, setCampusLocation] = useState("Boys Hostel");
   const [description, setDescription] = useState("");
-  const [features, setFeatures] = useState("");
-
-  // Images state (array of permanent data URLs or URLs)
   const [images, setImages] = useState([]);
-  const [activePreviewImageIndex, setActivePreviewImageIndex] = useState(0);
 
-  // Validation & UI states
+  // Activation & Submission states
+  const [activatingSeller, setActivatingSeller] = useState(false);
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
 
-  const userName =
-    profile?.name ||
-    profile?.fullName ||
-    localStorage.getItem("loggedInUser") ||
-    user?.email?.split("@")[0] ||
-    "Arjun Verma";
-
-  const userCollege =
-    profile?.college ||
-    profile?.university ||
-    localStorage.getItem("college") ||
-    "Dev Sanskriti Vishwavidyalaya";
-
+  // Fetch active categories from Supabase
   useEffect(() => {
-    categoryService.getActiveCategories().then((cats) => {
-      if (cats && cats.length > 0) {
-        setCategoriesList(cats);
-        setCategoryId(cats[0].id || cats[0].name);
-        setCategoryName(cats[0].name);
-      }
-    });
+    categoryService
+      .getActiveCategories()
+      .then((cats) => {
+        if (cats && cats.length > 0) {
+          setCategoriesList(cats);
+          setCategoryId(cats[0].id);
+          setCategoryName(cats[0].name);
+        }
+      })
+      .catch((err) => {
+        console.warn("Failed to load active categories:", err);
+      })
+      .finally(() => setLoadingCategories(false));
   }, []);
 
-  // Handle Free Giveaway Toggle
+  // Handle seller activation toggle if required
+  const handleActivateSeller = async () => {
+    setActivatingSeller(true);
+    try {
+      if (updateProfile) {
+        await updateProfile({ seller_enabled: true, account_status: "active" });
+      }
+      toast.success("🎉 Seller account activated! You can now list items on CampusLoop.");
+    } catch (err) {
+      toast.error(err.message || "Failed to activate seller account.");
+    } finally {
+      setActivatingSeller(false);
+    }
+  };
+
+  // Handle Free Toggle
   const handleFreeToggle = (e) => {
     const checked = e.target.checked;
     setIsFree(checked);
     if (checked) {
       setPrice("0");
+      if (errors.price) setErrors((prev) => ({ ...prev, price: null }));
     } else {
       setPrice("");
     }
   };
 
-  // Image Upload Handling (Converts to permanent base64 data URLs)
-  const handleImageChange = (e) => {
-    const files = Array.from(e.target.files || []);
-    if (!files.length) return;
-
-    if (images.length + files.length > 5) {
-      toast.error("You can upload a maximum of 5 product photos.");
-      return;
-    }
-
-    files.forEach((file) => {
-      if (file.size > 8 * 1024 * 1024) {
-        toast.error(`"${file.name}" exceeds the 8MB file limit.`);
-        return;
-      }
-      if (!["image/jpeg", "image/jpg", "image/png", "image/webp"].includes(file.type)) {
-        toast.error(`"${file.name}" is not a supported image format.`);
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const dataUrl = event.target.result;
-        setImages((prev) => {
-          if (prev.length >= 5) return prev;
-          return [...prev, { preview: dataUrl, file }];
-        });
-        setErrors((prev) => ({ ...prev, images: null }));
-      };
-      reader.readAsDataURL(file);
-    });
-
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-  };
-
-  const handlePickPresetImage = (url) => {
-    if (images.length >= 5) {
-      toast.info("Maximum 5 photos reached.");
-      return;
-    }
-    setImages((prev) => [...prev, { preview: url, file: null }]);
-    setErrors((prev) => ({ ...prev, images: null }));
-    toast.success("Sample photo added!");
-  };
-
-  const removeImage = (indexToRemove) => {
-    setImages((prev) => prev.filter((_, idx) => idx !== indexToRemove));
-    if (activePreviewImageIndex >= indexToRemove && activePreviewImageIndex > 0) {
-      setActivePreviewImageIndex((prev) => prev - 1);
-    }
-  };
-
-  const setAsCoverImage = (index) => {
-    if (index === 0) return;
-    setImages((prev) => {
-      const next = [...prev];
-      const [selected] = next.splice(index, 1);
-      next.unshift(selected);
-      return next;
-    });
-    setActivePreviewImageIndex(0);
-    toast.info("Cover photo updated!");
-  };
-
-  // Validate form fields
+  // Form Validation
   const validateForm = () => {
     const newErrors = {};
 
-    if (!images.length) {
+    if (!images || images.length === 0) {
       newErrors.images = "Please upload at least 1 product photo.";
     }
 
@@ -196,259 +141,248 @@ export default function ProductListing() {
     if (!isFree) {
       const numPrice = Number(price);
       if (!price || isNaN(numPrice) || numPrice <= 0) {
-        newErrors.price = "Please enter a valid price greater than ₹0 (or mark as Free).";
+        newErrors.price = "Selling price must be greater than ₹0 (or select 'List for FREE').";
       }
     }
 
-    if (!description.trim() || description.trim().length < 6) {
-      newErrors.description = "Please provide a short description (at least 6 characters).";
+    if (!condition) {
+      newErrors.condition = "Please select the condition of your item.";
+    }
+
+    if (!campusLocation) {
+      newErrors.campusLocation = "Please select a campus meetup location.";
+    }
+
+    if (!description.trim() || description.trim().length < 10) {
+      newErrors.description = "Please provide a detailed description (at least 10 characters).";
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  // Submit and Publish Listing
-  const handlePublish = async (e) => {
-    if (e) e.preventDefault();
-
+  // Submit and Publish Listing to Supabase
+  const handlePublish = async () => {
     if (!validateForm()) {
       setShowPreviewModal(false);
       window.scrollTo({ top: 0, behavior: "smooth" });
-      toast.error("Please fill in all required fields correctly.");
+      toast.error("Please resolve the highlighted form errors before publishing.");
+      return;
+    }
+
+    if (!isAuthenticated || !user?.id) {
+      toast.info("Please login to list items.");
+      navigate("/login");
       return;
     }
 
     setIsSubmitting(true);
     try {
-      const mainCoverUrl = images[0]?.preview || "/images/products/1.jpg";
-      const allImageUrls = images.map((i) => i.preview);
+      const imageFiles = images.map((i) => i.file).filter(Boolean);
 
-      const newListingItem = {
-        _id: `listing-${Date.now()}`,
-        id: `listing-${Date.now()}`,
+      const productPayload = {
+        sellerId: user.id,
+        categoryId: categoryId || null,
         title: title.trim(),
-        description: description.trim() + (features ? `\n\nFeatures: ${features.trim()}` : ""),
+        description: description.trim(),
+        price: isFree ? 0 : Number(price),
+        isFree: !!isFree,
+        condition,
+        campusLocation,
+      };
+
+      const createdProduct = await productService.createProduct(productPayload, imageFiles);
+
+      // Sync local storage cache for immediate marketplace synchronization
+      const localListing = {
+        _id: createdProduct?.id || `product-${Date.now()}`,
+        id: createdProduct?.id,
+        title: title.trim(),
+        description: description.trim(),
         price: isFree ? "FREE" : Number(price),
         numericPrice: isFree ? 0 : Number(price),
         isFree: !!isFree,
-        category: categoryName || "Campus Essentials",
+        category: categoryName || "Hostel Essentials",
         condition,
         campusLocation,
         location: campusLocation,
         status: "Available",
-        views: 1,
-        image: mainCoverUrl,
-        images: allImageUrls,
+        image: images[0]?.preview || "/images/products/desk-lamp.png",
+        images: images.map((i) => i.preview),
         seller: {
-          name: userName,
-          email: user?.email || "student.dsvv@buykaro.in",
-          college: userCollege,
-          city: "Haridwar",
+          id: user.id,
+          name: profile?.name || user?.user_metadata?.name || user.email?.split("@")[0] || "Student Seller",
+          college: profile?.college || "Campus Community",
+          verified: true,
         },
-        timeAgo: "Just now",
         createdAt: new Date().toISOString(),
       };
 
-      // Try server upload if user logged in
-      if (user?.id) {
-        try {
-          const imageFiles = images.map((i) => i.file).filter(Boolean);
-          await productService.createProduct(
-            {
-              sellerId: user.id,
-              categoryId: categoryId || null,
-              title: title.trim(),
-              description: newListingItem.description,
-              price: isFree ? 0 : Number(price),
-              isFree: !!isFree,
-              condition,
-              campusLocation,
-            },
-            imageFiles
-          );
-        } catch (serverErr) {
-          console.warn("Backend sync fallback to local storage:", serverErr);
-        }
-      }
-
-      // Persist to user listings storage
       const existingCustom = JSON.parse(
-        localStorage.getItem("buykaro_user_listings") || "[]"
+        localStorage.getItem("buykaro_user_listings") ||
+        localStorage.getItem("studx_user_listings") ||
+        "[]"
       );
-      existingCustom.unshift(newListingItem);
+      existingCustom.unshift(localListing);
       localStorage.setItem("buykaro_user_listings", JSON.stringify(existingCustom));
 
-      toast.success("🎉 Your item has been listed successfully on BuyKaro!");
+      toast.success("🎉 Your item has been listed successfully!");
       setShowPreviewModal(false);
 
       setTimeout(() => {
-        navigate("/my-listings");
-      }, 700);
+        if (createdProduct?.id) {
+          navigate(`/product/${createdProduct.id}`);
+        } else {
+          navigate("/my-listings");
+        }
+      }, 1000);
     } catch (err) {
-      console.error("Publishing error:", err);
-      toast.error(err.message || "Failed to publish listing. Please try again.");
+      console.error("Listing publish error:", err);
+      toast.error(err.message || "Failed to publish listing. Please check connection and try again.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  return (
-    <main className="min-h-screen bg-[var(--cm-bg)] text-[var(--cm-ink)] flex flex-col justify-between">
-      <Header />
+  // Seller details for display
+  const sellerName =
+    profile?.name ||
+    user?.user_metadata?.name ||
+    user?.email?.split("@")[0] ||
+    "Campus Student";
+  const sellerCollege =
+    profile?.college ||
+    user?.user_metadata?.college ||
+    "Campus Community";
 
-      <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8 w-full flex-1">
+  // Check if seller activation is needed
+  const isSellerDisabled = profile?.seller_enabled === false;
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-[#F4F7FB] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#2563EB] border-t-transparent"></div>
+          <p className="text-sm font-bold text-slate-600">Checking campus account...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-[#F4F7FB] text-[#0F172A] flex flex-col justify-between font-sans">
+      <Header showSearchBar={false} />
+      <ToastContainer position="top-right" autoClose={3000} />
+
+      <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8 w-full flex-1">
         {/* Navigation Breadcrumb */}
         <div className="mb-6 flex items-center justify-between">
           <Link
             to="/all-products"
-            className="inline-flex items-center gap-1.5 text-sm font-bold text-indigo-600 hover:text-indigo-700 transition cursor-pointer"
+            className="inline-flex items-center gap-1.5 text-sm font-bold text-[#2563EB] hover:text-[#1D4ED8] transition cursor-pointer"
           >
             <ArrowLeft size={18} />
             Back to Marketplace
           </Link>
-          <span className="rounded-full bg-emerald-50 border border-emerald-200 px-3 py-1 text-xs font-semibold text-emerald-700 flex items-center gap-1.5">
-            <ShieldCheck size={14} />
+          <span className="rounded-full bg-emerald-50 border border-emerald-200 px-3.5 py-1 text-xs font-bold text-[#16A34A] flex items-center gap-1.5 shadow-2xs">
+            <ShieldCheck size={15} />
             Verified Campus Seller
           </span>
         </div>
 
         {/* Page Title Card */}
-        <div className="mb-8 rounded-3xl bg-white p-6 sm:p-8 border border-indigo-100/90 shadow-sm">
+        <div className="mb-8 rounded-3xl bg-white p-6 sm:p-8 border border-slate-200 shadow-xs">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h1
-                className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight"
-                style={{ fontFamily: "var(--font-display)" }}
-              >
-                Sell on <span className="text-indigo-600">BuyKaro</span>
+              <span className="text-xs font-bold uppercase tracking-wider text-[#2563EB] block mb-1">
+                Campus Marketplace Exchange
+              </span>
+              <h1 className="text-2xl sm:text-3xl font-black text-[#0F172A] tracking-tight">
+                Sell an Item on CampusLoop
               </h1>
-              <p className="mt-1.5 text-sm text-slate-600">
-                List second-hand textbooks, electronics, cycles, or dorm essentials for peers across{" "}
-                <strong className="text-indigo-900">{userCollege}</strong>.
+              <p className="mt-1.5 text-sm text-slate-500 max-w-xl">
+                Post textbooks, cycles, dorm essentials, lab equipment, or electronics for fellow students in your campus community.
               </p>
             </div>
 
             {/* Authenticated Seller Badge */}
-            <div className="rounded-2xl bg-indigo-50/80 p-3.5 border border-indigo-100 shrink-0">
-              <span className="text-[10.5px] font-bold uppercase tracking-wider text-indigo-700 block">
-                Seller Profile
+            <div className="rounded-2xl bg-blue-50/70 p-4 border border-blue-100 shrink-0">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#2563EB] block mb-0.5">
+                Posting As
               </span>
-              <p className="text-sm font-bold text-slate-900">{userName}</p>
-              <p className="text-xs text-slate-500 font-medium">{userCollege}</p>
+              <p className="text-sm font-bold text-[#0F172A] flex items-center gap-1.5">
+                <UserCheck size={16} className="text-[#2563EB]" />
+                {sellerName}
+              </p>
+              <p className="text-xs text-slate-500 mt-0.5">{sellerCollege}</p>
             </div>
           </div>
         </div>
 
-        {/* Main Listing Form */}
-        <form onSubmit={(e) => { e.preventDefault(); setShowPreviewModal(true); }} className="space-y-8">
-          {/* 1. PRODUCT IMAGES (1 to 5 Photos) */}
-          <div className="rounded-3xl bg-white p-6 sm:p-8 border border-indigo-100/90 shadow-sm">
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <ImageIcon size={18} className="text-indigo-600" />
-                Product Photos
-                <span className="text-xs font-normal text-slate-500">(1–5 Photos)</span>
-              </label>
-              <span className="text-xs font-semibold text-slate-500">
-                {images.length} / 5 photos
-              </span>
+        {/* Seller Account Activation Warning Banner (if disabled) */}
+        {isSellerDisabled && (
+          <div className="mb-8 rounded-3xl bg-amber-50 border border-amber-200 p-6 sm:p-8 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-start gap-4">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-amber-100 text-amber-700">
+                <Lock size={22} />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-amber-900">
+                  Activate your seller account to start selling
+                </h3>
+                <p className="text-xs sm:text-sm text-amber-700 mt-1">
+                  Activate seller privileges with one click to publish listings on the campus marketplace.
+                </p>
+              </div>
             </div>
-            <p className="text-xs text-slate-500 mb-4">
-              Add clear photos of your item. The first photo will be used as the main cover photo.
-            </p>
-
-            {/* Dropzone & Upload Box */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3.5">
-              {/* Existing Uploaded Images */}
-              {images.map((img, idx) => (
-                <div
-                  key={idx}
-                  className="group relative aspect-square rounded-2xl overflow-hidden border-2 border-indigo-200 bg-slate-50 shadow-2xs transition-all hover:border-indigo-600"
-                >
-                  <img
-                    src={img.preview}
-                    alt={`Upload ${idx + 1}`}
-                    className="h-full w-full object-cover"
-                  />
-
-                  {/* Cover Badge */}
-                  {idx === 0 ? (
-                    <span className="absolute top-2 left-2 rounded-full bg-indigo-600 px-2 py-0.5 text-[10px] font-bold text-white shadow-xs">
-                      Main Cover
-                    </span>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => setAsCoverImage(idx)}
-                      className="absolute bottom-2 left-2 opacity-0 group-hover:opacity-100 rounded-md bg-black/75 px-1.5 py-0.5 text-[9px] font-semibold text-white transition-opacity hover:bg-black cursor-pointer"
-                    >
-                      Make Cover
-                    </button>
-                  )}
-
-                  {/* Remove Button */}
-                  <button
-                    type="button"
-                    onClick={() => removeImage(idx)}
-                    className="absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-full bg-rose-600 text-white shadow-md transition hover:bg-rose-700 active:scale-95 cursor-pointer"
-                    aria-label="Remove image"
-                  >
-                    <X size={13} strokeWidth={2.5} />
-                  </button>
-                </div>
-              ))}
-
-              {/* Add Image Button (if < 5) */}
-              {images.length < 5 && (
-                <label className="relative aspect-square flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-indigo-200 bg-indigo-50/40 p-3 text-center cursor-pointer hover:border-indigo-500 hover:bg-indigo-50/80 transition group">
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    multiple
-                    accept="image/jpeg, image/png, image/jpg, image/webp"
-                    onChange={handleImageChange}
-                    className="sr-only"
-                  />
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-indigo-600 shadow-xs group-hover:scale-110 transition-transform">
-                    <Upload size={18} />
-                  </div>
-                  <span className="mt-2 text-xs font-bold text-slate-800 group-hover:text-indigo-600">
-                    + Add Photo
-                  </span>
-                  <span className="text-[10px] text-slate-400 mt-0.5">JPG, PNG, WEBP</span>
-                </label>
+            <button
+              type="button"
+              disabled={activatingSeller}
+              onClick={handleActivateSeller}
+              className="shrink-0 w-full sm:w-auto rounded-full bg-amber-600 px-6 py-3 text-xs font-bold text-white shadow-md hover:bg-amber-700 transition cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
+            >
+              {activatingSeller ? (
+                <>
+                  <Loader2 size={14} className="animate-spin" />
+                  Activating...
+                </>
+              ) : (
+                "Activate Seller Account Now"
               )}
-            </div>
+            </button>
+          </div>
+        )}
 
-            {/* Quick Sample Presets */}
-            <div className="mt-4 pt-3 border-t border-slate-100 flex flex-wrap items-center gap-2">
-              <span className="text-xs font-bold text-slate-500">Or use sample photo:</span>
-              {PRESET_SAMPLE_PHOTOS.map((preset) => (
-                <button
-                  key={preset.label}
-                  type="button"
-                  onClick={() => handlePickPresetImage(preset.url)}
-                  className="px-2.5 py-1 rounded-full bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-700 text-xs font-medium transition cursor-pointer border border-slate-200"
-                >
-                  + {preset.label}
-                </button>
-              ))}
-            </div>
-
-            {errors.images && (
-              <p className="mt-2.5 text-xs font-semibold text-rose-600 flex items-center gap-1">
-                <AlertCircle size={13} /> {errors.images}
-              </p>
-            )}
+        {/* Main Sell Item Form */}
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (validateForm()) {
+              setShowPreviewModal(true);
+            } else {
+              window.scrollTo({ top: 0, behavior: "smooth" });
+              toast.error("Please fill in all required fields correctly.");
+            }
+          }}
+          className="space-y-8"
+        >
+          {/* 1. PRODUCT IMAGES (1 to 5 Photos) */}
+          <div className="rounded-3xl bg-white p-6 sm:p-8 border border-slate-200 shadow-xs">
+            <ImageUploader
+              images={images}
+              setImages={setImages}
+              error={errors.images}
+              setError={(err) => setErrors((prev) => ({ ...prev, images: err }))}
+              maxImages={5}
+            />
           </div>
 
-          {/* 2. TITLE & CATEGORY */}
-          <div className="rounded-3xl bg-white p-6 sm:p-8 border border-indigo-100/90 shadow-sm space-y-6">
+          {/* 2. PRODUCT TITLE & CATEGORY */}
+          <div className="rounded-3xl bg-white p-6 sm:p-8 border border-slate-200 shadow-xs space-y-6">
             {/* Title */}
             <div>
-              <label className="block text-sm font-bold text-slate-900 mb-1.5">
-                Product Title / Name <span className="text-rose-500">*</span>
+              <label className="block text-sm font-bold text-[#0F172A] mb-1.5">
+                Product Title <span className="text-rose-500">*</span>
               </label>
               <input
                 type="text"
@@ -457,64 +391,66 @@ export default function ProductListing() {
                   setTitle(e.target.value);
                   if (errors.title) setErrors((prev) => ({ ...prev, title: null }));
                 }}
-                placeholder="e.g. Hero Sprint 21-Speed Bicycle, Calculus 8th Edition, HP Core i5 Laptop"
+                placeholder="e.g. Hero Sprint 21-Speed Bicycle, Calculus 8th Edition, Wooden Study Desk"
                 maxLength={90}
-                className="w-full rounded-2xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-500/20"
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm text-[#0F172A] outline-none transition focus:border-[#2563EB] focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20"
                 required
               />
-              <div className="mt-1 flex justify-between text-xs text-slate-500">
+              <div className="mt-1.5 flex justify-between text-xs text-slate-500">
                 <span>{errors.title && <span className="text-rose-600 font-semibold">{errors.title}</span>}</span>
                 <span>{title.length} / 90</span>
               </div>
             </div>
 
-            {/* Category Dropdown */}
+            {/* Dynamic Category Dropdown */}
             <div>
-              <label className="block text-sm font-bold text-slate-900 mb-1.5">
+              <label className="block text-sm font-bold text-[#0F172A] mb-1.5">
                 Category <span className="text-rose-500">*</span>
               </label>
               <select
-                value={categoryName}
+                value={categoryId}
                 onChange={(e) => {
-                  const selName = e.target.value;
-                  setCategoryName(selName);
-                  const found = categoriesList.find((c) => c.name === selName);
-                  if (found) setCategoryId(found.id || found.name);
+                  const selId = e.target.value;
+                  setCategoryId(selId);
+                  const found = categoriesList.find((c) => String(c.id) === String(selId));
+                  if (found) setCategoryName(found.name);
                 }}
-                className="w-full rounded-2xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-500/20 cursor-pointer"
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm text-[#0F172A] outline-none transition focus:border-[#2563EB] focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 cursor-pointer"
               >
                 {categoriesList.map((cat) => (
-                  <option key={cat.id || cat.name} value={cat.name}>
-                    {cat.emoji ? `${cat.emoji} ` : ""}{cat.name}
+                  <option key={cat.id || cat.name} value={cat.id || cat.name}>
+                    {cat.emoji ? `${cat.emoji} ` : "📦 "}{cat.name}
                   </option>
                 ))}
               </select>
             </div>
           </div>
 
-          {/* 3. PRICING & FREE GIVEAWAY TOGGLE */}
-          <div className="rounded-3xl bg-white p-6 sm:p-8 border border-indigo-100/90 shadow-sm space-y-4">
+          {/* 3. SELLING PRICE & FREE LISTING TOGGLE */}
+          <div className="rounded-3xl bg-white p-6 sm:p-8 border border-slate-200 shadow-xs space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <label className="text-sm font-bold text-slate-900">
+              <label className="text-sm font-bold text-[#0F172A] flex items-center gap-1.5">
+                <Coins size={16} className="text-[#2563EB]" />
                 Selling Price (INR) <span className="text-rose-500">*</span>
               </label>
 
-              {/* Free Toggle */}
+              {/* Free item checkbox */}
               <label className="inline-flex items-center gap-2 cursor-pointer select-none">
                 <input
                   type="checkbox"
                   checked={isFree}
                   onChange={handleFreeToggle}
-                  className="h-4 w-4 rounded-md border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                  className="h-4 w-4 rounded-md border-slate-300 text-[#2563EB] focus:ring-[#2563EB] cursor-pointer"
                 />
-                <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
-                  🎁 This item is FREE / Giveaway
+                <span className="text-xs font-bold text-[#16A34A] bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200 flex items-center gap-1">
+                  <Gift size={13} />
+                  List this item for FREE
                 </span>
               </label>
             </div>
 
             <div className="relative">
-              <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-base font-bold text-slate-400">
+              <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-lg font-bold text-slate-400">
                 ₹
               </span>
               <input
@@ -525,17 +461,17 @@ export default function ProductListing() {
                   setPrice(e.target.value);
                   if (errors.price) setErrors((prev) => ({ ...prev, price: null }));
                 }}
-                placeholder={isFree ? "FREE for campus peers" : "e.g. 1500"}
+                placeholder={isFree ? "Listed as FREE for fellow campus students" : "e.g. 1500"}
                 min="1"
                 step="1"
-                className={`w-full rounded-2xl border px-9 py-3 text-base font-bold outline-none transition ${
+                className={`w-full rounded-2xl border px-10 py-3.5 text-base font-bold outline-none transition ${
                   isFree
-                    ? "border-emerald-300 bg-emerald-50/50 text-emerald-800 placeholder:text-emerald-700 placeholder:font-bold cursor-not-allowed"
-                    : "border-slate-200 bg-slate-50/50 text-slate-900 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-500/20"
+                    ? "border-emerald-300 bg-emerald-50/50 text-[#16A34A] placeholder:text-emerald-700 placeholder:font-bold cursor-not-allowed"
+                    : "border-slate-200 bg-slate-50/50 text-[#0F172A] focus:border-[#2563EB] focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20"
                 }`}
               />
               {isFree && (
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-emerald-600 px-3 py-0.5 text-xs font-extrabold text-white">
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-[#16A34A] px-3.5 py-1 text-xs font-black text-white shadow-xs">
                   FREE
                 </span>
               )}
@@ -548,11 +484,14 @@ export default function ProductListing() {
             )}
           </div>
 
-          {/* 4. CONDITION */}
-          <div className="rounded-3xl bg-white p-6 sm:p-8 border border-indigo-100/90 shadow-sm">
-            <label className="block text-sm font-bold text-slate-900 mb-3">
-              Item Condition <span className="text-rose-500">*</span>
+          {/* 4. PRODUCT CONDITION (Like New, Good, Fair) */}
+          <div className="rounded-3xl bg-white p-6 sm:p-8 border border-slate-200 shadow-xs">
+            <label className="block text-sm font-bold text-[#0F172A] mb-1.5">
+              Condition <span className="text-rose-500">*</span>
             </label>
+            <p className="text-xs text-slate-500 mb-4">
+              Select the option that best reflects the physical and functional state of your item.
+            </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
               {CONDITIONS.map((c) => {
@@ -564,16 +503,16 @@ export default function ProductListing() {
                     onClick={() => setCondition(c.id)}
                     className={`rounded-2xl p-4 text-left border-2 transition-all cursor-pointer ${
                       isSelected
-                        ? "border-indigo-600 bg-indigo-50/70 shadow-2xs"
-                        : "border-slate-200 bg-slate-50/60 hover:border-slate-300 hover:bg-white"
+                        ? "border-[#2563EB] bg-blue-50/70 shadow-xs"
+                        : "border-slate-200 bg-slate-50/50 hover:border-slate-300 hover:bg-white"
                     }`}
                   >
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm font-bold text-slate-900">{c.label}</span>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-sm font-bold text-[#0F172A]">{c.label}</span>
                       <span
                         className={`h-4 w-4 rounded-full border flex items-center justify-center ${
                           isSelected
-                            ? "border-indigo-600 bg-indigo-600"
+                            ? "border-[#2563EB] bg-[#2563EB]"
                             : "border-slate-300 bg-white"
                         }`}
                       >
@@ -588,19 +527,20 @@ export default function ProductListing() {
           </div>
 
           {/* 5. CAMPUS LOCATION */}
-          <div className="rounded-3xl bg-white p-6 sm:p-8 border border-indigo-100/90 shadow-sm">
-            <label className="block text-sm font-bold text-slate-900 mb-1.5">
-              Campus Hand-off Spot <span className="text-rose-500">*</span>
+          <div className="rounded-3xl bg-white p-6 sm:p-8 border border-slate-200 shadow-xs">
+            <label className="block text-sm font-bold text-[#0F172A] mb-1.5 flex items-center gap-1.5">
+              <MapPin size={16} className="text-[#2563EB]" />
+              Campus / Hostel Location <span className="text-rose-500">*</span>
             </label>
             <p className="text-xs text-slate-500 mb-3">
-              Where in Dev Sanskriti Vishwavidyalaya would you prefer to meet the buyer?
+              Preferred meetup point on campus for item inspection and handover.
             </p>
             <select
               value={campusLocation}
               onChange={(e) => setCampusLocation(e.target.value)}
-              className="w-full rounded-2xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-500/20 cursor-pointer"
+              className="w-full rounded-2xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm text-[#0F172A] outline-none transition focus:border-[#2563EB] focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 cursor-pointer"
             >
-              {LOCATIONS.map((loc) => (
+              {CAMPUS_LOCATIONS.map((loc) => (
                 <option key={loc} value={loc}>
                   {loc}
                 </option>
@@ -608,42 +548,35 @@ export default function ProductListing() {
             </select>
           </div>
 
-          {/* 6. DESCRIPTION & DETAILS */}
-          <div className="rounded-3xl bg-white p-6 sm:p-8 border border-indigo-100/90 shadow-sm space-y-6">
+          {/* 6. PRODUCT DESCRIPTION */}
+          <div className="rounded-3xl bg-white p-6 sm:p-8 border border-slate-200 shadow-xs space-y-3">
             <div>
-              <label className="block text-sm font-bold text-slate-900 mb-1.5">
+              <label className="block text-sm font-bold text-[#0F172A] mb-1.5">
                 Product Description <span className="text-rose-500">*</span>
               </label>
+              <p className="text-xs text-slate-500 mb-3">
+                Include age of item, working condition, accessories included, defects (if any), and reason for selling.
+              </p>
               <textarea
                 value={description}
                 onChange={(e) => {
                   setDescription(e.target.value);
                   if (errors.description) setErrors((prev) => ({ ...prev, description: null }));
                 }}
-                rows={4}
+                rows={5}
                 maxLength={1000}
-                placeholder="Describe age of item, working condition, accessories included, semester notes included..."
-                className="w-full rounded-2xl border border-slate-200 bg-slate-50/50 p-4 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-500/20"
+                placeholder="e.g. Used for one year. Brakes and tyres are working properly. Minor scratches on the frame. Selling because I am graduating."
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50/50 p-4 text-sm text-[#0F172A] outline-none transition focus:border-[#2563EB] focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20"
                 required
               />
-              <div className="mt-1 flex justify-between text-xs text-slate-500">
-                <span>{errors.description && <span className="text-rose-600 font-semibold">{errors.description}</span>}</span>
+              <div className="mt-1.5 flex justify-between text-xs text-slate-500">
+                <span>
+                  {errors.description && (
+                    <span className="text-rose-600 font-semibold">{errors.description}</span>
+                  )}
+                </span>
                 <span>{description.length} / 1000</span>
               </div>
-            </div>
-
-            {/* Optional Key Features */}
-            <div>
-              <label className="block text-sm font-bold text-slate-900 mb-1.5">
-                Key Features / Specifications <span className="text-xs font-normal text-slate-500">(Optional, comma-separated)</span>
-              </label>
-              <input
-                type="text"
-                value={features}
-                onChange={(e) => setFeatures(e.target.value)}
-                placeholder="e.g. 21 Shimano Gears, Includes Lock and Helmet, Working Charger"
-                className="w-full rounded-2xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-500/20"
-              />
             </div>
           </div>
 
@@ -656,177 +589,57 @@ export default function ProductListing() {
                   setShowPreviewModal(true);
                 } else {
                   window.scrollTo({ top: 0, behavior: "smooth" });
-                  toast.error("Please fill in required fields before previewing.");
+                  toast.error("Please fill in all required fields before previewing.");
                 }
               }}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-7 py-3.5 text-sm font-bold text-slate-800 shadow-2xs hover:bg-slate-50 transition cursor-pointer"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full border border-slate-300 bg-white px-7 py-3.5 text-sm font-bold text-[#0F172A] shadow-xs hover:bg-slate-50 transition cursor-pointer"
             >
               <Eye size={16} />
               Preview Listing
             </button>
 
             <button
-              type="button"
-              disabled={isSubmitting}
-              onClick={handlePublish}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full cm-gradient-btn px-9 py-3.5 text-sm font-bold text-white shadow-md transition cursor-pointer disabled:opacity-50"
+              type="submit"
+              disabled={isSubmitting || isSellerDisabled}
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full bg-[#2563EB] px-9 py-3.5 text-sm font-bold text-white shadow-md hover:bg-[#1D4ED8] transition cursor-pointer disabled:opacity-50"
             >
               {isSubmitting ? (
                 <>
                   <Loader2 size={18} className="animate-spin" />
-                  Publishing Listing...
+                  Publishing...
                 </>
               ) : (
                 <>
                   <Sparkles size={16} />
-                  Publish Listing Now
+                  Publish Listing
                 </>
               )}
             </button>
           </div>
         </form>
-      </div>
+      </main>
 
-      {/* ── INTERACTIVE PREVIEW MODAL ── */}
-      {showPreviewModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl bg-white shadow-2xl border border-indigo-100">
-            {/* Modal Header */}
-            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-100 bg-white/95 px-6 py-4 backdrop-blur-md">
-              <div className="flex items-center gap-2">
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-50 text-indigo-600">
-                  <Eye size={16} />
-                </span>
-                <div>
-                  <h3 className="text-base font-bold text-slate-900">Listing Preview</h3>
-                  <p className="text-xs text-slate-500">This is how students will see your product</p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowPreviewModal(false)}
-                className="rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition cursor-pointer"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            {/* Modal Content / Preview Mockup */}
-            <div className="p-6 sm:p-8 space-y-6">
-              {/* Product Cover & Gallery */}
-              <div className="space-y-3">
-                <div className="aspect-[16/10] w-full rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 relative">
-                  <img
-                    src={images[activePreviewImageIndex]?.preview || images[0]?.preview}
-                    alt="Preview"
-                    className="h-full w-full object-cover"
-                  />
-                  <span className="absolute top-3 left-3 rounded-full bg-emerald-600 px-3 py-1 text-xs font-bold text-white shadow-md">
-                    Available
-                  </span>
-                  <span className="absolute top-3 right-3 rounded-full bg-white/90 backdrop-blur-md px-3 py-1 text-xs font-bold text-slate-900 shadow-md">
-                    {categoryName}
-                  </span>
-                </div>
-
-                {/* Thumbnails if > 1 */}
-                {images.length > 1 && (
-                  <div className="flex gap-2 overflow-x-auto pb-1">
-                    {images.map((img, i) => (
-                      <button
-                        key={i}
-                        type="button"
-                        onClick={() => setActivePreviewImageIndex(i)}
-                        className={`h-14 w-14 rounded-xl overflow-hidden border-2 shrink-0 transition-all cursor-pointer ${
-                          activePreviewImageIndex === i
-                            ? "border-indigo-600 scale-105"
-                            : "border-slate-200 opacity-70 hover:opacity-100"
-                        }`}
-                      >
-                        <img src={img.preview} alt="" className="h-full w-full object-cover" />
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Title & Price Header */}
-              <div className="flex items-start justify-between gap-4 pb-4 border-b border-slate-100">
-                <div>
-                  <h2 className="text-xl sm:text-2xl font-bold text-slate-900">{title || "Untitled Product"}</h2>
-                  <div className="mt-1 flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-500">
-                    <span className="rounded-md bg-indigo-50 text-indigo-700 px-2 py-0.5">{condition}</span>
-                    <span>•</span>
-                    <span className="flex items-center gap-1"><MapPin size={13} /> {campusLocation}</span>
-                  </div>
-                </div>
-
-                <div className="shrink-0 text-right">
-                  <span className="text-2xl font-black text-indigo-600">
-                    {isFree ? "FREE" : formatINR(Number(price) || 0)}
-                  </span>
-                </div>
-              </div>
-
-              {/* Description */}
-              <div>
-                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Description</h4>
-                <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line">
-                  {description || "No description provided."}
-                </p>
-              </div>
-
-              {/* Seller Info Card */}
-              <div className="rounded-2xl bg-slate-50 p-4 border border-slate-200 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center font-bold">
-                    {userName.charAt(0)}
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold text-slate-900">{userName}</p>
-                    <p className="text-[11px] text-slate-500">{userCollege}</p>
-                  </div>
-                </div>
-                <span className="rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2.5 py-1">
-                  Verified Student
-                </span>
-              </div>
-            </div>
-
-            {/* Modal Actions */}
-            <div className="sticky bottom-0 border-t border-slate-100 bg-slate-50 p-4 sm:p-5 flex items-center justify-end gap-3 rounded-b-3xl">
-              <button
-                type="button"
-                onClick={() => setShowPreviewModal(false)}
-                className="rounded-full border border-slate-300 bg-white px-6 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-100 transition cursor-pointer"
-              >
-                ← Edit Form
-              </button>
-              <button
-                type="button"
-                disabled={isSubmitting}
-                onClick={handlePublish}
-                className="rounded-full cm-gradient-btn px-7 py-2.5 text-xs font-bold text-white shadow-sm transition cursor-pointer disabled:opacity-50 flex items-center gap-2"
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 size={14} className="animate-spin" />
-                    Publishing...
-                  </>
-                ) : (
-                  <>
-                    <Sparkles size={14} />
-                    Publish Listing Now
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Interactive Listing Preview Modal */}
+      <ProductPreview
+        isOpen={showPreviewModal}
+        onClose={() => setShowPreviewModal(false)}
+        onPublish={handlePublish}
+        isPublishing={isSubmitting}
+        productData={{
+          title,
+          categoryName,
+          price: isFree ? 0 : price,
+          isFree,
+          condition,
+          campusLocation,
+          description,
+        }}
+        images={images}
+        sellerName={sellerName}
+        sellerCollege={sellerCollege}
+      />
 
       <Footer />
-      <ToastContainer position="top-right" autoClose={3000} />
-    </main>
+    </div>
   );
 }

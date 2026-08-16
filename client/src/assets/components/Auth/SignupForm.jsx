@@ -38,7 +38,8 @@ export default function SignupForm() {
   const [activeStep, setActiveStep] = useState(1) // Visual flow step: 1 = Auth, 2 = User created, 3 = Profile created
 
   const navigate = useNavigate()
-  const { signup } = useAuth()
+  const { signUp, signup } = useAuth()
+  const registerUser = signUp || signup
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -67,7 +68,11 @@ export default function SignupForm() {
     signupInfo.password === signupInfo.confirmPassword
 
   const handleSignup = async (e) => {
-    e.preventDefault()
+    if (e && e.preventDefault) e.preventDefault()
+
+    // Prevent duplicate submissions
+    if (submitting) return
+
     const { name, email, password, confirmPassword, college, studentId } = signupInfo
 
     if (!name.trim()) return handleError('Full name is required')
@@ -89,7 +94,7 @@ export default function SignupForm() {
       setSubmitting(true)
       setActiveStep(1) // Step 1: Auth
 
-      await signup({
+      await registerUser({
         email: email.trim().toLowerCase(),
         password,
         name: name.trim(),
@@ -102,12 +107,13 @@ export default function SignupForm() {
       setActiveStep(3) // Step 3: Profile created
       handleSuccess('Account created successfully! Welcome to CampusLoop.')
 
-      // Auto-save temporary registration state for seamless UX
+      // Auto-save email for convenience
       localStorage.setItem('tempRegisteredEmail', email.trim().toLowerCase())
 
+      // Redirect directly to /profile or dashboard (no email confirmation screen in dev)
       setTimeout(() => {
-        navigate('/')
-      }, 1000)
+        navigate('/profile')
+      }, 700)
     } catch (error) {
       handleError(error.message || 'Registration failed. Please try again.')
     } finally {
@@ -420,7 +426,7 @@ export default function SignupForm() {
                 </div>
               </div>
 
-              {/* Submit Button: [Create Account] */}
+              {/* Submit Button: [Create Account] - exactly 1 click submission */}
               <div className="pt-4">
                 <button
                   type="submit"

@@ -646,6 +646,40 @@ export default function Profile() {
                     </p>
                     <p className="text-base font-semibold text-slate-900">{profile?.student_id || profile?.studentId || user?.user_metadata?.student_id || "N/A"}</p>
                   </div>
+                  <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                    <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1 flex items-center gap-1">
+                      <MapPin size={13} className="text-blue-500" /> Campus / Hostel Location
+                    </p>
+                    <p className="text-base font-semibold text-slate-900">{profile?.campus_location || user?.user_metadata?.campus_location || "Campus Main"}</p>
+                  </div>
+                  <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                    <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1 flex items-center gap-1">
+                      <ShieldCheck size={13} className="text-emerald-600" /> Seller Status
+                    </p>
+                    <p className="text-base font-semibold text-slate-900">
+                      {profile?.seller_enabled !== false ? "Active Seller (Can list items)" : "Buyer Only"}
+                    </p>
+                  </div>
+                  <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                    <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1 flex items-center gap-1">
+                      <Clock size={13} className="text-slate-400" /> Account Status
+                    </p>
+                    <p className="text-base font-semibold text-slate-900 capitalize">
+                      {profile?.account_status || "Active"}
+                    </p>
+                  </div>
+                  <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                    <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1 flex items-center gap-1">
+                      <Calendar size={13} className="text-slate-400" /> Member Since
+                    </p>
+                    <p className="text-base font-semibold text-slate-900">
+                      {new Date(user?.created_at || profile?.created_at || Date.now()).toLocaleDateString("en-IN", {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                      })}
+                    </p>
+                  </div>
                 </div>
 
                 <div className="pt-3">

@@ -10,7 +10,7 @@ export function AuthProvider({ children }) {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Load user profile from profiles table
+  // Load user profile from Supabase profiles table
   const fetchProfile = useCallback(async (userId, fallbackUser = null) => {
     if (!userId) {
       setProfile(null);
@@ -34,8 +34,10 @@ export function AuthProvider({ children }) {
           campus_location: meta.campus_location || "Campus Main",
           student_id: meta.student_id || "",
           role: meta.role || "student",
+          seller_enabled: meta.seller_enabled !== false,
           verified: false,
           account_status: "active",
+          created_at: fallbackUser.created_at,
         };
         setProfile(synthetic);
         return synthetic;
@@ -44,18 +46,26 @@ export function AuthProvider({ children }) {
       console.warn("Notice: could not load profile, falling back to auth metadata:", err.message);
       if (fallbackUser?.user_metadata) {
         const meta = fallbackUser.user_metadata;
-        setProfile({
+        const fallbackProfile = {
           id: userId,
-          name: meta.name || "Student",
+          name: meta.name || fallbackUser.email?.split("@")[0] || "Student",
           college: meta.college || "Campus",
-          role: "student",
-        });
+          campus_location: meta.campus_location || "Campus Main",
+          student_id: meta.student_id || "",
+          role: meta.role || "student",
+          seller_enabled: meta.seller_enabled !== false,
+          verified: false,
+          account_status: "active",
+          created_at: fallbackUser.created_at,
+        };
+        setProfile(fallbackProfile);
+        return fallbackProfile;
       }
     }
     return null;
   }, []);
 
-  // Initialize session and listen to Auth state changes
+  // Initialize session from Supabase on startup and subscribe to auth state changes
   useEffect(() => {
     let mounted = true;
 
@@ -70,7 +80,7 @@ export function AuthProvider({ children }) {
           }
         }
       } catch (err) {
-        console.error("Auth initialization error:", err);
+        console.error("Auth initialization notice:", err?.message || err);
       } finally {
         if (mounted) setLoading(false);
       }
@@ -78,7 +88,7 @@ export function AuthProvider({ children }) {
 
     initAuth();
 
-    // Subscribe to auth changes (login, logout, token refresh)
+    // Subscribe to Supabase auth events (login, logout, token refresh, user update)
     const { data: authListener } = authService.onAuthStateChange(async (event, currentSession) => {
       if (!mounted) return;
 
@@ -87,8 +97,10 @@ export function AuthProvider({ children }) {
       setUser(currentUser);
 
       if (currentUser) {
-        // Sync legacy localStorage keys for existing UI compatibility
-        localStorage.setItem("token", currentSession.access_token);
+        // Sync legacy localStorage keys for backward UI compatibility
+        if (currentSession?.access_token) {
+          localStorage.setItem("token", currentSession.access_token);
+        }
         if (currentUser.user_metadata?.name) {
           localStorage.setItem("loggedInUser", currentUser.user_metadata.name);
         }
@@ -115,28 +127,14 @@ export function AuthProvider({ children }) {
     };
   }, [fetchProfile]);
 
-  // Sign in
-  const login = async ({ email, password }) => {
+  // Sign In with email & password
+  const signIn = async ({ email, password }) => {
     setLoading(true);
     try {
       const data = await authService.signIn({ email, password });
       setUser(data.user);
       setSession(data.session);
-      await fetchProfile(data.user.id, data.user);
-      return data;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Sign up
-  const signup = async (params) => {
-    setLoading(true);
-    try {
-      const data = await authService.signUp(params);
       if (data.user) {
-        setUser(data.user);
-        setSession(data.session);
         await fetchProfile(data.user.id, data.user);
       }
       return data;
@@ -145,8 +143,24 @@ export function AuthProvider({ children }) {
     }
   };
 
-  // Sign out
-  const logout = async () => {
+  // Sign Up with email, password, and metadata
+  const signUp = async (params) => {
+    setLoading(true);
+    try {
+      const data = await authService.signUp(params);
+      if (data.user) {
+        setUser(data.user);
+        setSession(data.session || null);
+        await fetchProfile(data.user.id, data.user);
+      }
+      return data;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Sign Out
+  const signOut = async () => {
     setLoading(true);
     try {
       await authService.signOut();
@@ -167,13 +181,14 @@ export function AuthProvider({ children }) {
 
   // Update profile
   const updateProfile = async (updates) => {
-    if (!user?.id) throw new Error("No authenticated user");
+    if (!user?.id) throw new Error("No authenticated user session");
     const updated = await profileService.updateProfile(user.id, updates);
     setProfile(updated);
     return updated;
   };
 
   const isAdmin = profile?.role === "admin" || user?.user_metadata?.role === "admin";
+  const isSeller = profile?.seller_enabled !== false;
   const isAuthenticated = !!user;
 
   const value = {
@@ -182,10 +197,15 @@ export function AuthProvider({ children }) {
     profile,
     loading,
     isAuthenticated,
+    isSeller,
     isAdmin,
-    login,
-    signup,
-    logout,
+    signUp,
+    signIn,
+    signOut,
+    // Aliases for compatibility
+    signup: signUp,
+    login: signIn,
+    logout: signOut,
     refreshProfile,
     updateProfile,
   };

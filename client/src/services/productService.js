@@ -266,12 +266,16 @@ export const productService = {
     if (!title || title.trim().length < 3) throw new Error("Title must be at least 3 characters");
     if (!description || description.trim().length < 10) throw new Error("Description must be at least 10 characters");
 
-    // 1. Insert product record
+    // Defensive UUID check for category_id so non-UUID fallbacks don't fail Postgres UUID casting
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(categoryId);
+    const safeCategoryId = isUuid ? categoryId : null;
+
+    // 1. Insert product record into products table
     const { data: product, error: insertError } = await supabase
       .from("products")
       .insert({
         seller_id: sellerId,
-        category_id: categoryId || null,
+        category_id: safeCategoryId,
         title: title.trim(),
         description: description.trim(),
         price: isFree ? 0 : Number(price) || 0,
@@ -285,7 +289,7 @@ export const productService = {
 
     if (insertError) {
       console.error("Product insert error:", insertError);
-      throw insertError;
+      throw new Error(insertError.message || "Failed to create product listing");
     }
 
     // 2. Upload images to Supabase Storage if provided
@@ -314,10 +318,18 @@ export const productService = {
         }
       } catch (uploadErr) {
         console.error("Image upload failed during product creation:", uploadErr);
+        // Transaction safety: Clean up incomplete product row if image upload failed
+        try {
+          await supabase.from("products").delete().eq("id", product.id);
+        } catch (cleanupErr) {
+          console.warn("Could not cleanup incomplete product:", cleanupErr);
+        }
+        throw new Error(`Image upload failed: ${uploadErr.message || "Storage error. Please verify bucket permissions."}`);
       }
     }
 
-    return this.getProductById(product.id);
+    const created = await this.getProductById(product.id);
+    return created || formatProduct(product);
   },
 
   /**
