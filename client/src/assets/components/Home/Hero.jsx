@@ -77,34 +77,34 @@ export default function Hero() {
 
   return (
     <section className="mx-auto max-w-7xl px-4 pt-4 sm:px-6 lg:px-8">
-      {/* ── SPLIT HERO SHOWCASE WITH CLEAN CAMPUS SLIDESHOW ── */}
-      <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-950 text-white shadow-xl border border-indigo-900/60 p-6 sm:p-10 lg:p-12">
-        {/* Ambient Glows */}
-        <div className="pointer-events-none absolute -top-24 -left-24 h-96 w-96 rounded-full bg-blue-600/25 blur-[100px]" />
-        <div className="pointer-events-none absolute -bottom-24 -right-24 h-96 w-96 rounded-full bg-purple-600/25 blur-[100px]" />
+      {/* ── LOGO BRAND THEME HERO SHOWCASE (Blue & Purple Harmony) ── */}
+      <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-[#f0f6ff] via-[#f8f9ff] to-[#f3f0ff] text-slate-900 shadow-md border border-indigo-100/90 p-6 sm:p-10 lg:p-12">
+        {/* Soft Ambient Brand Glows */}
+        <div className="pointer-events-none absolute -top-24 -left-24 h-96 w-96 rounded-full bg-blue-400/15 blur-[90px]" />
+        <div className="pointer-events-none absolute -bottom-24 -right-24 h-96 w-96 rounded-full bg-purple-400/15 blur-[90px]" />
 
         <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           {/* ── LEFT: Typography, Search & Badges (7 Cols) ── */}
           <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
             <h1
-              className="text-3xl sm:text-5xl lg:text-6xl font-black leading-[1.1] tracking-tight text-white"
+              className="text-3xl sm:text-5xl lg:text-6xl font-black leading-[1.1] tracking-tight text-slate-900"
               style={{ fontFamily: "var(--font-display)" }}
             >
               The smartest way to{" "}
-              <span className="bg-gradient-to-r from-blue-400 via-indigo-300 to-purple-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
                 buy &amp; sell
               </span>{" "}
               on campus.
             </h1>
 
-            <p className="text-sm sm:text-base text-slate-300 max-w-xl mx-auto lg:mx-0 leading-relaxed font-normal">
-              Join students across <strong className="text-white">Dev Sanskriti Vishwavidyalaya</strong> trading second-hand textbooks, electronics, cycles, and hostel gear with zero shipping fees &amp; instant physical hand-offs.
+            <p className="text-sm sm:text-base text-slate-600 max-w-xl mx-auto lg:mx-0 leading-relaxed font-normal">
+              Join students across <strong className="text-indigo-900 font-bold">Dev Sanskriti Vishwavidyalaya</strong> trading second-hand textbooks, electronics, cycles, and hostel gear with zero shipping fees &amp; instant physical hand-offs.
             </p>
 
             {/* Global Quick Search Form */}
             <form
               onSubmit={handleSearch}
-              className="flex items-center gap-2 rounded-full bg-white/95 p-1.5 sm:p-2 shadow-2xl backdrop-blur-md ring-2 ring-white/20 transition-all focus-within:ring-indigo-400 max-w-xl mx-auto lg:mx-0"
+              className="flex items-center gap-2 rounded-full bg-white p-1.5 sm:p-2 shadow-[0_12px_36px_rgba(79,70,229,0.12)] ring-1 ring-indigo-200/80 transition-all focus-within:ring-2 focus-within:ring-indigo-500/40 max-w-xl mx-auto lg:mx-0"
             >
               <input
                 type="text"
@@ -130,7 +130,7 @@ export default function Hero() {
                   key={tag}
                   type="button"
                   onClick={() => handleQuickTag(tag)}
-                  className="px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 text-slate-200 border border-white/10 transition text-[11px] font-medium cursor-pointer"
+                  className="px-3 py-1.5 rounded-full bg-white hover:bg-indigo-50 text-slate-700 border border-indigo-100/80 shadow-2xs transition text-[11px] font-semibold cursor-pointer"
                 >
                   {tag}
                 </button>
@@ -138,34 +138,34 @@ export default function Hero() {
             </div>
 
             {/* Trust Signals */}
-            <div className="grid grid-cols-3 gap-3 pt-3 border-t border-white/10 max-w-xl mx-auto lg:mx-0 text-left">
+            <div className="grid grid-cols-3 gap-3 pt-4 border-t border-indigo-100/90 max-w-xl mx-auto lg:mx-0 text-left">
               <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded-lg bg-emerald-500/20 text-emerald-300">
-                  <ShieldCheck size={16} />
+                <div className="p-2 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100 shadow-2xs">
+                  <ShieldCheck size={17} />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-white leading-none">100% Verified</p>
-                  <p className="text-[10px] text-slate-400 mt-0.5">DSVV Students</p>
+                  <p className="text-xs font-bold text-slate-900 leading-none">100% Verified</p>
+                  <p className="text-[10px] text-slate-500 mt-0.5 font-medium">DSVV Students</p>
                 </div>
               </div>
 
               <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded-lg bg-blue-500/20 text-blue-300">
-                  <Zap size={16} />
+                <div className="p-2 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 shadow-2xs">
+                  <Zap size={17} />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-white leading-none">Zero Fees</p>
-                  <p className="text-[10px] text-slate-400 mt-0.5">Free Hand-off</p>
+                  <p className="text-xs font-bold text-slate-900 leading-none">Zero Fees</p>
+                  <p className="text-[10px] text-slate-500 mt-0.5 font-medium">Free Hand-off</p>
                 </div>
               </div>
 
               <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded-lg bg-purple-500/20 text-purple-300">
-                  <MapPin size={16} />
+                <div className="p-2 rounded-xl bg-purple-50 text-purple-600 border border-purple-100 shadow-2xs">
+                  <MapPin size={17} />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-white leading-none">Campus Spots</p>
-                  <p className="text-[10px] text-slate-400 mt-0.5">Hostels &amp; Library</p>
+                  <p className="text-xs font-bold text-slate-900 leading-none">Campus Spots</p>
+                  <p className="text-[10px] text-slate-500 mt-0.5 font-medium">Hostels &amp; Library</p>
                 </div>
               </div>
             </div>
@@ -178,7 +178,7 @@ export default function Hero() {
             onMouseLeave={() => setIsPaused(false)}
           >
             {/* Slideshow Container Frame */}
-            <div className="relative aspect-[4/3] sm:aspect-[16/11] w-full rounded-3xl overflow-hidden shadow-2xl border-2 border-white/20 group bg-slate-950">
+            <div className="relative aspect-[4/3] sm:aspect-[16/11] w-full rounded-3xl overflow-hidden shadow-lg border-2 border-indigo-100/90 group bg-slate-100">
               {CAMPUS_SLIDES.map((slide, idx) => (
                 <div
                   key={slide.id}
@@ -201,7 +201,7 @@ export default function Hero() {
               {/* Minimal Left / Right Arrows on Hover */}
               <button
                 onClick={handlePrevSlide}
-                className="absolute left-3 top-1/2 -translate-y-1/2 z-20 h-9 w-9 rounded-full bg-black/40 hover:bg-black/70 text-white flex items-center justify-center backdrop-blur-md transition-all opacity-80 hover:opacity-100 hover:scale-110 cursor-pointer"
+                className="absolute left-3 top-1/2 -translate-y-1/2 z-20 h-9 w-9 rounded-full bg-white/80 hover:bg-white text-slate-800 shadow-md flex items-center justify-center backdrop-blur-md transition-all opacity-80 hover:opacity-100 hover:scale-110 cursor-pointer"
                 aria-label="Previous slide"
               >
                 <ChevronLeft size={20} />
@@ -209,7 +209,7 @@ export default function Hero() {
 
               <button
                 onClick={handleNextSlide}
-                className="absolute right-3 top-1/2 -translate-y-1/2 z-20 h-9 w-9 rounded-full bg-black/40 hover:bg-black/70 text-white flex items-center justify-center backdrop-blur-md transition-all opacity-80 hover:opacity-100 hover:scale-110 cursor-pointer"
+                className="absolute right-3 top-1/2 -translate-y-1/2 z-20 h-9 w-9 rounded-full bg-white/80 hover:bg-white text-slate-800 shadow-md flex items-center justify-center backdrop-blur-md transition-all opacity-80 hover:opacity-100 hover:scale-110 cursor-pointer"
                 aria-label="Next slide"
               >
                 <ChevronRight size={20} />
