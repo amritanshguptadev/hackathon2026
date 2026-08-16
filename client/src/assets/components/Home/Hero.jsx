@@ -23,11 +23,6 @@ export default function Hero() {
         <div className="absolute inset-0 bg-gradient-to-br from-[#eff6ff]/95 via-[#f5f3ff]/94 to-[#eef2ff]/96" />
 
         <div className="relative px-6 py-14 text-center sm:px-10 sm:py-16 md:py-20">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold uppercase tracking-wider mb-5 shadow-xs">
-            <span className="h-2 w-2 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 animate-ping" />
-            India's #1 Campus Marketplace
-          </div>
-
           <h1
             className="cm-rise mx-auto max-w-3xl text-3xl font-extrabold leading-tight tracking-tight text-slate-900 sm:text-4xl md:text-5xl lg:text-6xl"
             style={{ fontFamily: "var(--font-display)" }}
