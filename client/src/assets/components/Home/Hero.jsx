@@ -17,8 +17,8 @@ const REAL_CAMPUS_SLIDES = [
     id: 1,
     image:
       "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=1200&auto=format&fit=crop&q=80",
-    campus: "IIT Delhi - North Campus",
-    spot: "Central Library Quad",
+    campus: "Dev Sanskriti Vishwavidyalaya (DSVV)",
+    spot: "Central Library & Shantikunj Quad",
     activity: "Laptop & Tech Peer Exchange",
     badge: "💻 Up to 70% Off Student Tech",
     badgeColor: "from-blue-600 to-indigo-600",
@@ -27,8 +27,8 @@ const REAL_CAMPUS_SLIDES = [
     id: 2,
     image:
       "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=1200&auto=format&fit=crop&q=80",
-    campus: "Delhi University (DU) - North Campus",
-    spot: "Arts Faculty Book Bazaar",
+    campus: "Dev Sanskriti Vishwavidyalaya",
+    spot: "Academic Block Book Bazaar",
     activity: "Second-hand Textbooks & Notes",
     badge: "📚 2,500+ Books & Notes Traded",
     badgeColor: "from-indigo-600 to-purple-600",
@@ -37,8 +37,8 @@ const REAL_CAMPUS_SLIDES = [
     id: 3,
     image:
       "https://images.unsplash.com/photo-1519452635265-7b1fbfd1e4e0?w=1200&auto=format&fit=crop&q=80",
-    campus: "BITS Pilani - SAC Plaza",
-    spot: "Student Activity Center Courtyard",
+    campus: "Dev Sanskriti Vishwavidyalaya",
+    spot: "Mahakal Hostel & Sports Complex",
     activity: "Campus Cycles & Dorm Essentials",
     badge: "🚲 Instant Free Hand-off on Campus",
     badgeColor: "from-emerald-600 to-teal-600",
@@ -47,10 +47,10 @@ const REAL_CAMPUS_SLIDES = [
     id: 4,
     image:
       "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1200&auto=format&fit=crop&q=80",
-    campus: "IIT Bombay - Powai Campus",
-    spot: "Main Academic Building & Hostel 12",
-    activity: "Calculators, Lab Gear & Monitors",
-    badge: "🛡️ 100% Verified Student Members",
+    campus: "Dev Sanskriti Vishwavidyalaya",
+    spot: "Yagya Shala & Main Gate Area",
+    activity: "Calculators, Lab Gear & Electronics",
+    badge: "🛡️ 100% Verified DSVV Members",
     badgeColor: "from-rose-600 to-pink-600",
   },
 ];
@@ -108,7 +108,7 @@ export default function Hero() {
           <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-xs font-bold text-indigo-300 shadow-xs">
               <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>Live Indian Campus Peer-to-Peer Marketplace</span>
+              <span>Live Dev Sanskriti Vishwavidyalaya Marketplace</span>
             </div>
 
             <h1
@@ -123,7 +123,7 @@ export default function Hero() {
             </h1>
 
             <p className="text-sm sm:text-base text-slate-300 max-w-xl mx-auto lg:mx-0 leading-relaxed font-normal">
-              Join thousands of students across IITs, BITS, DU, NITs &amp; top universities trading second-hand textbooks, electronics, cycles, and dorm gear with zero shipping fees.
+              Join students across <strong className="text-white">Dev Sanskriti Vishwavidyalaya</strong> trading second-hand textbooks, electronics, cycles, and hostel gear with zero shipping fees &amp; instant physical hand-offs.
             </p>
 
             {/* Global Quick Search Form */}

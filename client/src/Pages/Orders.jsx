@@ -122,8 +122,8 @@ export default function Orders() {
           category: randomProduct.category || "Campus Items",
           seller: {
             name: "Rahul Mehra",
-            college: "Delhi University (DU)",
-            email: "rahul.m@du.ac.in",
+            college: "Dev Sanskriti Vishwavidyalaya",
+            email: "rahul.dsvv@buykaro.in",
           },
         },
       ],

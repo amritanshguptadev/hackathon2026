@@ -20,8 +20,8 @@ const INITIAL_DEMO_ORDERS = [
         category: "Electronics",
         seller: {
           name: "Arjun Verma",
-          college: "IIT Delhi",
-          email: "arjun.verma@iitd.ac.in",
+          college: "Dev Sanskriti Vishwavidyalaya",
+          email: "arjun.dsvv@buykaro.in",
         },
       },
     ],
@@ -50,8 +50,8 @@ const INITIAL_DEMO_ORDERS = [
         category: "Books & Notes",
         seller: {
           name: "Meera Sen",
-          college: "Delhi University",
-          email: "meera.sen@du.ac.in",
+          college: "Dev Sanskriti Vishwavidyalaya",
+          email: "meera.dsvv@buykaro.in",
         },
       },
       {
@@ -65,8 +65,8 @@ const INITIAL_DEMO_ORDERS = [
         category: "Hostel Essentials",
         seller: {
           name: "Rajat Chauhan",
-          college: "IIT Roorkee",
-          email: "rajat.chauhan@iitr.ac.in",
+          college: "Dev Sanskriti Vishwavidyalaya",
+          email: "rajat.dsvv@buykaro.in",
         },
       },
     ],

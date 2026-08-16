@@ -26,21 +26,11 @@ import {
 } from "lucide-react";
 
 const CAMPUS_PRESETS = [
-  "IIT Delhi",
-  "BITS Pilani",
-  "Delhi University (DU)",
-  "VIT Vellore",
-  "IIT Bombay",
-  "SRM University",
-  "DTU Delhi",
-  "NIT Trichy",
-  "MIT Pune",
-  "Manipal University",
-  "Jadavpur University",
-  "IIT Roorkee",
-  "BHU Varanasi",
-  "Thapar University",
-  "Other Campus",
+  "Dev Sanskriti Vishwavidyalaya (DSVV)",
+  "Dev Sanskriti Vishwavidyalaya - Main Campus",
+  "Dev Sanskriti Vishwavidyalaya - Shantikunj Area",
+  "Dev Sanskriti Vishwavidyalaya - Mahakal Hostel Block",
+  "Dev Sanskriti Vishwavidyalaya - Haridwar",
 ];
 
 const AVATAR_PRESETS = [
@@ -61,10 +51,10 @@ export default function EditProfile() {
     profile?.name || profile?.fullName || localStorage.getItem("loggedInUser") || "Arjun Verma"
   );
   const [college, setCollege] = useState(
-    profile?.college || profile?.university || localStorage.getItem("college") || "IIT Delhi"
+    profile?.college || profile?.university || localStorage.getItem("college") || "Dev Sanskriti Vishwavidyalaya"
   );
   const [studentId, setStudentId] = useState(
-    profile?.student_id || profile?.studentId || localStorage.getItem("studentId") || "2023CSB1048"
+    profile?.student_id || profile?.studentId || localStorage.getItem("studentId") || "DSVV2024CS08"
   );
   const [campusLocation, setCampusLocation] = useState(
     profile?.campus_location || "North Hostel Block C, Room 204"

@@ -322,7 +322,7 @@ export default function Profile() {
                   </h1>
                   <p className="text-xs font-semibold text-slate-500 flex items-center gap-1.5 justify-center sm:justify-start mt-0.5">
                     <GraduationCap size={15} className="text-slate-400" />
-                    {profile?.college || profile?.university || user?.user_metadata?.college || "University Campus"}
+                    {profile?.college || profile?.university || user?.user_metadata?.college || "Dev Sanskriti Vishwavidyalaya"}
                   </p>
                 </div>
               </div>
@@ -638,7 +638,7 @@ export default function Profile() {
                     <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1 flex items-center gap-1">
                       <GraduationCap size={13} className="text-[var(--cm-blue)]" /> College / University
                     </p>
-                    <p className="text-base font-semibold text-slate-900">{profile?.college || profile?.university || user?.user_metadata?.college || "N/A"}</p>
+                    <p className="text-base font-semibold text-slate-900">{profile?.college || profile?.university || user?.user_metadata?.college || "Dev Sanskriti Vishwavidyalaya"}</p>
                   </div>
                   <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
                     <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1 flex items-center gap-1">

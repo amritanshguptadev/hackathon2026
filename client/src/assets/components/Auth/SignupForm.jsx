@@ -387,7 +387,7 @@ export default function SignupForm() {
                       required
                       value={signupInfo.college}
                       onChange={handleChange}
-                      placeholder="e.g. Stanford / Delhi University"
+                      placeholder="e.g. Dev Sanskriti Vishwavidyalaya"
                       className="w-full rounded-xl border border-slate-300 bg-slate-50/50 py-3 pl-10 pr-4 text-sm sm:text-base text-slate-900 outline-none transition focus:border-[var(--cm-blue)] focus:bg-white focus:ring-2 focus:ring-[var(--cm-blue)]/20"
                     />
                   </div>

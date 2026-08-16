@@ -159,7 +159,7 @@ export default function Settings() {
                 <h3 className="text-lg font-bold text-slate-900">
                   {profile?.name || profile?.fullName || localStorage.getItem("loggedInUser") || "Arjun Verma"}
                 </h3>
-                <p className="text-xs text-slate-500">{user?.email || "arjun.verma@iitd.ac.in"}</p>
+                <p className="text-xs text-slate-500">{user?.email || "arjun.verma@dsvv.ac.in"}</p>
                 <div className="inline-flex items-center gap-1 mt-1 text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full">
                   <ShieldCheck size={13} /> Verified Student Member
                 </div>

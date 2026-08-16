@@ -1,69 +1,33 @@
-/**
- * Central paths for BuyKaro marketplace images.
- * Files live in: client/public/images/
- */
 export const IMAGES = {
-  logo: "/images/logo.png",
-
-  products: {
-    // 18 New Second-Hand Campus Items
-    hpProBook: "/images/products/1.jpg",
-    mountainCycle: "/images/products/2.jpg",
-    studioHeadphones: "/images/products/3.jpg",
-    humanitiesBooks: "/images/products/4.jpg",
-    dellInspiron: "/images/products/5.jpg",
-    smartphonesCombo: "/images/products/6.jpg",
-    ipadRetina: "/images/products/7.jpg",
-    stemBooks: "/images/products/8.jpg",
-    hpSlimLaptop: "/images/products/9.jpg",
-    externalHdd1tb: "/images/products/10.jpg",
-    usbDrives3pack: "/images/products/11.jpg",
-    powerExtension4socket: "/images/products/12.jpg",
-    seagateHdd: "/images/products/13.jpg",
-    usbDrives4pack: "/images/products/14.jpg",
-    surgeProtector6socket: "/images/products/15.jpg",
-    multimediaProjector: "/images/products/16.jpg",
-    roomAirCooler: "/images/products/17.jpg",
-    miniDormFridge: "/images/products/18.jpg",
-
-    // Legacy demo images
-    macbook: "/images/products/macbook.png",
-    textbook: "/images/products/textbook.png",
-    deskLamp: "/images/products/desk-lamp.png",
-    gamingChair: "/images/products/gaming-chair.png",
-    headphones: "/images/products/headphones.png",
-    cycle: "/images/products/cycle.png",
-    keyboard: "/images/products/keyboard.png",
-    sofa: "/images/products/sofa.png",
+  hero: {
+    campusLife: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=1200&auto=format&fit=crop&q=80",
+    studentsStudying: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1200&auto=format&fit=crop&q=80",
+    library: "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1200&auto=format&fit=crop&q=80",
+    techTrade: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=1200&auto=format&fit=crop&q=80",
+    collegeBikes: "https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=1200&auto=format&fit=crop&q=80",
   },
   categories: {
-    cycles: "/images/categories/cycles.png",
-    books: "/images/categories/books.png",
-    electronics: "/images/categories/electronics.png",
-    furniture: "/images/categories/furniture.png",
-    appliances: "/images/categories/appliances.png",
-    hostel: "/images/categories/hostel.png",
-  },
-  auth: {
-    campus: "/images/auth/campus.png",
-  },
-  hero: {
-    campusLife: "/images/hero/campus-life.png",
-  },
+    electronics: "https://images.unsplash.com/photo-1498049794561-7780e7231661?w=400&auto=format&fit=crop&q=80",
+    books: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=400&auto=format&fit=crop&q=80",
+    furniture: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&auto=format&fit=crop&q=80",
+    cycles: "https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=400&auto=format&fit=crop&q=80",
+    hostel: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&auto=format&fit=crop&q=80",
+    appliances: "https://images.unsplash.com/photo-1584269600464-37b1b58a9fe7?w=400&auto=format&fit=crop&q=80",
+  }
 };
 
 export const DEMO_LISTINGS = [
   {
     _id: "bk-item-1",
     title: "HP ProBook 15.6\" Student Laptop (Core i5 / 8GB / 256GB SSD)",
-    description: "HP ProBook 15.6-inch laptop with Intel Core i5 processor, 8GB RAM, and 256GB SSD. Perfect for coding, college assignments, and web development.",
+    description: "Well-maintained student laptop used for 3 semesters of computer science coursework. Excellent battery health, smooth performance for coding, browsing, and assignments.",
     price: "13,999",
     numericPrice: 13999,
     image: "/images/products/1.jpg",
     category: "Electronics",
     condition: "Good",
-    location: "Library Area",
-    meta: "Good condition • Library Area",
+    location: "North Hostel",
+    meta: "Good condition • North Hostel",
     status: "Available",
     timeAgo: "1h ago",
     details: [
@@ -71,20 +35,20 @@ export const DEMO_LISTINGS = [
       "8GB DDR4 RAM + 256GB High-Speed SSD",
       "15.6-inch Anti-Glare HD Display with full numeric keypad",
       "Battery backup: ~3.5 hours on normal usage, original HP charger included",
-      "Pre-installed with clean Windows 11 & essential developer tools (VS Code, Git)"
+      "Pre-installed with clean Windows 11 & essential developer tools"
     ],
     seller: {
       name: "Arjun Verma",
-      email: "arjun.cse@buykaro.in",
-      college: "IIT Delhi",
-      city: "New Delhi",
+      email: "arjun.dsvv@buykaro.in",
+      college: "Dev Sanskriti Vishwavidyalaya",
+      city: "Haridwar",
       joinedAt: "2024-03-10T10:00:00Z"
     }
   },
   {
     _id: "bk-item-2",
     title: "Hero Sprint 21-Speed Mountain Bike (Carrier & Lock)",
-    description: "Sturdy blue campus mountain bike equipped with 21-speed Shimano gears, comfortable dual-cushion seat, and strong rear luggage carrier.",
+    description: "Sturdy campus mountain bike equipped with 21-speed Shimano gears, comfortable dual-cushion seat, and strong rear luggage carrier.",
     price: "2,499",
     numericPrice: 2499,
     image: "/images/products/2.jpg",
@@ -103,9 +67,9 @@ export const DEMO_LISTINGS = [
     ],
     seller: {
       name: "Tanmay Deshmukh",
-      email: "tanmay.mech@buykaro.in",
-      college: "BITS Pilani",
-      city: "Pilani",
+      email: "tanmay.dsvv@buykaro.in",
+      college: "Dev Sanskriti Vishwavidyalaya",
+      city: "Haridwar",
       joinedAt: "2024-05-15T10:00:00Z"
     }
   },
@@ -130,16 +94,16 @@ export const DEMO_LISTINGS = [
     ],
     seller: {
       name: "Kavya Nair",
-      email: "kavya.media@buykaro.in",
-      college: "Christ University",
-      city: "Bengaluru",
+      email: "kavya.dsvv@buykaro.in",
+      college: "Dev Sanskriti Vishwavidyalaya",
+      city: "Haridwar",
       joinedAt: "2024-07-20T10:00:00Z"
     }
   },
   {
     _id: "bk-item-4",
     title: "Humanities & Social Sciences Core Textbook Stack",
-    description: "Essential undergraduate semester bundle including Econometrics, Sociology, Molecular Biology of the Cell, and American Governance.",
+    description: "Essential undergraduate semester bundle including Econometrics, Sociology, Molecular Biology of the Cell, and Indian Heritage.",
     price: "599",
     numericPrice: 599,
     image: "/images/products/4.jpg",
@@ -157,9 +121,9 @@ export const DEMO_LISTINGS = [
     ],
     seller: {
       name: "Meera Sen",
-      email: "meera.eco@buykaro.in",
-      college: "Delhi University",
-      city: "Delhi",
+      email: "meera.dsvv@buykaro.in",
+      college: "Dev Sanskriti Vishwavidyalaya",
+      city: "Haridwar",
       joinedAt: "2024-01-12T10:00:00Z"
     }
   },
@@ -185,9 +149,9 @@ export const DEMO_LISTINGS = [
     ],
     seller: {
       name: "Sameer Joshi",
-      email: "sameer.civil@buykaro.in",
-      college: "MIT Pune",
-      city: "Pune",
+      email: "sameer.dsvv@buykaro.in",
+      college: "Dev Sanskriti Vishwavidyalaya",
+      city: "Haridwar",
       joinedAt: "2023-11-05T10:00:00Z"
     }
   },
@@ -212,9 +176,9 @@ export const DEMO_LISTINGS = [
     ],
     seller: {
       name: "Rahul Saxena",
-      email: "rahul.ece@buykaro.in",
-      college: "DTU Delhi",
-      city: "Delhi",
+      email: "rahul.dsvv@buykaro.in",
+      college: "Dev Sanskriti Vishwavidyalaya",
+      city: "Haridwar",
       joinedAt: "2024-02-18T10:00:00Z"
     }
   },
@@ -240,9 +204,9 @@ export const DEMO_LISTINGS = [
     ],
     seller: {
       name: "Aayush Agarwal",
-      email: "aayush.cse@buykaro.in",
-      college: "VIT Vellore",
-      city: "Vellore",
+      email: "aayush.dsvv@buykaro.in",
+      college: "Dev Sanskriti Vishwavidyalaya",
+      city: "Haridwar",
       joinedAt: "2024-04-22T10:00:00Z"
     }
   },
@@ -267,9 +231,9 @@ export const DEMO_LISTINGS = [
     ],
     seller: {
       name: "Sneha Mukherjee",
-      email: "sneha.sci@buykaro.in",
-      college: "Jadavpur University",
-      city: "Kolkata",
+      email: "sneha.dsvv@buykaro.in",
+      college: "Dev Sanskriti Vishwavidyalaya",
+      city: "Haridwar",
       joinedAt: "2024-06-11T10:00:00Z"
     }
   },
@@ -295,9 +259,9 @@ export const DEMO_LISTINGS = [
     ],
     seller: {
       name: "Aditya Khurana",
-      email: "aditya.se@buykaro.in",
-      college: "SRM Chennai",
-      city: "Chennai",
+      email: "aditya.dsvv@buykaro.in",
+      college: "Dev Sanskriti Vishwavidyalaya",
+      city: "Haridwar",
       joinedAt: "2024-01-30T10:00:00Z"
     }
   },
@@ -322,9 +286,9 @@ export const DEMO_LISTINGS = [
     ],
     seller: {
       name: "Varun Nair",
-      email: "varun.it@buykaro.in",
-      college: "Manipal University",
-      city: "Manipal",
+      email: "varun.dsvv@buykaro.in",
+      college: "Dev Sanskriti Vishwavidyalaya",
+      city: "Haridwar",
       joinedAt: "2024-03-25T10:00:00Z"
     }
   },
@@ -348,9 +312,9 @@ export const DEMO_LISTINGS = [
     ],
     seller: {
       name: "Devika Pillai",
-      email: "devika.ee@buykaro.in",
-      college: "NIT Trichy",
-      city: "Tiruchirappalli",
+      email: "devika.dsvv@buykaro.in",
+      college: "Dev Sanskriti Vishwavidyalaya",
+      city: "Haridwar",
       joinedAt: "2024-08-01T10:00:00Z"
     }
   },
@@ -375,9 +339,9 @@ export const DEMO_LISTINGS = [
     ],
     seller: {
       name: "Rajat Chauhan",
-      email: "rajat.hostel@buykaro.in",
-      college: "IIT Roorkee",
-      city: "Roorkee",
+      email: "rajat.dsvv@buykaro.in",
+      college: "Dev Sanskriti Vishwavidyalaya",
+      city: "Haridwar",
       joinedAt: "2023-10-15T10:00:00Z"
     }
   },
@@ -402,9 +366,9 @@ export const DEMO_LISTINGS = [
     ],
     seller: {
       name: "Pooja Hegde",
-      email: "pooja.design@buykaro.in",
-      college: "CEPT Ahmedabad",
-      city: "Ahmedabad",
+      email: "pooja.dsvv@buykaro.in",
+      college: "Dev Sanskriti Vishwavidyalaya",
+      city: "Haridwar",
       joinedAt: "2024-02-14T10:00:00Z"
     }
   },
@@ -424,13 +388,13 @@ export const DEMO_LISTINGS = [
     details: [
       "4 Functional USB thumb drives formatted and wiped clean",
       "Capless slider and 360-degree metal swivel designs prevent lost caps",
-      "Ideal for bootable Linux drives, assignments, and campus xerox runs"
+      "Ideal for assignments, presentations, and campus print runs"
     ],
     seller: {
       name: "Nitin Singhania",
-      email: "nitin.phys@buykaro.in",
-      college: "BHU Varanasi",
-      city: "Varanasi",
+      email: "nitin.dsvv@buykaro.in",
+      college: "Dev Sanskriti Vishwavidyalaya",
+      city: "Haridwar",
       joinedAt: "2023-09-08T10:00:00Z"
     }
   },
@@ -454,16 +418,16 @@ export const DEMO_LISTINGS = [
     ],
     seller: {
       name: "Vikram Batra",
-      email: "vikram.thapar@buykaro.in",
-      college: "Thapar University",
-      city: "Patiala",
+      email: "vikram.dsvv@buykaro.in",
+      college: "Dev Sanskriti Vishwavidyalaya",
+      city: "Haridwar",
       joinedAt: "2024-04-05T10:00:00Z"
     }
   },
   {
     _id: "bk-item-16",
     title: "Epson / NEC LCD Multimedia Classroom & Movie Projector",
-    description: "High-brightness 3LCD multimedia projector with HDMI and VGA ports. Perfect for student club presentations, hackathons, and dorm movie nights.",
+    description: "High-brightness 3LCD multimedia projector with HDMI and VGA ports. Perfect for student club presentations, seminars, and dorm study nights.",
     price: "5,999",
     numericPrice: 5999,
     image: "/images/products/16.jpg",
@@ -480,10 +444,10 @@ export const DEMO_LISTINGS = [
       "Includes power cable and 2-meter gold-plated HDMI cable"
     ],
     seller: {
-      name: "Campus Tech Club",
-      email: "techclub.iitb@buykaro.in",
-      college: "IIT Bombay",
-      city: "Mumbai",
+      name: "DSVV Tech Society",
+      email: "techsociety.dsvv@buykaro.in",
+      college: "Dev Sanskriti Vishwavidyalaya",
+      city: "Haridwar",
       joinedAt: "2023-08-15T10:00:00Z"
     }
   },
@@ -503,14 +467,14 @@ export const DEMO_LISTINGS = [
     details: [
       "25L Water tank capacity with clear water level indicator",
       "Honeycomb cooling pads and high-velocity blower with motorized louvers",
-      "Low power consumption (only 120W) — runs smoothly on hostel inverters",
+      "Low power consumption (only 120W) — runs smoothly on hostel power",
       "4 Multi-directional caster wheels for effortless relocation"
     ],
     seller: {
       name: "Kunal Bansal",
-      email: "kunal.mnit@buykaro.in",
-      college: "MNIT Jaipur",
-      city: "Jaipur",
+      email: "kunal.dsvv@buykaro.in",
+      college: "Dev Sanskriti Vishwavidyalaya",
+      city: "Haridwar",
       joinedAt: "2024-03-01T10:00:00Z"
     }
   },
@@ -529,15 +493,15 @@ export const DEMO_LISTINGS = [
     timeAgo: "18h ago",
     details: [
       "Compact dimensions fit perfectly beside hostel study desks",
-      "Dedicated top freezer section for ice cubes and frozen treats",
+      "Dedicated top freezer section for ice cubes and cold snacks",
       "Adjustable wire shelf and in-door can/bottle storage racks",
       "Energy efficient compressor with ultra-quiet 38dB operation"
     ],
     seller: {
       name: "Aniket & Roommates",
-      email: "aniket.bits@buykaro.in",
-      college: "BITS Goa",
-      city: "Goa",
+      email: "aniket.dsvv@buykaro.in",
+      college: "Dev Sanskriti Vishwavidyalaya",
+      city: "Haridwar",
       joinedAt: "2023-12-10T10:00:00Z"
     }
   }
