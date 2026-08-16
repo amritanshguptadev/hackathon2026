@@ -86,11 +86,6 @@ export default function Hero() {
         <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           {/* ── LEFT: Typography, Search & Badges (7 Cols) ── */}
           <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-xs font-bold text-indigo-300 shadow-xs">
-              <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>Live Dev Sanskriti Vishwavidyalaya Marketplace</span>
-            </div>
-
             <h1
               className="text-3xl sm:text-5xl lg:text-6xl font-black leading-[1.1] tracking-tight text-white"
               style={{ fontFamily: "var(--font-display)" }}
