@@ -5,6 +5,11 @@ import SignupForm from './assets/components/Auth/SignupForm';
 import ProductDetails from './assets/components/Product/ProductDetails';
 import AllProducts from './assets/components/Product/AllProducts';
 import Wishlist from './Pages/Wishlist';
+import Orders from './Pages/Orders';
+import EditProfile from './Pages/EditProfile';
+import MyListings from './Pages/MyListings';
+import Notifications from './Pages/Notifications';
+import Settings from './Pages/Settings';
 import LoginForm from './assets/components/Auth/LoginForm';
 import EmailVerification from './assets/components/Auth/EmailVerification';
 import Profile from './Pages/Profile';
@@ -14,6 +19,7 @@ import Cart from './Pages/Cart';
 import { SocketProvider } from './context/SocketContext';
 import { CartProvider } from './context/CartContext';
 import { WishlistProvider } from './context/WishlistContext';
+import { OrderProvider } from './context/OrderContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
 function PrivateRoute({ element }) {
@@ -43,11 +49,19 @@ function AppRoutes() {
       <Route path="/favorites" element={<Wishlist />} />
       <Route path="/liked" element={<Wishlist />} />
       <Route path="/upcoming" element={<Wishlist />} />
+      <Route path="/orders" element={<PrivateRoute element={<Orders />} />} />
+      <Route path="/my-orders" element={<PrivateRoute element={<Orders />} />} />
       <Route path="/profile" element={<PrivateRoute element={<Profile />} />} />
+      <Route path="/profile/edit" element={<PrivateRoute element={<EditProfile />} />} />
+      <Route path="/edit-profile" element={<PrivateRoute element={<EditProfile />} />} />
+      <Route path="/my-listings" element={<PrivateRoute element={<MyListings />} />} />
+      <Route path="/notifications" element={<PrivateRoute element={<Notifications />} />} />
+      <Route path="/settings" element={<PrivateRoute element={<Settings />} />} />
       <Route path="/product-listing" element={<PrivateRoute element={<ProductListing />} />} />
       <Route path="/sell" element={<PrivateRoute element={<ProductListing />} />} />
       <Route path="/messages" element={<PrivateRoute element={<Messages />} />} />
       <Route path="/messages/:conversationId" element={<PrivateRoute element={<Messages />} />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
@@ -58,7 +72,9 @@ function App() {
       <SocketProvider>
         <CartProvider>
           <WishlistProvider>
-            <AppRoutes />
+            <OrderProvider>
+              <AppRoutes />
+            </OrderProvider>
           </WishlistProvider>
         </CartProvider>
       </SocketProvider>

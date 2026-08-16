@@ -344,6 +344,57 @@ export default function Profile() {
               </div>
             </div>
 
+            {/* Profile Quick Links / Navigation Hub */}
+            <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 pb-3 mb-6">
+              <Link
+                to="/orders"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition shadow-2xs"
+              >
+                <Package size={14} />
+                Your Orders
+              </Link>
+
+              <Link
+                to="/my-listings"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition shadow-2xs"
+              >
+                <ShoppingBag size={14} />
+                My Listings ({myListings.length})
+              </Link>
+
+              <Link
+                to="/wishlist"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-rose-50 text-rose-600 hover:bg-rose-100 transition shadow-2xs"
+              >
+                <Heart size={14} />
+                Liked Items ({favorites.length})
+              </Link>
+
+              <Link
+                to="/profile/edit"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition"
+              >
+                <Edit size={14} />
+                Edit Profile
+              </Link>
+
+              <Link
+                to="/notifications"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition"
+              >
+                <Bell size={14} />
+                Notifications
+              </Link>
+
+              <Link
+                to="/settings"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition"
+              >
+                <Settings size={14} />
+                Settings
+              </Link>
+            </div>
+
             {/* Profile Navigation Tabs */}
             <div className="flex items-center gap-3 border-b border-slate-200 pb-3 mb-6">
               <button

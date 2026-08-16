@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import HeaderMain from '../assets/components/Home/HeaderMain';
 import Footer from '../assets/components/Home/Footer';
 import { useCart } from '../context/CartContext';
+import { useOrders } from '../context/OrderContext';
 import { resolveImageUrl } from '../config/api';
 import { ToastContainer, toast } from 'react-toastify';
 import {
@@ -91,6 +92,8 @@ export default function Cart() {
     setIsCheckingOut(true);
   };
 
+  const { addOrder } = useOrders();
+
   const handleConfirmOrder = () => {
     const orderId = `BK-${Date.now().toString().slice(-6)}`;
     const studentUser = localStorage.getItem('loggedInUser') || 'Student Buyer';
@@ -109,6 +112,7 @@ export default function Cart() {
       createdAt: new Date().toISOString(),
     };
 
+    addOrder(orderData);
     setPlacedOrderDetails(orderData);
     clearCart();
     setIsCheckingOut(false);
@@ -636,24 +640,33 @@ export default function Cart() {
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex flex-col sm:flex-row gap-2.5">
+              <button
+                onClick={() => {
+                  setOrderCompleteModal(false);
+                  navigate('/orders');
+                }}
+                className="flex-1 cm-gradient-btn py-3 rounded-xl font-bold text-xs shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <Package size={15} /> Track Your Orders
+              </button>
               <button
                 onClick={() => {
                   setOrderCompleteModal(false);
                   navigate('/messages');
                 }}
-                className="flex-1 cm-gradient-btn py-3 rounded-xl font-bold text-xs shadow-md transition flex items-center justify-center gap-2"
+                className="flex-1 border border-indigo-200 bg-indigo-50/50 hover:bg-indigo-50 text-indigo-700 py-3 rounded-xl font-bold text-xs transition flex items-center justify-center gap-1.5 cursor-pointer"
               >
-                <MessageSquare size={16} /> Open Chat with Seller
+                <MessageSquare size={15} /> Chat Seller
               </button>
               <button
                 onClick={() => {
                   setOrderCompleteModal(false);
                   navigate('/all-products');
                 }}
-                className="flex-1 border border-indigo-200 bg-indigo-50/50 hover:bg-indigo-50 text-indigo-700 py-3 rounded-xl font-bold text-xs transition"
+                className="flex-1 border border-slate-200 hover:bg-slate-50 text-slate-700 py-3 rounded-xl font-bold text-xs transition cursor-pointer"
               >
-                Continue Shopping
+                Marketplace
               </button>
             </div>
           </div>
