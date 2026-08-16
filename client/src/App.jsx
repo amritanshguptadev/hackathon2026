@@ -4,7 +4,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import SignupForm from './assets/components/Auth/SignupForm';
 import ProductDetails from './assets/components/Product/ProductDetails';
 import AllProducts from './assets/components/Product/AllProducts';
-import Upcoming from './Pages/Upcoming';
+import Wishlist from './Pages/Wishlist';
 import LoginForm from './assets/components/Auth/LoginForm';
 import EmailVerification from './assets/components/Auth/EmailVerification';
 import Profile from './Pages/Profile';
@@ -13,6 +13,7 @@ import Messages from './Pages/Messages';
 import Cart from './Pages/Cart';
 import { SocketProvider } from './context/SocketContext';
 import { CartProvider } from './context/CartContext';
+import { WishlistProvider } from './context/WishlistContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
 function PrivateRoute({ element }) {
@@ -38,7 +39,10 @@ function AppRoutes() {
       <Route path="/product/:id" element={<ProductDetails />} />
       <Route path="/all-products" element={<AllProducts />} />
       <Route path="/cart" element={<Cart />} />
-      <Route path="/upcoming" element={<Upcoming />} />
+      <Route path="/wishlist" element={<Wishlist />} />
+      <Route path="/favorites" element={<Wishlist />} />
+      <Route path="/liked" element={<Wishlist />} />
+      <Route path="/upcoming" element={<Wishlist />} />
       <Route path="/profile" element={<PrivateRoute element={<Profile />} />} />
       <Route path="/product-listing" element={<PrivateRoute element={<ProductListing />} />} />
       <Route path="/sell" element={<PrivateRoute element={<ProductListing />} />} />
@@ -53,7 +57,9 @@ function App() {
     <AuthProvider>
       <SocketProvider>
         <CartProvider>
-          <AppRoutes />
+          <WishlistProvider>
+            <AppRoutes />
+          </WishlistProvider>
         </CartProvider>
       </SocketProvider>
     </AuthProvider>

@@ -4,11 +4,13 @@ import { Link } from "react-router-dom";
 import MobileMenu from "./MobileMenu.jsx";
 import { useSocket } from "../../../context/SocketContext";
 import { useCart } from "../../../context/CartContext";
+import { useWishlist } from "../../../context/WishlistContext";
 
 export default function HeaderMain({ showSearchBar = true }) {
   const [searchText, setSearchText] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const { cartCount } = useCart() || { cartCount: 0 };
+  const { favoriteCount } = useWishlist() || { favoriteCount: 0 };
   const isAuthenticated = !!localStorage.getItem("token");
   const { totalUnreadCount } = useSocket() || { totalUnreadCount: 0 };
 
@@ -48,11 +50,16 @@ export default function HeaderMain({ showSearchBar = true }) {
 
         <div className="ml-auto flex items-center gap-1 sm:gap-2">
           <Link
-            to="/upcoming"
-            className="rounded-full p-2.5 text-slate-600 transition hover:bg-indigo-50 hover:text-indigo-600"
-            aria-label="Wishlist"
+            to="/wishlist"
+            className="relative rounded-full p-2.5 text-slate-600 transition hover:bg-indigo-50 hover:text-indigo-600"
+            aria-label={`Liked Items (${favoriteCount})`}
           >
-            <Heart size={20} />
+            <Heart size={20} className={favoriteCount > 0 ? "fill-rose-500 text-rose-500" : ""} />
+            {favoriteCount > 0 && (
+              <span className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white shadow-xs">
+                {favoriteCount > 9 ? "9+" : favoriteCount}
+              </span>
+            )}
           </Link>
           <Link
             to={isAuthenticated ? "/messages" : "/login"}

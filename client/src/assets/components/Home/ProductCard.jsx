@@ -2,6 +2,7 @@ import { Heart, ShoppingBag } from "lucide-react";
 import { Link } from "react-router-dom";
 import { resolveImageUrl } from "../../../config/api";
 import { useCart } from "../../../context/CartContext";
+import { useWishlist } from "../../../context/WishlistContext";
 
 const STATUS_STYLES = {
   Available: "bg-emerald-50 text-emerald-700 border-emerald-100",
@@ -11,14 +12,27 @@ const STATUS_STYLES = {
 
 export default function ProductCard({ product }) {
   const { addToCart } = useCart() || { addToCart: () => {} };
+  const { isFavorite, toggleFavorite } = useWishlist() || {
+    isFavorite: () => false,
+    toggleFavorite: () => {},
+  };
+
+  const prodId = product._id || product.id;
+  const isLiked = isFavorite(prodId);
   const status = product.status || "Available";
   const statusClass = STATUS_STYLES[status] || STATUS_STYLES.Available;
-  const to = product._id ? `/api/product/${product._id}` : "/all-products";
+  const to = prodId ? `/api/product/${prodId}` : "/all-products";
 
   const handleQuickAdd = (e) => {
     e.preventDefault();
     e.stopPropagation();
     addToCart(product, 1);
+  };
+
+  const handleToggleLike = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleFavorite(product);
   };
 
   return (
@@ -40,14 +54,16 @@ export default function ProductCard({ product }) {
         {/* Wishlist Button */}
         <button
           type="button"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-          }}
-          className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-slate-400 shadow-sm transition hover:text-rose-500 hover:bg-white"
-          aria-label="Save to wishlist"
+          onClick={handleToggleLike}
+          className={`absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full shadow-sm transition active:scale-90 cursor-pointer ${
+            isLiked
+              ? "bg-white text-rose-500 hover:bg-rose-50 ring-2 ring-rose-100"
+              : "bg-white/90 text-slate-400 hover:text-rose-500 hover:bg-white"
+          }`}
+          aria-label={isLiked ? "Remove from wishlist" : "Save to wishlist"}
+          title={isLiked ? "Remove from Liked" : "Save to Liked"}
         >
-          <Heart size={15} />
+          <Heart size={15} className={isLiked ? "fill-rose-500 text-rose-500" : ""} />
         </button>
 
         {/* Quick Add to Cart button on hover */}

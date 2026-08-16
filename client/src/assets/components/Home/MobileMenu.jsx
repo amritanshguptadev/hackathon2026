@@ -1,11 +1,13 @@
 import { Heart, User, Package, MessageCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useSocket } from "../../../context/SocketContext";
+import { useWishlist } from "../../../context/WishlistContext";
 
 export default function MobileMenu() {
   const isAuthenticated = !!localStorage.getItem("token");
   const userName = localStorage.getItem("loggedInUser") || "Guest";
   const { totalUnreadCount } = useSocket() || { totalUnreadCount: 0 };
+  const { favoriteCount } = useWishlist() || { favoriteCount: 0 };
 
   return (
     <div className="space-y-4 py-2">
@@ -46,11 +48,16 @@ export default function MobileMenu() {
           )}
         </Link>
         <Link
-          to="/upcoming"
-          className="flex flex-col items-center gap-1 rounded-xl bg-[var(--cm-bg)] py-3 text-xs font-medium text-[var(--cm-slate)]"
+          to="/wishlist"
+          className="relative flex flex-col items-center gap-1 rounded-xl bg-[var(--cm-bg)] py-3 text-xs font-medium text-[var(--cm-slate)]"
         >
-          <Heart size={20} />
+          <Heart size={20} className={favoriteCount > 0 ? "fill-rose-500 text-rose-500" : ""} />
           Wishlist
+          {favoriteCount > 0 && (
+            <span className="absolute right-2 top-2 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-bold text-white shadow-xs">
+              {favoriteCount}
+            </span>
+          )}
         </Link>
         <Link
           to={isAuthenticated ? "/profile" : "/login"}

@@ -4,8 +4,8 @@ import Header from "../Home/Header";
 import Footer from "../Home/Footer";
 import { useCart } from "../../../context/CartContext";
 import { useAuth } from "../../../context/AuthContext";
+import { useWishlist } from "../../../context/WishlistContext";
 import { productService } from "../../../services/productService";
-import { favoriteService } from "../../../services/favoriteService";
 import { ToastContainer, toast } from "react-toastify";
 import { resolveMediaUrl } from "../../../config/api";
 import { DEMO_LISTINGS } from "../../../data/images";
@@ -29,11 +29,14 @@ export default function ProductDetails() {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [isFav, setIsFav] = useState(false);
   const [contacting, setContacting] = useState(false);
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { isFavorite, toggleFavorite } = useWishlist();
   const { user, isAuthenticated } = useAuth();
+
+  const prodId = product?._id || product?.id || id;
+  const isFav = isFavorite(prodId);
 
   useEffect(() => {
     setLoading(true);
@@ -79,24 +82,9 @@ export default function ProductDetails() {
     navigate("/cart");
   };
 
-  const handleToggleFavorite = async () => {
-    if (!isAuthenticated) {
-      toast.info("Please log in to save items to your wishlist");
-      navigate("/login");
-      return;
-    }
-    try {
-      if (isFav) {
-        await favoriteService?.removeFavorite?.(user.id, id);
-        setIsFav(false);
-        toast.info("Removed from saved items");
-      } else {
-        await favoriteService?.addFavorite?.(user.id, id);
-        setIsFav(true);
-        toast.success("Saved to your campus wishlist!");
-      }
-    } catch {
-      setIsFav(!isFav);
+  const handleToggleFavorite = () => {
+    if (product) {
+      toggleFavorite(product);
     }
   };
 
